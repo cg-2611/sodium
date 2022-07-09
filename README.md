@@ -1,5 +1,5 @@
 # Sodium
-The Sodium Programming Language is currently in the very early stages of development.
+The Sodium programming language is currently in the very early stages of development.
 
 **The Windows operating system is not currently supported.**
 
