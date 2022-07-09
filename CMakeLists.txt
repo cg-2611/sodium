@@ -4,4 +4,10 @@ project(sodium VERSION 0.0.0)
 
 add_executable(nac)
 
+# integrate googletest with ctest
+# including CTest module automatically invokes enable_testing()
+include(CTest)
+
 add_subdirectory(src) # sources are added for sodium compiler executable in src
+add_subdirectory(tests) # executable for sodium compiler tests is created in tests
+add_subdirectory(third_party) # external libraries are linked to executbales in third_party
