@@ -2,7 +2,7 @@
 .gitignore      export-ignore
 .editorconfig   export-ignore
 
-# auto detect text files and perform LF normalization
+# automatically perform LF normalization
 *       text=auto
 
 *.na    text
