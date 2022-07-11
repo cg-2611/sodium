@@ -1,12 +1,10 @@
-#ifndef SODIUM_NAC_MAIN_H_
-#define SODIUM_NAC_MAIN_H_
+#ifndef SODIUM_NAC_MAIN_H
+#define SODIUM_NAC_MAIN_H
 
-namespace sodium {
-namespace nac {
+namespace sodium::nac {
 
 void printHelloWorld();
 
 } // namespace sodium::nac
-} // namespace sodium
 
-#endif // SODIUM_NAC_MAIN_H_
+#endif // SODIUM_NAC_MAIN_H
