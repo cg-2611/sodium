@@ -47,18 +47,6 @@ ctest --test-dir build --output-on-fail
 
 ### Sodium Plan
 ---
-- Version 0.1:
-  - implement file reading for `nac`
+Currently, Sodium is in version 0.0.0.
 
-- Version 0.2:
-  - implement a lexer for `nac`
-
-- Version 0.3:
-  - implement a parser for `nac`
-  - interface `nac` front-end with llvm back-end
-
-- Version 0.4:
-  - compile examples/main.na
-
-- Version 0.5:
-  - start implementing language features
+To see the current plan for future Sodium versions, see [PLAN.md](./PLAN.md).
