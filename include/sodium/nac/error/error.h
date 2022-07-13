@@ -1,5 +1,5 @@
-#ifndef SODIUM_NAC_ERROR_H
-#define SODIUM_NAC_ERROR_H
+#ifndef SODIUM_NAC_ERROR_ERROR_H
+#define SODIUM_NAC_ERROR_ERROR_H
 
 #include <exception>
 #include <string>
@@ -7,17 +7,16 @@
 namespace sodium::nac {
 
 class NACException : public std::exception {
-protected:
-    int code_;
-    std::string message_;
-
 public:
-    NACException(int code, std::string message);
-    virtual ~NACException() {};
+    NACException(std::string message);
+    virtual ~NACException() {}
 
     virtual const char *what() const noexcept override;
+
+protected:
+    std::string message_;
 };
 
 } // namespace sodium::nac
 
-#endif // SODIUM_NAC_ERROR_H
+#endif // SODIUM_NAC_ERROR_ERROR_H
