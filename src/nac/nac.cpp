@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-void sodium::nac::compileFile(const char *filePath) {
+#include "sodium/nac/io/file.h"
+
+void sodium::nac::compileFile(const std::string &filePath) {
     sodium::nac::File file = sodium::nac::File(filePath);
 
     std::cout << file.getPath() << ": " << file.getSize() << "\n";

@@ -1,11 +1,11 @@
 #ifndef SODIUM_NAC_NAC_H
 #define SODIUM_NAC_NAC_H
 
-#include "io/file.h"
+#include <string>
 
 namespace sodium::nac {
 
-void compileFile(const char *filePath);
+void compileFile(const std::string &filePath);
 
 } // namespace sodium::nac
 
