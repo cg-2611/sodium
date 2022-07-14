@@ -2,7 +2,6 @@
 
 #include <cstdio>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "sodium/nac/error/error.h"
