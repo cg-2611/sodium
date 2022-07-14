@@ -7,6 +7,10 @@
 sodium::nac::FileReader::FileReader(const std::string &filePath) {
     path_ = filePath;
     openFile();
+
+    if (!isFileStreamOpen()) {
+        throw sodium::nac::NACException("error opening file " + path_);
+    }
 }
 
 sodium::nac::FileReader::~FileReader() {
@@ -14,12 +18,12 @@ sodium::nac::FileReader::~FileReader() {
 }
 
 size_t sodium::nac::FileReader::readFileContents(std::string &fileContents) {
-    // the file is opened at end of the stream, std::ifstream::tellg() gives
-    // the current position in the input stream the std::streampos is casted to
-    // size_t, this can be done as the std::streampos returned by
-    // std::ifstream::tellg() is an integral type
-    size_t fileSize = (size_t)fileStream_.tellg();
-    fileStream_.seekg(std::ios::beg);
+    // file stream is opened at the end, so tellg() gives the position at end of stream
+    // we then cast the std::streampos value returned by tellg() to a size_t, which is
+    // permissible as std::streampos is fundamentally an integral type
+    // we then return to the beginning of the file stream to read the file
+    size_t fileSize = static_cast<size_t>(fileStream_.tellg());
+    fileStream_.seekg(std::ifstream::beg);
 
     fileContents = std::string(fileSize, 0);
     fileStream_.read(&fileContents[0], fileSize);
@@ -39,10 +43,6 @@ bool sodium::nac::FileReader::isFileStreamOpen() const {
 void sodium::nac::FileReader::openFile() {
     // ifstream is opened on construction
     fileStream_ = std::ifstream(path_, std::ifstream::binary | std::ifstream::ate);
-
-    if (!fileStream_.is_open()) {
-        throw sodium::nac::NACException("error opening file " + path_);
-    }
 }
 
 void sodium::nac::FileReader::closeFile() {

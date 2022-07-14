@@ -4,10 +4,15 @@
 #include "sodium/nac/io/file_reader.h"
 
 sodium::nac::File::File(const std::string &filePath) {
-    sodium::nac::FileReader fileReader = sodium::nac::FileReader(filePath);
-
     path_ = filePath;
-    size_ = fileReader.readFileContents(contents_);
+
+    try {
+        sodium::nac::FileReader fileReader = sodium::nac::FileReader(filePath);
+        size_ = fileReader.readFileContents(contents_);
+    } catch(const sodium::nac::NACException &e) {
+        // pass the exception to the calling function
+        throw e;
+    }
 }
 
 const std::string sodium::nac::File::getPath() const {

@@ -8,11 +8,7 @@ int main(int argc, const char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    try {
-        sodium::nac::compileFile(argv[1]);
-    } catch(const std::exception &e) {
-        std::cerr << e.what() << "\n";
-    }
+    sodium::nac::compileFile(argv[1]);
 
     return EXIT_SUCCESS;
 }
