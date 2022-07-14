@@ -1,12 +1,14 @@
-#include "sodium/nac/main.h"
-
 #include <iostream>
 
-void sodium::nac::printHelloWorld() {
-    std::cout << "Hello World!" << std::endl;
-}
+#include "sodium/nac/nac.h"
 
-int main(int argc, char const *argv[]) {
-    sodium::nac::printHelloWorld();
-    return 0;
+int main(int argc, const char *argv[]) {
+    if (argc != 2) {
+        std::cerr << "invalid arguments passed\n";
+        return EXIT_FAILURE;
+    }
+
+    sodium::nac::compileFile(argv[1]);
+
+    return EXIT_SUCCESS;
 }
