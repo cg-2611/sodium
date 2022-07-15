@@ -6,6 +6,7 @@ target_link_libraries(nac_test PRIVATE naclib)
 target_sources(nac_test
     PRIVATE
         nac/io/file_reader_test.cpp
+        nac/lexer/lexer_test.cpp
 )
 
 add_test(NAME nac_test COMMAND nac_test)
