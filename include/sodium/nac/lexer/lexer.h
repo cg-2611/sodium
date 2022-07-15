@@ -8,7 +8,7 @@ namespace sodium::nac {
 
 class Lexer {
 public:
-    Lexer(File &file);
+    Lexer(const std::string &fileContents);
     ~Lexer() {};
 
     std::shared_ptr<Token> tokenize();
@@ -21,12 +21,12 @@ public:
     std::string readNumericLiteral();
 
 private:
-    File file_;
+    std::string fileContents_;
     size_t index_;
     char character_;
 
-    bool validIdentifierFirstCharacter(char c);
-    bool validIdentifierCharacter(char c);
+    inline bool validIdentifierFirstCharacter(char c);
+    inline bool validIdentifierCharacter(char c);
 
     bool isKeyword(const std::string &identifier);
     bool isType(const std::string &identifier);

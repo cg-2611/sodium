@@ -4,9 +4,10 @@
 
 #include "sodium/nac/error/error.h"
 
-sodium::nac::Lexer::Lexer(sodium::nac::File &file) : file_(file) {
+sodium::nac::Lexer::Lexer(const std::string &fileContents) {
+    fileContents_ = fileContents;
     index_ = 0;
-    character_ = file_.getContents()[index_];
+    character_ = fileContents_[index_];
 }
 
 std::shared_ptr<sodium::nac::Token> sodium::nac::Lexer::tokenize() {
@@ -72,11 +73,11 @@ std::shared_ptr<sodium::nac::Token> sodium::nac::Lexer::getNextToken() {
 void sodium::nac::Lexer::advance(size_t offset) {
     index_ += offset;
 
-    if (index_ >= file_.getSize() || character_ == '\0') {
-        index_ = file_.getSize();
+    if (index_ >= fileContents_.size() || character_ == '\0') {
+        index_ = fileContents_.size();
     }
 
-    character_ = file_.getContents()[index_];
+    character_ = fileContents_[index_];
 }
 
 void sodium::nac::Lexer::skipWhitespace() {
@@ -89,8 +90,8 @@ std::string sodium::nac::Lexer::readIdentifier() {
     std::string identifier = std::string(1, character_);
     size_t identifierIndex = index_ + 1;
 
-    while (validIdentifierCharacter(file_.getContents().at(identifierIndex))) {
-        identifier += file_.getContents().at(identifierIndex++);
+    while (validIdentifierCharacter(fileContents_[identifierIndex])) {
+        identifier += fileContents_[identifierIndex++];
     }
 
     return identifier;
@@ -100,8 +101,8 @@ std::string sodium::nac::Lexer::readNumericLiteral() {
     std::string numericLiteral = std::string(1, character_);
     size_t numericLiteralIndex = index_ + 1;
 
-    while (isdigit(file_.getContents().at(numericLiteralIndex))) {
-        numericLiteral += file_.getContents().at(numericLiteralIndex++);
+    while (isdigit(fileContents_[numericLiteralIndex])) {
+        numericLiteral += fileContents_[numericLiteralIndex++];
     }
 
     return numericLiteral;
@@ -120,5 +121,5 @@ bool sodium::nac::Lexer::isKeyword(const std::string &identifier) {
 }
 
 bool sodium::nac::Lexer::isType(const std::string &identifier) {
-    return sodium::nac::Token::TYPES.find(identifier) != sodium::nac::Token::KEYWORDS.end();
+    return sodium::nac::Token::TYPES.find(identifier) != sodium::nac::Token::TYPES.end();
 }

@@ -10,10 +10,10 @@
 void sodium::nac::compileFile(const std::string &filePath) {
     try {
         sodium::nac::File file = sodium::nac::File(filePath);
-        std::cout << file.getPath() << ": " << file.getSize() << "\n";
-
-        sodium::nac::Lexer lexer = sodium::nac::Lexer(file);
+        sodium::nac::Lexer lexer = sodium::nac::Lexer(file.getContents());
         std::shared_ptr<sodium::nac::Token> token = lexer.tokenize();
+
+        std::cout << file.getPath() << ": " << file.getSize() << "\n";
 
         while (token->getKind() != sodium::nac::TokenKind::TOKEN_EOF) {
             std::cout << "[nac]: " << token->getKindAsString() << ": " << token->getValue() << "\n";
