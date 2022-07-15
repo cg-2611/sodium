@@ -5,6 +5,7 @@ The Sodium programming language is currently in the very early stages of develop
 
 ### Contents:
 - [nac](#nac)
+- [Documentation](#documentation)
 - [Building Sodium](#building-sodium)
 - [Run Unit Tests](#run-unit-tests)
 - [Sodium Plan](#sodium-plan)
@@ -14,6 +15,12 @@ The Sodium programming language is currently in the very early stages of develop
 `nac` is the Sodium compiler. The name is derived from the chemical symbol for the element sodium: **Na c**-ompiler. The Sodium compiler will be able to be used to compiler programs written in Sodium.
 
 The compiler will use [LLVM](https://github.com/llvm/llvm-project) as a compiler back-end.
+
+## Documentation
+---
+The public API found in the include directory contains [doxygen](https://doxygen.nl/) comments to document the classes and methods.
+Currently, documentation is not generated during the build process, however there are plans to change this in the future.
+Feel free to generate the doxygen documentation yourself if you require it.
 
 ## Building Sodium
 ---

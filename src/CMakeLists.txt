@@ -9,6 +9,8 @@ target_sources(naclib
         nac/error/error.cpp
         nac/io/file.cpp
         nac/io/file_reader.cpp
+        nac/lexer/lexer.cpp
+        nac/lexer/token.cpp
 )
 
 # for nac target

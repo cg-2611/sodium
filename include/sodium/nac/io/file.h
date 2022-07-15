@@ -29,7 +29,7 @@ public:
     const std::string getPath() const;
 
     /**
-     * @return The contents of the as a string.
+     * @return The contents of the file as a string.
     */
     const std::string getContents() const;
 

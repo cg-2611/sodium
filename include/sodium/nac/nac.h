@@ -6,7 +6,7 @@
 namespace sodium::nac {
 
 /**
- * -----UNFINISHED, when finished, it will compile a file-----
+ * ---UNFINISHED, when finished, it will compile a file---
  * Compiles a given sodium file.
  * @param filePath path to sodium file to be compiled.
 */
