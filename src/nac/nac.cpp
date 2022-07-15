@@ -18,7 +18,7 @@ void sodium::nac::compileFile(const std::string &filePath) {
         while (token->getKind() != sodium::nac::TokenKind::TOKEN_EOF) {
             std::cout << "[nac]: " << token->getKindAsString() << ": " << token->getValue() << "\n";
 
-            token = token->getNextToken();
+            token = token->getNext();
         }
 
         std::cout << "[nac]: compilation complete\n";
