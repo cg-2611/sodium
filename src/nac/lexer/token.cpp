@@ -39,10 +39,10 @@ const std::string sodium::nac::Token::getValue() const {
     return value_;
 }
 
-const std::shared_ptr<sodium::nac::Token> sodium::nac::Token::getNextToken() const {
+const std::shared_ptr<sodium::nac::Token> sodium::nac::Token::getNext() const {
     return next_;
 }
 
-void sodium::nac::Token::setNextToken(std::shared_ptr<Token> nextToken) {
+void sodium::nac::Token::setNext(std::shared_ptr<Token> nextToken) {
     next_ = nextToken;
 }

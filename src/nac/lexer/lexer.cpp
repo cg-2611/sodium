@@ -21,8 +21,8 @@ std::shared_ptr<sodium::nac::Token> sodium::nac::Lexer::tokenize() {
             skipWhitespace();
 
             std::shared_ptr<sodium::nac::Token> nextToken = getNextToken();
-            currentToken->setNextToken(nextToken);
-            currentToken = currentToken->getNextToken();
+            currentToken->setNext(nextToken);
+            currentToken = currentToken->getNext();
 
             advance(currentToken->getValue().size());
         }
