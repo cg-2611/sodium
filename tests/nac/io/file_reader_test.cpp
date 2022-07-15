@@ -6,13 +6,13 @@
 
 #include "sodium/nac/error/error.h"
 
-const std::string EMPTY_FILE_PATH = "./empty_file.txt";
-const std::string TEST_FILE_PATH = "./test_file.txt";
-const std::string TEST_FILE_TEXT = "Text\n    File used\n\tfor\t\t\nunit testing\n\t  File\nReader\n";
+static const std::string EMPTY_FILE_PATH = "./empty_file.txt";
+static const std::string TEST_FILE_PATH = "./test_file.txt";
+static const std::string TEST_FILE_TEXT = "Text\n    File used\n\tfor\t\t\nunit testing\n\t  File\nReader\n";
 
 class FileReaderTest : public ::testing::Test {
 protected:
-    static void SetUpTestCase() {
+    static void SetUpTestSuite() {
         std::FILE *emptyFile = std::fopen(EMPTY_FILE_PATH.c_str(), "w");
         if (!emptyFile) {
             FAIL() << "FileReaderTest: error creating temporary empty file\n";
@@ -29,7 +29,7 @@ protected:
         std::fclose(tempFile);
     }
 
-    static void TearDownTestCase() {
+    static void TearDownTestSuite() {
         if (std::remove(EMPTY_FILE_PATH.c_str()) != 0) {
             FAIL() << "FileReaderTest: error removing empty temporary file\n";
         }
