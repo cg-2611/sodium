@@ -1,173 +1,247 @@
 #include "sodium/nac/lexer/lexer.h"
 
-#include <vector>
-
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "sodium/nac/error/error.h"
 
-static const std::vector<std::string> tokensToTest = {
-    "", "identifier", "2", ":", "{", "(", "}", ")", ";"
-};
+TEST(LexerTest, LexerReadsEmptyString) {
+    std::string emptyString("");
+    nac::Lexer lexer(emptyString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-static int testTokenIndex;
-static std::string stringToTokenize;
+    ASSERT_EQ(1, tokens.size());
 
-class LexerTest : public ::testing::Test {
-protected:
-    static void SetUpTestSuite() {
-        testTokenIndex = 0;
-        stringToTokenize = tokensToTest[testTokenIndex];
-    }
+    nac::Token &token = tokens[0];
 
-    void SetUp() override {
-        if (testTokenIndex < tokensToTest.size()) {
-            stringToTokenize = tokensToTest[testTokenIndex];
-        }
-
-    }
-
-    void TearDown() override {
-        if (testTokenIndex < tokensToTest.size()) {
-            testTokenIndex++;
-        }
-    }
-};
-
-TEST_F(LexerTest, LexerReadsEmptyString) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
-
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_EOF, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_EOF, token.getKind());
+    EXPECT_EQ(emptyString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsValidIdentifier) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsValidIdentifier) {
+    std::string identifierString("identifier");
+    nac::Lexer lexer(identifierString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
+    EXPECT_EQ(identifierString, token.getValue());
 }
 
+TEST(LexerTest, LexerReadsNumericLiteral) {
+    std::string numericLiteralString("2");
+    nac::Lexer lexer(numericLiteralString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-TEST_F(LexerTest, LexerReadsNumericLiteral) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+    ASSERT_EQ(2, tokens.size());
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_NUMERIC_LITERAL, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_NUMERIC_LITERAL, token.getKind());
+    EXPECT_EQ(numericLiteralString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsColon) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsColon) {
+    std::string colonString(":");
+    nac::Lexer lexer(colonString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_COLON, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_COLON, token.getKind());
+    EXPECT_EQ(colonString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsLeftBrace) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsLeftBrace) {
+    std::string leftBraceString("{");
+    nac::Lexer lexer(leftBraceString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_LEFT_BRACE, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_BRACE, token.getKind());
+    EXPECT_EQ(leftBraceString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsLeftParen) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsLeftParen) {
+    std::string leftParenString("(");
+    nac::Lexer lexer(leftParenString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_LEFT_PAREN, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_PAREN, token.getKind());
+    EXPECT_EQ(leftParenString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsRightBrace) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsRightBrace) {
+    std::string rightBraceString("}");
+    nac::Lexer lexer(rightBraceString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_RIGHT_BRACE, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_RIGHT_BRACE, token.getKind());
+    EXPECT_EQ(rightBraceString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsRightParen) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsRightParen) {
+    std::string rightParenString(")");
+    nac::Lexer lexer(rightParenString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_RIGHT_PAREN, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_RIGHT_PAREN, token.getKind());
+    EXPECT_EQ(rightParenString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsSemiColon) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(stringToTokenize);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsSemiColon) {
+    std::string semiColonString(";");
+    nac::Lexer lexer(semiColonString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_SEMI_COLON, token.getKind());
-    EXPECT_EQ(stringToTokenize, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_SEMI_COLON, token.getKind());
+    EXPECT_EQ(semiColonString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsAllKeywords) {
-    for (auto &&keyword : sodium::nac::Token::KEYWORDS) {
-        sodium::nac::Lexer lexer = sodium::nac::Lexer(keyword);
-        sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsAllKeywords) {
+    for (auto &&keyword : nac::KEYWORDS) {
+        nac::Lexer lexer(keyword);
+        std::vector<nac::Token> tokens = lexer.tokenize();
 
-        EXPECT_EQ(sodium::nac::TokenKind::TOKEN_KEYWORD, token.getKind());
+        ASSERT_EQ(2, tokens.size());
+
+        nac::Token &token = tokens[0];
+
+        EXPECT_EQ(nac::TokenKind::TOKEN_KEYWORD, token.getKind());
         EXPECT_EQ(keyword, token.getValue());
     }
 }
 
-TEST_F(LexerTest, LexerReadsAllTypes) {
-    for (auto &&type : sodium::nac::Token::TYPES) {
-        sodium::nac::Lexer lexer = sodium::nac::Lexer(type);
-        sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsAllTypes) {
+    for (auto &&type : nac::TYPES) {
+        nac::Lexer lexer(type);
+        std::vector<nac::Token> tokens = lexer.tokenize();
 
-        EXPECT_EQ(sodium::nac::TokenKind::TOKEN_TYPE, token.getKind());
+        ASSERT_EQ(2, tokens.size());
+
+        nac::Token &token = tokens[0];
+
+        EXPECT_EQ(nac::TokenKind::TOKEN_TYPE, token.getKind());
         EXPECT_EQ(type, token.getValue());
     }
 }
 
-TEST_F(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
-    std::string identifierToTest = "_identifier";
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(identifierToTest);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
+    std::string identifierString("_identifier");
+    nac::Lexer lexer(identifierString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ(identifierToTest, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
+    EXPECT_EQ(identifierString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerReadsValidIdentifierWith$Prefix) {
-    std::string identifierToTest = "$identifier";
-    sodium::nac::Lexer lexer = sodium::nac::Lexer(identifierToTest);
-    sodium::nac::Token token = *(lexer.tokenize());
+TEST(LexerTest, LexerReadsValidIdentifierWith$Prefix) {
+    std::string identifierString("$identifier");
+    nac::Lexer lexer(identifierString);
+    std::vector<nac::Token> tokens = lexer.tokenize();
 
-    EXPECT_EQ(sodium::nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ(identifierToTest, token.getValue());
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
+    EXPECT_EQ(identifierString, token.getValue());
 }
 
-TEST_F(LexerTest, LexerRejectsInvalidIdentifier1) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer("§identifier");
+TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
+    nac::Lexer lexer("identifier 2;");
+    std::vector<nac::Token> tokens = lexer.tokenize();
+
+    ASSERT_EQ(4, tokens.size());
+
+    nac::Token &token1 = tokens[0];
+    nac::Token &token2 = tokens[1];
+    nac::Token &token3 = tokens[2];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token1.getKind());
+    EXPECT_EQ("identifier", token1.getValue());
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_NUMERIC_LITERAL, token2.getKind());
+    EXPECT_EQ("2", token2.getValue());
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_SEMI_COLON, token3.getKind());
+    EXPECT_EQ(";", token3.getValue());
+}
+
+TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
+    nac::Lexer lexer("§identifier");
 
     EXPECT_THROW(
-        sodium::nac::Token token = *(lexer.tokenize()),
-        sodium::nac::NACException
+        lexer.tokenize(),
+        nac::Exception
     );
 }
 
-TEST_F(LexerTest, LexerRejectsInvalidIdentifier2) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer("ident§ifier");
+TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
+    nac::Lexer lexer("ident§ifier");
 
     EXPECT_THROW(
-        sodium::nac::Token token = *(lexer.tokenize()),
-        sodium::nac::NACException
+        lexer.tokenize(),
+        nac::Exception
     );
 }
 
-TEST_F(LexerTest, LexerRejectsInvalidToken) {
-    sodium::nac::Lexer lexer = sodium::nac::Lexer("§");
+TEST(LexerTest, LexerRejectsInvalidToken) {
+    nac::Lexer lexer("§");
 
     EXPECT_THROW(
-        sodium::nac::Token token = *(lexer.tokenize()),
-        sodium::nac::NACException
+        lexer.tokenize(),
+        nac::Exception
     );
+}
+
+TEST(LexerTest, LexerSkipsWhitespace1) {
+    nac::Lexer lexer("  \n    \t \r\f \v   ");
+    std::vector<nac::Token> tokens = lexer.tokenize();
+
+    ASSERT_EQ(1, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_EOF, token.getKind());
+    EXPECT_EQ("", token.getValue());
+}
+
+TEST(LexerTest, LexerSkipsWhitespace2) {
+    nac::Lexer lexer("  \n    \t \ridentifier\f \v   ");
+    std::vector<nac::Token> tokens = lexer.tokenize();
+
+    ASSERT_EQ(2, tokens.size());
+
+    nac::Token &token = tokens[0];
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
+    EXPECT_EQ("identifier", token.getValue());
 }

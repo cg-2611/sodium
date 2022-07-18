@@ -1,17 +1,17 @@
-#ifndef SODIUM_NAC_NAC_H
-#define SODIUM_NAC_NAC_H
+#ifndef NAC_NAC_H
+#define NAC_NAC_H
 
-#include <string>
+#include "sodium/nac/io/file.h"
 
-namespace sodium::nac {
+namespace nac {
 
 /**
  * ---UNFINISHED, when finished, it will compile a file---
  * Compiles a given sodium file.
  * @param filePath path to sodium file to be compiled.
 */
-void compileFile(const std::string &filePath);
+void compileFile(File &file);
 
-} // namespace sodium::nac
+} // namespace nac
 
-#endif // SODIUM_NAC_NAC_H
+#endif // NAC_NAC_H

@@ -4,122 +4,111 @@
 
 #include "sodium/nac/error/error.h"
 
-sodium::nac::Lexer::Lexer(const std::string &fileContents) {
-    fileContents_ = fileContents;
-    index_ = 0;
-    character_ = fileContents_[index_];
-}
+nac::Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
-std::shared_ptr<sodium::nac::Token> sodium::nac::Lexer::tokenize() {
-    try {
-        std::shared_ptr<sodium::nac::Token> token = getNextToken();
-        std::shared_ptr<sodium::nac::Token> currentToken = token;
+std::vector<nac::Token> nac::Lexer::tokenize() {
+    std::vector<nac::Token> tokens{};
 
-        advance(currentToken->getValue().size());
+    // skip any leading whitespace
+    skipWhitespace();
 
-        while(character_ != '\0') {
-            skipWhitespace();
+    while (index_ < string_.size()) {
+        nac::Token token = getNextToken();
+        tokens.push_back(token);
 
-            std::shared_ptr<sodium::nac::Token> nextToken = getNextToken();
-            currentToken->setNext(nextToken);
-            currentToken = currentToken->getNext();
-
-            advance(currentToken->getValue().size());
-        }
-
-        return token;
-    } catch (const sodium::nac::NACException &e) {
-        // pass exception to the calling function
-        throw e;
+        advance(token.getValue().size());
+        skipWhitespace();
     }
+
+    // add the EOF token to the end of the vector once end of string reached
+    tokens.push_back(nac::Token(nac::TokenKind::TOKEN_EOF, ""));
+
+    return tokens;
 }
 
-std::shared_ptr<sodium::nac::Token> sodium::nac::Lexer::getNextToken() {
-    if (validIdentifierFirstCharacter(character_)) {
-        std::string identifier = readIdentifier();
+nac::Token nac::Lexer::getNextToken() {
+    // if we have come across an identifier
+    if (validIdentifierFirstCharacter(string_[index_])) {
+        // extract the identifier from the string
+        std::string identifier(string_.substr(index_, getIdentifierLength()));
 
         if (isKeyword(identifier)) {
-            return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_KEYWORD, identifier));
+            return nac::Token(nac::TokenKind::TOKEN_KEYWORD, identifier);
         }
 
         if (isType(identifier)) {
-            return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_TYPE, identifier));
+            return nac::Token(nac::TokenKind::TOKEN_TYPE, identifier);
         }
 
-        return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_IDENTIFIER, identifier));
+        return nac::Token(nac::TokenKind::TOKEN_IDENTIFIER, identifier);
     }
 
-    if (isdigit(character_)) {
-        std::string numericLiteral = readNumericLiteral();
-        return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_NUMERIC_LITERAL, numericLiteral));
+    // if we have come across a numeric literal
+    if (isdigit(string_[index_])) {
+        // extract the numeric literal from the string
+        std::string numericLiteral(string_.substr(index_, getNumericLiteralLength()));
+        return nac::Token(nac::TokenKind::TOKEN_NUMERIC_LITERAL, numericLiteral);
     }
 
-    switch (character_) {
-        case '(': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_LEFT_PAREN, "("));
-        case ')': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_RIGHT_PAREN, ")"));
-        case '{': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_LEFT_BRACE, "{"));
-        case '}': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_RIGHT_BRACE, "}"));
-        case ':': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_COLON, ":"));
-        case ';': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_SEMI_COLON, ";"));
-        case '\0': return std::make_shared<sodium::nac::Token>(Token(sodium::nac::TokenKind::TOKEN_EOF, ""));
+    // otherwise
+    switch (string_[index_]) {
+        case ':': return nac::Token(nac::TokenKind::TOKEN_COLON, ":");
+        case '{': return nac::Token(nac::TokenKind::TOKEN_LEFT_BRACE, "{");
+        case '(': return nac::Token(nac::TokenKind::TOKEN_LEFT_PAREN, "(");
+        case '}': return nac::Token(nac::TokenKind::TOKEN_RIGHT_BRACE, "}");
+        case ')': return nac::Token(nac::TokenKind::TOKEN_RIGHT_PAREN, ")");
+        case ';': return nac::Token(nac::TokenKind::TOKEN_SEMI_COLON, ";");
         default:
             std::string message = std::string("unexpected token \'\'");
-            message.insert(message.size() - 1, 1, character_);
-            throw sodium::nac::NACException(message);
+            message.insert(message.size() - 1, 1, string_[index_]);
+            throw nac::Exception(message);
     }
-
 }
 
-void sodium::nac::Lexer::advance(size_t offset) {
+void nac::Lexer::advance(size_t offset) {
     index_ += offset;
 
-    if (index_ >= fileContents_.size() || character_ == '\0') {
-        index_ = fileContents_.size();
+    if (index_ > string_.size()) {
+        index_ = string_.size();
     }
-
-    character_ = fileContents_[index_];
 }
 
-void sodium::nac::Lexer::skipWhitespace() {
-    while (isspace(character_)) {
+void nac::Lexer::skipWhitespace() {
+    while (std::isspace(string_[index_])) {
         advance(1);
     }
 }
 
-std::string sodium::nac::Lexer::readIdentifier() {
-    std::string identifier = std::string(1, character_);
-    size_t identifierIndex = index_ + 1;
-
-    while (validIdentifierCharacter(fileContents_[identifierIndex])) {
-        identifier += fileContents_[identifierIndex++];
+size_t nac::Lexer::getIdentifierLength() {
+    size_t end = index_;
+    while (end < string_.size() && validIdentifierCharacter(string_[end])) {
+        end++;
     }
 
-    return identifier;
+    return end - index_;
 }
 
-std::string sodium::nac::Lexer::readNumericLiteral() {
-    std::string numericLiteral = std::string(1, character_);
-    size_t numericLiteralIndex = index_ + 1;
-
-    while (isdigit(fileContents_[numericLiteralIndex])) {
-        numericLiteral += fileContents_[numericLiteralIndex++];
+size_t nac::Lexer::getNumericLiteralLength() {
+    size_t end = index_;
+    while (end < string_.size() && std::isdigit(string_[end])) {
+        end++;
     }
 
-    return numericLiteral;
+    return end - index_;
 }
 
-bool sodium::nac::Lexer::validIdentifierFirstCharacter(char c) {
-    return isalpha(c) || c == '_' || c == '$';
+inline bool nac::Lexer::validIdentifierFirstCharacter(char c) {
+    return std::isalpha(c) || c == '_' || c == '$';
 }
 
-bool sodium::nac::Lexer::validIdentifierCharacter(char c) {
-    return validIdentifierFirstCharacter(c) || isdigit(c);
+inline bool nac::Lexer::validIdentifierCharacter(char c) {
+    return validIdentifierFirstCharacter(c) || std::isdigit(c);
 }
 
-bool sodium::nac::Lexer::isKeyword(const std::string &identifier) {
-    return sodium::nac::Token::KEYWORDS.find(identifier) != sodium::nac::Token::KEYWORDS.end();
+inline bool nac::Lexer::isKeyword(const std::string &identifier) {
+    return nac::KEYWORDS.find(identifier) != nac::KEYWORDS.end();
 }
 
-bool sodium::nac::Lexer::isType(const std::string &identifier) {
-    return sodium::nac::Token::TYPES.find(identifier) != sodium::nac::Token::TYPES.end();
+inline bool nac::Lexer::isType(const std::string &identifier) {
+    return nac::TYPES.find(identifier) != nac::TYPES.end();
 }

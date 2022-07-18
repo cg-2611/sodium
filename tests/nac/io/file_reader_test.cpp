@@ -2,7 +2,7 @@
 
 #include <cstdio>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "sodium/nac/error/error.h"
 
@@ -42,31 +42,23 @@ protected:
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
     EXPECT_THROW(
-        sodium::nac::FileReader fileReader = sodium::nac::FileReader("./file_does_not_exist.txt"),
-        sodium::nac::NACException
+        std::string fileContents;
+        nac::io::readFile("./file_does_not_exist.txt", fileContents),
+        nac::Exception
     );
 }
 
-TEST_F(FileReaderTest, FileStreamIsOpenAfterConstruction) {
-    sodium::nac::FileReader fileReader = sodium::nac::FileReader(TEST_FILE_PATH);
-    EXPECT_TRUE(fileReader.isFileStreamOpen());
-}
-
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {
-    sodium::nac::FileReader fileReader = sodium::nac::FileReader(TEST_FILE_PATH);
-
     std::string fileContents;
-    size_t fileSize = fileReader.readFileContents(fileContents);
+    size_t fileSize = nac::io::readFile(TEST_FILE_PATH, fileContents);
 
     EXPECT_EQ(TEST_FILE_TEXT, fileContents);
     EXPECT_EQ(fileSize, fileContents.size());
 }
 
 TEST_F(FileReaderTest, EmptyFileCanBeRead) {
-    sodium::nac::FileReader fileReader = sodium::nac::FileReader(EMPTY_FILE_PATH);
-
     std::string fileContents;
-    size_t fileSize = fileReader.readFileContents(fileContents);
+    size_t fileSize = nac::io::readFile(EMPTY_FILE_PATH, fileContents);
 
     EXPECT_EQ("", fileContents);
     EXPECT_EQ(fileSize, fileContents.size());

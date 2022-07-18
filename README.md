@@ -49,7 +49,7 @@ The executable can then be run using:
 ---
 To run the unit tests for the Sodium compiler, first, build the project using:
 ```
-cmake -B build -DENABLE_TESTS=ON
+cmake -B build -DBUILD_TESTS=ON
 ```
 Then from the root directory of Sodium, run the following command:
 ```

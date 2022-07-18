@@ -1,78 +1,60 @@
-#ifndef SODIUM_NAC_LEXER_LEXER_H
-#define SODIUM_NAC_LEXER_LEXER_H
+#ifndef NAC_LEXER_LEXER_H
+#define NAC_LEXER_LEXER_H
+
+#include <vector>
 
 #include "sodium/nac/io/file.h"
 #include "sodium/nac/lexer/token.h"
 
-namespace sodium::nac {
+namespace nac {
 
 /**
- * This class is used to extract the recognised sodium tokens from a string.
+ * Used to extract, from a string, any tokens used in the Sodium programming language.
 */
 class Lexer {
 public:
     /**
-     * Constructor for Lexer.
-     * @param fileContents the string to be tokenized by the lexer.
+     * Constructor for Lexer. Initializes private members.
+     * @param string The string to be tokenized.
     */
-    Lexer(const std::string &fileContents);
+    Lexer(std::string_view string);
 
     /**
      * Destructor for Lexer.
     */
-    ~Lexer() {};
+    ~Lexer() {}
 
     /**
-     * Extracts the tokens from the string stored when the lexer is constructed.
-     * @return An std::shared_ptr<Token> pointer to the first token in the string.
+     * Extracts the Sodium programming language tokens from the string.
+     * @return An std::vector<Token> of tokens extracted from the string.
     */
-    std::shared_ptr<Token> tokenize();
-
-    /**
-     * @return An std::shared_ptr<Token> pointer to the next token in the string from
-     * the current position of the lexer.
-    */
-    std::shared_ptr<Token> getNextToken();
-
-    /**
-     * Change the position of the lexer in the string. The lexer only moves forward in the string.
-     * @param offset the number of characters to move the lexer forward in the string.
-    */
-    void advance(size_t offset);
-
-    /**
-     * Move the lexer over any consecutive whitespace characters.
-    */
-    void skipWhitespace();
-
-    /**
-     * Reads and constructs an identifier value from the current position of the lexer in the string.
-     * This method does not modify the position of the lexer in the string, i.e. after the method returns,
-     * the lexer will still be at the character at the start of the identifier.
-     * @return The identifier read by the lexer as a string.
-    */
-    std::string readIdentifier();
-
-    /**
-     * Reads and constructs a numeric literal value (as a string) from the current position of the lexer in the string.
-     * This method does not modify the position of the lexer in the string, i.e. after the method returns,
-     * the lexer will still be at the character at the start of the numeric literal.
-     * @return The numeric literal read by the lexer as a string.
-    */
-    std::string readNumericLiteral();
+    std::vector<Token> tokenize();
 
 private:
-    std::string fileContents_;
+    std::string_view string_;
     size_t index_;
-    char character_;
 
+    // returns the next token in the string from the current position of the lexer
+    // note: index_ is not updated
+    Token getNextToken();
+
+    // increase index_ by offset characters
+    // index_ will not exceed the length of the string
+    void advance(size_t offset);
+    void skipWhitespace(); // moves the lexer over all consecutive whitespace characters
+
+    size_t getIdentifierLength(); // returns the length of an identifier from index_
+    size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
+
+    // returns true if c is a valid character to begin an identifier
     inline bool validIdentifierFirstCharacter(char c);
+    // returns true if c is a valid character to be anywhere in the identifier after the first character
     inline bool validIdentifierCharacter(char c);
 
-    bool isKeyword(const std::string &identifier);
-    bool isType(const std::string &identifier);
+    inline bool isKeyword(const std::string &identifier); // returns true if identifier is a keyword
+    inline bool isType(const std::string &identifier); // returns true if identifier is a type
 };
 
-} // namespace sodium::nac
+} // namespace nac
 
-#endif // SODIUM_NAC_LEXER_LEXER_H
+#endif // NAC_LEXER_LEXER_H

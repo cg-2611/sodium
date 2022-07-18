@@ -6,7 +6,7 @@ add_executable(nac)
 
 add_subdirectory(src) # sources are added for sodium compiler executable in src
 
-if(ENABLE_TESTS)
+if(BUILD_TESTS)
     # integrate googletest with ctest
     # including CTest module automatically invokes enable_testing()
     include(CTest)

@@ -1,51 +1,21 @@
-#ifndef SODIUM_NAC_IO_FILE_READER_H
-#define SODIUM_NAC_IO_FILE_READER_H
+#ifndef NAC_IO_FILE_READER_H
+#define NAC_IO_FILE_READER_H
 
-#include <fstream>
 #include <string>
 
-namespace sodium::nac {
+namespace nac {
+namespace io {
 
 /**
- * This class can be used to read a file.
+ * Function used to read the contents of a file.
+ * @param filePath The path to the file of which the contents are to be read.
+ * @param fileContents [out] The string where the contents of the file are read into.
+ * @return The size in bytes of the file read.
+ * @throws An nac::Exception when the file fails to be opened, or when the file is failed to be read.
 */
-class FileReader {
-public:
-    /**
-     * Constructor for FileReader. A file stream is opened in binary mode and at the end of the stream
-     * for the provided file when this is called.
-     * @param filePath the path to the file to be read.
-     * @throws NACException if opening the file fails.
-    */
-    FileReader(const std::string &filePath);
+size_t readFile(const std::string &filePath, std::string &fileContents);
 
-    /**
-     * Destructor for FileReader. The file stream is closed when this is called.
-    */
-    ~FileReader();
+} // namespace nac::io
+} // namespace nac
 
-    /**
-     * Reads the contents of the file as a string using the file stream opened in the constructor.
-     * @param fileContents [out] a string of the contents of the file.
-     * @return The size of the file in bytes.
-     * @throws NACException if the failbit or badbit of the file stream are set during the read.
-    */
-    size_t readFileContents(std::string &fileContents);
-
-    /**
-     * @return True if the file stream is open.
-    */
-    bool isFileStreamOpen() const;
-
-private:
-    std::string path_;
-    std::ifstream fileStream_;
-
-
-    void openFile();  // creates and opens fileStream_
-    void closeFile(); // closes fileStream_
-};
-
-} // namespace sodium::nac
-
-#endif // SODIUM_NAC_IO_FILE_READER_H
+#endif // NAC_IO_FILE_READER_H

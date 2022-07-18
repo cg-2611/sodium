@@ -8,7 +8,7 @@ target_include_directories(nac PRIVATE ${LLVM_INCLUDE_DIRS})
 llvm_map_components_to_libnames(LLVM_LIBS support core irreader)
 target_link_libraries(nac PRIVATE ${LLVM_LIBS})
 
-if(ENABLE_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(googletest)
 
     # add googletest libraries to sodium compiler test target
@@ -16,4 +16,3 @@ if(ENABLE_TESTS)
     target_link_directories(nac_test PRIVATE ${CMAKE_BINARY_DIR}/lib)
     target_link_libraries(nac_test PRIVATE gtest gtest_main gmock gmock_main)
 endif()
-

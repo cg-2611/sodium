@@ -1,27 +1,26 @@
-#ifndef SODIUM_NAC_ERROR_ERROR_H
-#define SODIUM_NAC_ERROR_ERROR_H
+#ifndef NAC_ERROR_ERROR_H
+#define NAC_ERROR_ERROR_H
 
 #include <exception>
 #include <string>
 
-namespace sodium::nac {
+namespace nac {
 
 /**
- * This class inherits std::exception and is used to handle sodium compiler errors.
+ * Used to handle errors from the Sodium compiler. Inherits std::exception.
 */
-class NACException : public std::exception {
+class Exception : public std::exception {
 public:
     /**
-     * Constructor for NACException. The string value of errno is appended to the message argument
-     * when this is called.
-     * @param message the message to be output when the what() method is called.
+     * Constructor for Exception.
+     * @param message The message to be output when the what() method is called.
     */
-    NACException(std::string message);
+    Exception(std::string message);
 
     /**
-     * Destructor for NACException.
+     * Destructor for Exception.
     */
-    virtual ~NACException() {}
+    virtual ~Exception() {}
 
     /**
      * Inherited from std::exception.
@@ -29,9 +28,10 @@ public:
     virtual const char *what() const noexcept override;
 
 protected:
+    // the error message to be output when what() is called
     std::string message_;
 };
 
-} // namespace sodium::nac
+} // namespace nac
 
-#endif // SODIUM_NAC_ERROR_ERROR_H
+#endif // NAC_ERROR_ERROR_H

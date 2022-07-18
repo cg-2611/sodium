@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "sodium/nac/error/error.h"
+#include "sodium/nac/io/file.h"
 #include "sodium/nac/nac.h"
 
 int main(int argc, const char *argv[]) {
@@ -8,7 +10,13 @@ int main(int argc, const char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    sodium::nac::compileFile(argv[1]);
+    try {
+        nac::File file(argv[1]);
+        nac::compileFile(file);
+    } catch(const nac::Exception &e) {
+        std::cerr << e.what() << "\n";
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
