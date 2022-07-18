@@ -3,6 +3,8 @@ Checks: "-*, bugprone-*, cppcoreguidelines-*, llvm-header-guard, llvm-include-or
 CheckOptions:
   - key:             readability-identifier-naming.ClassCase
     value:           CamelCase
+  - key:             readability-identifier-naming.ClassMemberSuffix
+    value:           _
   - key:             readability-identifier-naming.ConstantCase
     value:           UPPER_CASE
   - key:             readability-identifier-naming.EnumCase
