@@ -2,7 +2,7 @@
 
 #include <cctype>
 
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/exception.h"
 
 nac::Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
@@ -16,7 +16,7 @@ std::vector<nac::Token> nac::Lexer::tokenize() {
         nac::Token token = getNextToken();
         tokens.push_back(token);
 
-        advance(token.getValue().size());
+        advance(token.value().size());
         skipWhitespace();
     }
 

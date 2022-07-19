@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/exception.h"
 #include "sodium/nac/io/file.h"
 #include "sodium/nac/nac.h"
 

@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/exception.h"
 
 TEST(LexerTest, LexerReadsEmptyString) {
     std::string emptyString("");
@@ -13,8 +13,8 @@ TEST(LexerTest, LexerReadsEmptyString) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_EOF, token.getKind());
-    EXPECT_EQ(emptyString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_EOF, token.kind());
+    EXPECT_EQ(emptyString, token.value());
 }
 
 TEST(LexerTest, LexerReadsValidIdentifier) {
@@ -26,8 +26,8 @@ TEST(LexerTest, LexerReadsValidIdentifier) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ(identifierString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.kind());
+    EXPECT_EQ(identifierString, token.value());
 }
 
 TEST(LexerTest, LexerReadsNumericLiteral) {
@@ -39,8 +39,8 @@ TEST(LexerTest, LexerReadsNumericLiteral) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_NUMERIC_LITERAL, token.getKind());
-    EXPECT_EQ(numericLiteralString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_NUMERIC_LITERAL, token.kind());
+    EXPECT_EQ(numericLiteralString, token.value());
 }
 
 TEST(LexerTest, LexerReadsColon) {
@@ -52,8 +52,8 @@ TEST(LexerTest, LexerReadsColon) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_COLON, token.getKind());
-    EXPECT_EQ(colonString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_COLON, token.kind());
+    EXPECT_EQ(colonString, token.value());
 }
 
 TEST(LexerTest, LexerReadsLeftBrace) {
@@ -65,8 +65,8 @@ TEST(LexerTest, LexerReadsLeftBrace) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_BRACE, token.getKind());
-    EXPECT_EQ(leftBraceString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_BRACE, token.kind());
+    EXPECT_EQ(leftBraceString, token.value());
 }
 
 TEST(LexerTest, LexerReadsLeftParen) {
@@ -78,8 +78,8 @@ TEST(LexerTest, LexerReadsLeftParen) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_PAREN, token.getKind());
-    EXPECT_EQ(leftParenString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_PAREN, token.kind());
+    EXPECT_EQ(leftParenString, token.value());
 }
 
 TEST(LexerTest, LexerReadsRightBrace) {
@@ -91,8 +91,8 @@ TEST(LexerTest, LexerReadsRightBrace) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_RIGHT_BRACE, token.getKind());
-    EXPECT_EQ(rightBraceString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_RIGHT_BRACE, token.kind());
+    EXPECT_EQ(rightBraceString, token.value());
 }
 
 TEST(LexerTest, LexerReadsRightParen) {
@@ -104,8 +104,8 @@ TEST(LexerTest, LexerReadsRightParen) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_RIGHT_PAREN, token.getKind());
-    EXPECT_EQ(rightParenString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_RIGHT_PAREN, token.kind());
+    EXPECT_EQ(rightParenString, token.value());
 }
 
 TEST(LexerTest, LexerReadsSemiColon) {
@@ -117,8 +117,8 @@ TEST(LexerTest, LexerReadsSemiColon) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_SEMI_COLON, token.getKind());
-    EXPECT_EQ(semiColonString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_SEMI_COLON, token.kind());
+    EXPECT_EQ(semiColonString, token.value());
 }
 
 TEST(LexerTest, LexerReadsAllKeywords) {
@@ -130,8 +130,8 @@ TEST(LexerTest, LexerReadsAllKeywords) {
 
         nac::Token &token = tokens[0];
 
-        EXPECT_EQ(nac::TokenKind::TOKEN_KEYWORD, token.getKind());
-        EXPECT_EQ(keyword, token.getValue());
+        EXPECT_EQ(nac::TokenKind::TOKEN_KEYWORD, token.kind());
+        EXPECT_EQ(keyword, token.value());
     }
 }
 
@@ -144,8 +144,8 @@ TEST(LexerTest, LexerReadsAllTypes) {
 
         nac::Token &token = tokens[0];
 
-        EXPECT_EQ(nac::TokenKind::TOKEN_TYPE, token.getKind());
-        EXPECT_EQ(type, token.getValue());
+        EXPECT_EQ(nac::TokenKind::TOKEN_TYPE, token.kind());
+        EXPECT_EQ(type, token.value());
     }
 }
 
@@ -158,8 +158,8 @@ TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ(identifierString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.kind());
+    EXPECT_EQ(identifierString, token.value());
 }
 
 TEST(LexerTest, LexerReadsValidIdentifierWith$Prefix) {
@@ -171,8 +171,8 @@ TEST(LexerTest, LexerReadsValidIdentifierWith$Prefix) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ(identifierString, token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.kind());
+    EXPECT_EQ(identifierString, token.value());
 }
 
 TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
@@ -185,14 +185,14 @@ TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
     nac::Token &token2 = tokens[1];
     nac::Token &token3 = tokens[2];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token1.getKind());
-    EXPECT_EQ("identifier", token1.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token1.kind());
+    EXPECT_EQ("identifier", token1.value());
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_NUMERIC_LITERAL, token2.getKind());
-    EXPECT_EQ("2", token2.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_NUMERIC_LITERAL, token2.kind());
+    EXPECT_EQ("2", token2.value());
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_SEMI_COLON, token3.getKind());
-    EXPECT_EQ(";", token3.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_SEMI_COLON, token3.kind());
+    EXPECT_EQ(";", token3.value());
 }
 
 TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
@@ -230,8 +230,8 @@ TEST(LexerTest, LexerSkipsWhitespace1) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_EOF, token.getKind());
-    EXPECT_EQ("", token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_EOF, token.kind());
+    EXPECT_EQ("", token.value());
 }
 
 TEST(LexerTest, LexerSkipsWhitespace2) {
@@ -242,6 +242,6 @@ TEST(LexerTest, LexerSkipsWhitespace2) {
 
     nac::Token &token = tokens[0];
 
-    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.getKind());
-    EXPECT_EQ("identifier", token.getValue());
+    EXPECT_EQ(nac::TokenKind::TOKEN_IDENTIFIER, token.kind());
+    EXPECT_EQ("identifier", token.value());
 }

@@ -25,17 +25,17 @@ public:
     /**
      * @return The path of the file as a string.
     */
-    const std::string & getPath() const;
+    const std::string & path() const;
 
     /**
      * @return The contents of the file as a string.
     */
-    const std::string & getContents() const;
+    const std::string & contents() const;
 
     /**
      * @return The size of the file in bytes.
     */
-    size_t getSize() const;
+    size_t size() const;
 
 private:
     std::string path_;

@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/exception.h"
 
 static const std::string EMPTY_FILE_PATH = "./empty_file.txt";
 static const std::string TEST_FILE_PATH = "./test_file.txt";
@@ -42,23 +42,20 @@ protected:
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
     EXPECT_THROW(
-        std::string fileContents;
-        nac::io::readFile("./file_does_not_exist.txt", fileContents),
+        nac::io::readFile("./file_does_not_exist.txt"),
         nac::Exception
     );
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {
-    std::string fileContents;
-    size_t fileSize = nac::io::readFile(TEST_FILE_PATH, fileContents);
+    auto [fileSize, fileContents] = nac::io::readFile(TEST_FILE_PATH);
 
     EXPECT_EQ(TEST_FILE_TEXT, fileContents);
     EXPECT_EQ(fileSize, fileContents.size());
 }
 
 TEST_F(FileReaderTest, EmptyFileCanBeRead) {
-    std::string fileContents;
-    size_t fileSize = nac::io::readFile(EMPTY_FILE_PATH, fileContents);
+    auto [fileSize, fileContents] = nac::io::readFile(EMPTY_FILE_PATH);
 
     EXPECT_EQ("", fileContents);
     EXPECT_EQ(fileSize, fileContents.size());

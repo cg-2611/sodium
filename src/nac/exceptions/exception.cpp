@@ -1,4 +1,4 @@
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/exception.h"
 
 nac::Exception::Exception(std::string message) {
     message_ = "[nac]: " + message;

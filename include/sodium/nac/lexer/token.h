@@ -52,18 +52,18 @@ public:
     /**
      * @return The kind of this token.
     */
-    TokenKind getKind() const;
+    TokenKind kind() const;
 
     /**
      * @return The kind of this token as a string. The string will match the
      * corresponding nac::TokenKind enum identifier.
     */
-    const std::string getKindAsString() const;
+    const std::string kindString() const;
 
     /**
      * @return The value of this token as a string.
     */
-    const std::string & getValue() const;
+    const std::string & value() const;
 
 private:
     TokenKind kind_;

@@ -2,11 +2,11 @@
 
 nac::Token::Token(nac::TokenKind kind, const std::string &value) : kind_(kind), value_(value) {}
 
-nac::TokenKind nac::Token::getKind() const {
+nac::TokenKind nac::Token::kind() const {
     return kind_;
 }
 
-const std::string nac::Token::getKindAsString() const {
+const std::string nac::Token::kindString() const {
     switch (kind_) {
         case nac::TokenKind::TOKEN_EOF: return "TOKEN_EOF";
         case nac::TokenKind::TOKEN_KEYWORD: return "TOKEN_KEYWORD";
@@ -23,6 +23,6 @@ const std::string nac::Token::getKindAsString() const {
     }
 }
 
-const std::string & nac::Token::getValue() const {
+const std::string & nac::Token::value() const {
     return value_;
 }

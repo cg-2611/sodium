@@ -2,10 +2,10 @@
 
 #include <fstream>
 
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/exception.h"
 
-size_t nac::io::readFile(const std::string &filePath, std::string &fileContents) {
-    std::ifstream fileStream(filePath, std::ifstream::binary | std::ifstream::ate);
+std::tuple<size_t, std::string> nac::io::readFile(const std::string &filePath) {
+    std::ifstream fileStream(filePath, std::ifstream::ate);
 
     // fileStream_ is opened on construction
     if (!fileStream.is_open()) {
@@ -19,7 +19,7 @@ size_t nac::io::readFile(const std::string &filePath, std::string &fileContents)
     size_t fileSize = static_cast<size_t>(fileStream.tellg());
     fileStream.seekg(std::ifstream::beg);
 
-    fileContents = std::string(fileSize, 0);
+    std::string fileContents(fileSize, 0);
     fileStream.read(&fileContents[0], fileSize);
 
     if (fileStream.fail()) {
@@ -29,5 +29,5 @@ size_t nac::io::readFile(const std::string &filePath, std::string &fileContents)
 
     // file stream closed on destruction
 
-    return fileSize;
+    return std::make_tuple(fileSize, fileContents);
 }

@@ -1,5 +1,5 @@
-#ifndef NAC_ERROR_ERROR_H
-#define NAC_ERROR_ERROR_H
+#ifndef NAC_EXCEPTIONS_EXCEPTION_H
+#define NAC_EXCEPTIONS_EXCEPTION_H
 
 #include <exception>
 #include <string>
@@ -34,4 +34,4 @@ protected:
 
 } // namespace nac
 
-#endif // NAC_ERROR_ERROR_H
+#endif // NAC_EXCEPTIONS_EXCEPTION_H
