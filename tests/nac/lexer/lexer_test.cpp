@@ -86,10 +86,9 @@ TEST(LexerTest, LexerReadsSemiColon) {
 }
 
 TEST(LexerTest, LexerReadsAllKeywords) {
-    for (auto &&keyword : nac::KEYWORDS) {
+    for (auto&& keyword : nac::KEYWORDS) {
         nac::Lexer lexer(keyword);
         std::unique_ptr<nac::Token> token = lexer.tokenize();
-
 
         EXPECT_EQ(nac::TokenKind::TOKEN_KEYWORD, token->kind());
         EXPECT_EQ(keyword, token->value());
@@ -97,10 +96,9 @@ TEST(LexerTest, LexerReadsAllKeywords) {
 }
 
 TEST(LexerTest, LexerReadsAllTypes) {
-    for (auto &&type : nac::TYPES) {
+    for (auto&& type : nac::TYPES) {
         nac::Lexer lexer(type);
         std::unique_ptr<nac::Token> token = lexer.tokenize();
-
 
         EXPECT_EQ(nac::TokenKind::TOKEN_TYPE, token->kind());
         EXPECT_EQ(type, token->value());
@@ -146,28 +144,19 @@ TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
 TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
     nac::Lexer lexer("§identifier");
 
-    EXPECT_THROW(
-        lexer.tokenize(),
-        nac::Exception
-    );
+    EXPECT_THROW(lexer.tokenize(), nac::Exception);
 }
 
 TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
     nac::Lexer lexer("ident§ifier");
 
-    EXPECT_THROW(
-        lexer.tokenize(),
-        nac::Exception
-    );
+    EXPECT_THROW(lexer.tokenize(), nac::Exception);
 }
 
 TEST(LexerTest, LexerRejectsInvalidToken) {
     nac::Lexer lexer("§");
 
-    EXPECT_THROW(
-        lexer.tokenize(),
-        nac::Exception
-    );
+    EXPECT_THROW(lexer.tokenize(), nac::Exception);
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {

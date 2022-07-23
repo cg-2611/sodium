@@ -9,8 +9,8 @@ namespace nac {
  * ---UNFINISHED, when finished, it will compile a file---
  * Compiles a given sodium file.
  * @param filePath path to sodium file to be compiled.
-*/
-void compileFile(File &file);
+ */
+void compileFile(File& file);
 
 } // namespace nac
 

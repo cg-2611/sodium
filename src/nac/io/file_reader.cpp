@@ -4,7 +4,7 @@
 
 #include "sodium/nac/exceptions/exception.h"
 
-std::tuple<size_t, std::string> nac::io::readFile(const std::string &filePath) {
+std::tuple<size_t, std::string> nac::io::readFile(const std::string& filePath) {
     std::ifstream fileStream(filePath, std::ifstream::ate);
 
     // fileStream_ is opened on construction

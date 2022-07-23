@@ -122,11 +122,11 @@ inline bool Lexer::validIdentifierCharacter(char c) {
     return validIdentifierFirstCharacter(c) || std::isdigit(c);
 }
 
-inline bool Lexer::isKeyword(const std::string &identifier) {
+inline bool Lexer::isKeyword(const std::string& identifier) {
     return KEYWORDS.find(identifier) != KEYWORDS.end();
 }
 
-inline bool Lexer::isType(const std::string &identifier) {
+inline bool Lexer::isType(const std::string& identifier) {
     return TYPES.find(identifier) != TYPES.end();
 }
 

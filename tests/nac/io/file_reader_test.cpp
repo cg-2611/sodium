@@ -11,16 +11,16 @@ static const std::string TEST_FILE_PATH = "./test_file.txt";
 static const std::string TEST_FILE_TEXT = "Text\n    File used\n\tfor\t\t\nunit testing\n\t  File\nReader\n";
 
 class FileReaderTest : public ::testing::Test {
-protected:
+  protected:
     static void SetUpTestSuite() {
-        std::FILE *emptyFile = std::fopen(EMPTY_FILE_PATH.c_str(), "w");
+        std::FILE* emptyFile = std::fopen(EMPTY_FILE_PATH.c_str(), "w");
         if (!emptyFile) {
             FAIL() << "FileReaderTest: error creating temporary empty file\n";
         }
 
         std::fclose(emptyFile);
 
-        std::FILE *tempFile = std::fopen(TEST_FILE_PATH.c_str(), "w");
+        std::FILE* tempFile = std::fopen(TEST_FILE_PATH.c_str(), "w");
         if (!tempFile) {
             FAIL() << "FileReaderTest: error creating temporary file\n";
         }
@@ -41,10 +41,7 @@ protected:
 };
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
-    EXPECT_THROW(
-        nac::io::readFile("./file_does_not_exist.txt"),
-        nac::Exception
-    );
+    EXPECT_THROW(nac::io::readFile("./file_does_not_exist.txt"), nac::Exception);
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {

@@ -13,10 +13,10 @@ namespace io {
  * @return An std::tuple<size_t, std::string> containing the file size in bytes and
  *         the contents of the file as a string.
  * @throws An nac::Exception when the file fails to be opened, or when the file is failed to be read.
-*/
-std::tuple<size_t, std::string> readFile(const std::string &filePath);
+ */
+std::tuple<size_t, std::string> readFile(const std::string& filePath);
 
-} // namespace nac::io
+} // namespace io
 } // namespace nac
 
 #endif // NAC_IO_FILE_READER_H

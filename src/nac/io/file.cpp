@@ -2,15 +2,15 @@
 
 #include "sodium/nac/io/file_reader.h"
 
-nac::File::File(const std::string &path) : path_(path) {
+nac::File::File(const std::string& path) : path_(path) {
     std::tie(size_, contents_) = nac::io::readFile(path_);
 }
 
-const std::string & nac::File::path() const {
+const std::string& nac::File::path() const {
     return path_;
 }
 
-const std::string & nac::File::contents() const {
+const std::string& nac::File::contents() const {
     return contents_;
 }
 
