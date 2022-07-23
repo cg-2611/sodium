@@ -1,7 +1,7 @@
 #ifndef NAC_LEXER_LEXER_H
 #define NAC_LEXER_LEXER_H
 
-#include <vector>
+#include <memory>
 
 #include "sodium/nac/io/file.h"
 #include "sodium/nac/lexer/token.h"
@@ -22,13 +22,13 @@ public:
     /**
      * Destructor for Lexer.
     */
-    ~Lexer() {}
+    ~Lexer() = default;
 
     /**
      * Extracts the Sodium programming language tokens from the string.
-     * @return An std::vector<Token> of tokens extracted from the string.
+     * @return An std::unique_ptr<Token> pointer to the first token in the string.
     */
-    std::vector<Token> tokenize();
+    std::unique_ptr<Token> tokenize();
 
 private:
     std::string_view string_;
@@ -36,7 +36,7 @@ private:
 
     // returns the next token in the string from the current position of the lexer
     // note: index_ is not updated
-    Token getNextToken();
+    std::unique_ptr<Token> getNextToken();
 
     // increase index_ by offset characters
     // index_ will not exceed the length of the string

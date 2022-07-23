@@ -1,6 +1,7 @@
 #ifndef NAC_LEXER_TOKEN_H
 #define NAC_LEXER_TOKEN_H
 
+#include <memory>
 #include <set>
 #include <string>
 
@@ -47,7 +48,7 @@ public:
     /**
      * Destructor for Token.
     */
-    ~Token() {}
+    ~Token() = default;
 
     /**
      * @return The kind of this token.
@@ -63,11 +64,23 @@ public:
     /**
      * @return The value of this token as a string.
     */
-    const std::string & value() const;
+    const std::string& value() const;
+
+    /**
+     * @return A raw pointer to the token that comes after this token.
+    */
+    Token* next() const;
+
+    /**
+     * Modifier method for the next token.
+     * @param next An std::unique_ptr<Token> which is moved into the next_ member of this token.
+    */
+    void next(std::unique_ptr<Token> next);
 
 private:
     TokenKind kind_;
     std::string value_;
+    std::unique_ptr<Token> next_;
 };
 
 } // namespace nac
