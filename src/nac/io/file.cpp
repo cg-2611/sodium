@@ -1,19 +1,23 @@
 #include "sodium/nac/io/file.h"
 
-#include "sodium/nac/io/file_reader.h"
+#include "sodium/nac/io/file_io.h"
 
-nac::File::File(const std::string& path) : path_(path) {
-    std::tie(size_, contents_) = nac::io::readFile(path_);
+namespace nac {
+
+File::File(const std::string& path) : path_(path) {
+    std::tie(size_, contents_) = io::readFile(path_);
 }
 
-const std::string& nac::File::path() const {
+const std::string& File::path() const {
     return path_;
 }
 
-const std::string& nac::File::contents() const {
+const std::string& File::contents() const {
     return contents_;
 }
 
-size_t nac::File::size() const {
+size_t File::size() const {
     return size_;
 }
+
+} // namespace nac

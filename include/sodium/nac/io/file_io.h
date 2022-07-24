@@ -1,5 +1,5 @@
-#ifndef NAC_IO_FILE_READER_H
-#define NAC_IO_FILE_READER_H
+#ifndef NAC_IO_FILE_IO_H
+#define NAC_IO_FILE_IO_H
 
 #include <string>
 #include <tuple>
@@ -19,4 +19,4 @@ std::tuple<size_t, std::string> readFile(const std::string& filePath);
 } // namespace io
 } // namespace nac
 
-#endif // NAC_IO_FILE_READER_H
+#endif // NAC_IO_FILE_IO_H
