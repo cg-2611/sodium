@@ -1,6 +1,6 @@
 #include "sodium/nac/lexer/lexer.h"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "sodium/nac/exceptions/exception.h"
 
