@@ -40,13 +40,13 @@ private:
 
     // increase index_ by offset characters
     // index_ will not exceed the length of the string
-    void advance(size_t offset);
+    constexpr void advance(size_t offset);
 
     // moves the lexer over all consecutive whitespace characters
-    void skipWhitespace();
+    constexpr void skipWhitespace();
 
-    size_t getIdentifierLength();     // returns the length of an identifier from index_
-    size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
+    constexpr size_t getIdentifierLength();     // returns the length of an identifier from index_
+    constexpr size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
 };
 
 } // namespace nac

@@ -1,6 +1,6 @@
-#include <utility>
-
 #include "sodium/nac/io/file.h"
+
+#include <utility>
 
 #include "sodium/nac/io/file_io.h"
 
@@ -8,7 +8,6 @@ namespace nac {
 
 File::File(std::string  path) : path_(std::move(path)) {
     std::tie(size_, contents_) = io::readFile(path_);
-    contents_.size();
 }
 
 const std::string& File::path() const noexcept {

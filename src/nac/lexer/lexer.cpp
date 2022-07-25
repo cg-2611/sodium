@@ -7,12 +7,12 @@
 namespace nac {
 
 // returns true if c is a valid character to begin an identifier
-static inline bool isValidIdentifierFirstCharacter(char c) {
+static constexpr bool isValidIdentifierFirstCharacter(char c) {
     return std::isalpha(c) || c == '_' || c == '$';
 }
 
 // returns true if c is a valid character to be anywhere in the identifier after the first character
-static inline bool isValidIdentifierCharacter(char c) {
+static constexpr bool isValidIdentifierCharacter(char c) {
     return isValidIdentifierFirstCharacter(c) || std::isdigit(c);
 }
 
@@ -102,7 +102,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
     }
 }
 
-void Lexer::advance(size_t offset) {
+constexpr void Lexer::advance(size_t offset) {
     index_ += offset;
 
     if (index_ > string_.size()) {
@@ -110,13 +110,13 @@ void Lexer::advance(size_t offset) {
     }
 }
 
-void Lexer::skipWhitespace() {
+constexpr void Lexer::skipWhitespace() {
     while (std::isspace(string_[index_])) {
         advance(1);
     }
 }
 
-size_t Lexer::getIdentifierLength() {
+constexpr size_t Lexer::getIdentifierLength() {
     size_t end = index_;
     while (end < string_.size() && isValidIdentifierCharacter(string_[end])) {
         ++end;
@@ -125,7 +125,7 @@ size_t Lexer::getIdentifierLength() {
     return end - index_;
 }
 
-size_t Lexer::getNumericLiteralLength() {
+constexpr size_t Lexer::getNumericLiteralLength() {
     size_t end = index_;
     while (end < string_.size() && std::isdigit(string_[end])) {
         ++end;
