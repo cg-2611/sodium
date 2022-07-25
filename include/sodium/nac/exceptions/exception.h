@@ -15,7 +15,7 @@ public:
      * Constructor for Exception.
      * @param message The message to be output when the what() method is called.
      */
-    Exception(std::string message);
+    Exception(const std::string& message);
 
     /**
      * Destructor for Exception.

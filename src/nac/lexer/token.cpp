@@ -4,13 +4,13 @@
 
 namespace nac {
 
-Token::Token(TokenKind kind, const std::string& value) : kind_(kind), value_(value), next_(nullptr) {}
+Token::Token(TokenKind kind, std::string  value) : kind_(kind), value_(std::move(value)), next_(nullptr) {}
 
 TokenKind Token::kind() const {
     return kind_;
 }
 
-const std::string Token::kindString() const {
+std::string Token::kindString() const {
     switch (kind_) {
         case TokenKind::TOKEN_EOF: return "TOKEN_EOF";
         case TokenKind::TOKEN_KEYWORD: return "TOKEN_KEYWORD";

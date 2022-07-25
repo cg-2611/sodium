@@ -20,7 +20,7 @@ namespace nac {
     size_t fileSize = static_cast<size_t>(std::filesystem::file_size(filePath));
 
     std::string fileContents(fileSize, '\0');
-    size_t readLength = std::fread(&fileContents[0], sizeof(char), fileSize, file.get());
+    size_t readLength = std::fread(fileContents.data(), sizeof(char), fileSize, file.get());
 
     // if these two values differ, then the file has not been read correctly
     if (readLength != fileSize) {

@@ -15,7 +15,7 @@ public:
      * when this is called.
      * @param path The path to the file.
      */
-    File(const std::string& path);
+    File(std::string  path);
 
     /**
      * Destructor for File.
@@ -40,7 +40,7 @@ public:
   private:
     std::string path_;
     std::string contents_;
-    size_t size_;
+    size_t size_{};
 };
 
 } // namespace nac

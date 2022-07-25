@@ -39,7 +39,7 @@ public:
      * @param tokenKind the kind of token being constructed, must be one of nac::TokenKind.
      * @param tokenValue the value of the token as a string.
      */
-    Token(TokenKind kind, const std::string& string);
+    Token(TokenKind kind, std::string value);
 
     /**
      * Destructor for Token.
@@ -55,7 +55,7 @@ public:
      * @return The kind of this token as a string. The string will match the
      * corresponding nac::TokenKind enum identifier.
      */
-    const std::string kindString() const;
+    std::string kindString() const;
 
     /**
      * @return The value of this token as a string.

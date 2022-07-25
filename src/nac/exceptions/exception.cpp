@@ -2,7 +2,7 @@
 
 namespace nac {
 
-Exception::Exception(std::string message) {
+Exception::Exception(const std::string& message) {
     message_ = "[nac]: " + message;
 }
 
