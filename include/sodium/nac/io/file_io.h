@@ -14,7 +14,7 @@ namespace io {
  *         the contents of the file as a string.
  * @throws An nac::Exception when the file fails to be opened, or when the file is failed to be read.
  */
-std::tuple<size_t, std::string> readFile(const std::string& filePath);
+[[nodiscard]] std::tuple<size_t, std::string> readFile(const std::string& filePath);
 
 } // namespace io
 } // namespace nac

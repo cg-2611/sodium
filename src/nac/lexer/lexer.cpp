@@ -13,7 +13,7 @@ static inline bool isType(const std::string& identifier);
 
 Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
-std::unique_ptr<Token> Lexer::tokenize() {
+[[nodiscard]] std::unique_ptr<Token> Lexer::tokenize() {
     // skip leading whitespace
     skipWhitespace();
 

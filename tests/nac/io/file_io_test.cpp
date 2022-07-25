@@ -41,7 +41,10 @@ class FileReaderTest : public ::testing::Test {
 };
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
-    EXPECT_THROW(nac::io::readFile("./file_does_not_exist.txt"), nac::Exception);
+    EXPECT_THROW(
+        auto _ = nac::io::readFile("./file_does_not_exist.txt"),
+        nac::Exception
+    );
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {

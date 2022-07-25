@@ -144,19 +144,19 @@ TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
 TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
     nac::Lexer lexer("§identifier");
 
-    EXPECT_THROW(lexer.tokenize(), nac::Exception);
+    EXPECT_THROW(auto _ = lexer.tokenize(), nac::Exception);
 }
 
 TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
     nac::Lexer lexer("ident§ifier");
 
-    EXPECT_THROW(lexer.tokenize(), nac::Exception);
+    EXPECT_THROW(auto _ = lexer.tokenize(), nac::Exception);
 }
 
 TEST(LexerTest, LexerRejectsInvalidToken) {
     nac::Lexer lexer("§");
 
-    EXPECT_THROW(lexer.tokenize(), nac::Exception);
+    EXPECT_THROW(auto _ = lexer.tokenize(), nac::Exception);
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {

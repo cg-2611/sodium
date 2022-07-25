@@ -28,7 +28,7 @@ public:
      * Extracts the Sodium programming language tokens from the string.
      * @return An std::unique_ptr<Token> pointer to the first token in the string.
      */
-    std::unique_ptr<Token> tokenize();
+    [[nodiscard]] std::unique_ptr<Token> tokenize();
 
 private:
     std::string_view string_;
