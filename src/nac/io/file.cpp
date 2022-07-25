@@ -8,17 +8,18 @@ namespace nac {
 
 File::File(std::string  path) : path_(std::move(path)) {
     std::tie(size_, contents_) = io::readFile(path_);
+    contents_.size();
 }
 
-const std::string& File::path() const {
+const std::string& File::path() const noexcept {
     return path_;
 }
 
-const std::string& File::contents() const {
+const std::string& File::contents() const noexcept {
     return contents_;
 }
 
-size_t File::size() const {
+size_t File::size() const noexcept {
     return size_;
 }
 

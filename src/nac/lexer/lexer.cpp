@@ -6,10 +6,25 @@
 
 namespace nac {
 
-static inline bool isValidIdentifierFirstCharacter(char c);
-static inline bool isValidIdentifierCharacter(char c);
-static inline bool isKeyword(const std::string& identifier);
-static inline bool isType(const std::string& identifier);
+// returns true if c is a valid character to begin an identifier
+static inline bool isValidIdentifierFirstCharacter(char c) {
+    return std::isalpha(c) || c == '_' || c == '$';
+}
+
+// returns true if c is a valid character to be anywhere in the identifier after the first character
+static inline bool isValidIdentifierCharacter(char c) {
+    return isValidIdentifierFirstCharacter(c) || std::isdigit(c);
+}
+
+// returns true if identifier is a keyword
+static inline bool isKeyword(const std::string& identifier) {
+    return KEYWORDS.find(identifier) != KEYWORDS.end();
+}
+
+// returns true if identifier is a type
+static inline bool isType(const std::string& identifier) {
+    return TYPES.find(identifier) != TYPES.end();
+}
 
 Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
@@ -117,26 +132,6 @@ size_t Lexer::getNumericLiteralLength() {
     }
 
     return end - index_;
-}
-
-// returns true if c is a valid character to begin an identifier
-static inline bool isValidIdentifierFirstCharacter(char c) {
-    return std::isalpha(c) || c == '_' || c == '$';
-}
-
-// returns true if c is a valid character to be anywhere in the identifier after the first character
-static inline bool isValidIdentifierCharacter(char c) {
-    return isValidIdentifierFirstCharacter(c) || std::isdigit(c);
-}
-
-// returns true if identifier is a keyword
-static inline bool isKeyword(const std::string& identifier) {
-    return KEYWORDS.find(identifier) != KEYWORDS.end();
-}
-
-// returns true if identifier is a type
-static inline bool isType(const std::string& identifier) {
-    return TYPES.find(identifier) != TYPES.end();
 }
 
 } // namespace nac

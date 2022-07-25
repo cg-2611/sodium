@@ -25,17 +25,17 @@ public:
     /**
      * @return The path of the file as a string.
      */
-    const std::string& path() const;
+    const std::string& path() const noexcept;
 
     /**
      * @return The contents of the file as a string.
      */
-    const std::string& contents() const;
+    const std::string& contents() const noexcept;
 
     /**
      * @return The size of the file in bytes.
      */
-    size_t size() const;
+    size_t size() const noexcept;
 
   private:
     std::string path_;

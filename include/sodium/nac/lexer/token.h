@@ -49,7 +49,7 @@ public:
     /**
      * @return The kind of this token.
      */
-    TokenKind kind() const;
+    TokenKind kind() const noexcept;
 
     /**
      * @return The kind of this token as a string. The string will match the
@@ -60,18 +60,18 @@ public:
     /**
      * @return The value of this token as a string.
      */
-    const std::string& value() const;
+    const std::string& value() const noexcept;
 
     /**
      * @return A raw pointer to the token that comes after this token.
      */
-    Token* next() const;
+    Token* next() const noexcept;
 
     /**
      * Modifier method for the next token.
      * @param next An std::unique_ptr<Token> which is moved into the next_ member of this token.
      */
-    void next(std::unique_ptr<Token> next);
+    void next(std::unique_ptr<Token> next) noexcept;
 
 private:
     TokenKind kind_;
