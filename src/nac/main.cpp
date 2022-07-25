@@ -14,7 +14,7 @@ int main(int argc, const char* argv[]) {
         nac::File file(argv[1]);
         nac::compileFile(file);
     } catch (const nac::Exception& e) {
-        std::cerr << e.what() << "\n";
+        std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
 

@@ -9,7 +9,7 @@ namespace nac {
  * Used to store information about a file, such as its path, size and contents.
  */
 class File {
-  public:
+public:
     /**
      * Constructor for File. The contents of the file are read and stored along with the size of the file
      * when this is called.

@@ -10,13 +10,13 @@ namespace nac {
 // used for debugging
 static void printTokens(Token* token) {
     while (token != nullptr) {
-        std::cout << "[nac]: " << token->kindString() << ": " << token->value() << "\n";
+        std::cout << "[nac]: " << token->kindString() << ": " << token->value() << '\n';
         token = token->next();
     }
 }
 
 void compileFile(File& file) {
-    std::cout << "[nac]: tokenizing " << file.path() << "\n";
+    std::cout << "[nac]: tokenizing " << file.path() << '\n';
 
     Lexer lexer = Lexer(file.contents());
 

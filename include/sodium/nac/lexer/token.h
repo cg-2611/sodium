@@ -33,7 +33,7 @@ enum class TokenKind {
  * A Sodium programming language token.
  */
 class Token {
-  public:
+public:
     /**
      * Constructor for a token.
      * @param tokenKind the kind of token being constructed, must be one of nac::TokenKind.
@@ -73,7 +73,7 @@ class Token {
      */
     void next(std::unique_ptr<Token> next);
 
-  private:
+private:
     TokenKind kind_;
     std::string value_;
     std::unique_ptr<Token> next_;

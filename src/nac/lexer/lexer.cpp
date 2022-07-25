@@ -6,6 +6,11 @@
 
 namespace nac {
 
+static inline bool isValidIdentifierFirstCharacter(char c);
+static inline bool isValidIdentifierCharacter(char c);
+static inline bool isKeyword(const std::string& identifier);
+static inline bool isType(const std::string& identifier);
+
 Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
 std::unique_ptr<Token> Lexer::tokenize() {
@@ -45,7 +50,7 @@ std::unique_ptr<Token> Lexer::tokenize() {
 
 std::unique_ptr<Token> Lexer::getNextToken() {
     // if we have come across an identifier
-    if (validIdentifierFirstCharacter(string_[index_])) {
+    if (isValidIdentifierFirstCharacter(string_[index_])) {
         // extract the identifier from the string
         std::string identifier(string_.substr(index_, getIdentifierLength()));
 
@@ -98,8 +103,8 @@ void Lexer::skipWhitespace() {
 
 size_t Lexer::getIdentifierLength() {
     size_t end = index_;
-    while (end < string_.size() && validIdentifierCharacter(string_[end])) {
-        end++;
+    while (end < string_.size() && isValidIdentifierCharacter(string_[end])) {
+        ++end;
     }
 
     return end - index_;
@@ -108,25 +113,29 @@ size_t Lexer::getIdentifierLength() {
 size_t Lexer::getNumericLiteralLength() {
     size_t end = index_;
     while (end < string_.size() && std::isdigit(string_[end])) {
-        end++;
+        ++end;
     }
 
     return end - index_;
 }
 
-inline bool Lexer::validIdentifierFirstCharacter(char c) {
+// returns true if c is a valid character to begin an identifier
+static inline bool isValidIdentifierFirstCharacter(char c) {
     return std::isalpha(c) || c == '_' || c == '$';
 }
 
-inline bool Lexer::validIdentifierCharacter(char c) {
-    return validIdentifierFirstCharacter(c) || std::isdigit(c);
+// returns true if c is a valid character to be anywhere in the identifier after the first character
+static inline bool isValidIdentifierCharacter(char c) {
+    return isValidIdentifierFirstCharacter(c) || std::isdigit(c);
 }
 
-inline bool Lexer::isKeyword(const std::string& identifier) {
+// returns true if identifier is a keyword
+static inline bool isKeyword(const std::string& identifier) {
     return KEYWORDS.find(identifier) != KEYWORDS.end();
 }
 
-inline bool Lexer::isType(const std::string& identifier) {
+// returns true if identifier is a type
+static inline bool isType(const std::string& identifier) {
     return TYPES.find(identifier) != TYPES.end();
 }
 

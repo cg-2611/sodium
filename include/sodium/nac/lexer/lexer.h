@@ -12,7 +12,7 @@ namespace nac {
  * Used to extract, from a string, any tokens used in the Sodium programming language.
  */
 class Lexer {
-  public:
+public:
     /**
      * Constructor for Lexer. Initializes private members.
      * @param string The string to be tokenized.
@@ -30,7 +30,7 @@ class Lexer {
      */
     std::unique_ptr<Token> tokenize();
 
-  private:
+private:
     std::string_view string_;
     size_t index_;
 
@@ -47,15 +47,6 @@ class Lexer {
 
     size_t getIdentifierLength();     // returns the length of an identifier from index_
     size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
-
-    // returns true if c is a valid character to begin an identifier
-    inline bool validIdentifierFirstCharacter(char c);
-
-    // returns true if c is a valid character to be anywhere in the identifier after the first character
-    inline bool validIdentifierCharacter(char c);
-
-    inline bool isKeyword(const std::string& identifier); // returns true if identifier is a keyword
-    inline bool isType(const std::string& identifier);    // returns true if identifier is a type
 };
 
 } // namespace nac

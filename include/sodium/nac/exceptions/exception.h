@@ -10,7 +10,7 @@ namespace nac {
  * Used to handle errors from the Sodium compiler. Inherits std::exception.
  */
 class Exception : public std::exception {
-  public:
+public:
     /**
      * Constructor for Exception.
      * @param message The message to be output when the what() method is called.
@@ -27,7 +27,7 @@ class Exception : public std::exception {
      */
     virtual const char* what() const noexcept override;
 
-  protected:
+protected:
     // the error message to be output when what() is called
     std::string message_;
 };
