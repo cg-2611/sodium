@@ -31,15 +31,6 @@ TEST(LexerTest, LexerReadsNumericLiteral) {
     EXPECT_EQ(numericLiteralString, token->value());
 }
 
-TEST(LexerTest, LexerReadsColon) {
-    std::string colonString(":");
-    nac::Lexer lexer(colonString);
-    std::unique_ptr<nac::Token> token = lexer.tokenize();
-
-    EXPECT_EQ(nac::TokenKind::TOKEN_COLON, token->kind());
-    EXPECT_EQ(colonString, token->value());
-}
-
 TEST(LexerTest, LexerReadsLeftBrace) {
     std::string leftBraceString("{");
     nac::Lexer lexer(leftBraceString);
@@ -56,6 +47,15 @@ TEST(LexerTest, LexerReadsLeftParen) {
 
     EXPECT_EQ(nac::TokenKind::TOKEN_LEFT_PAREN, token->kind());
     EXPECT_EQ(leftParenString, token->value());
+}
+
+TEST(LexerTest, LexerReadsReturnArrow) {
+    std::string colonString("->");
+    nac::Lexer lexer(colonString);
+    std::unique_ptr<nac::Token> token = lexer.tokenize();
+
+    EXPECT_EQ(nac::TokenKind::TOKEN_RETURN_ARROW, token->kind());
+    EXPECT_EQ(colonString, token->value());
 }
 
 TEST(LexerTest, LexerReadsRightBrace) {

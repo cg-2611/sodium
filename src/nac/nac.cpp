@@ -15,9 +15,9 @@ static constexpr std::string_view kindString(TokenKind tokenKind) {
         case TokenKind::TOKEN_TYPE: return "TOKEN_TYPE";
         case TokenKind::TOKEN_IDENTIFIER: return "TOKEN_IDENTIFIER";
         case TokenKind::TOKEN_NUMERIC_LITERAL: return "TOKEN_NUMERIC_LITERAL";
-        case TokenKind::TOKEN_COLON: return "TOKEN_COLON";
         case TokenKind::TOKEN_LEFT_BRACE: return "TOKEN_LEFT_BRACE";
         case TokenKind::TOKEN_LEFT_PAREN: return "TOKEN_LEFT_PAREN";
+        case TokenKind::TOKEN_RETURN_ARROW: return "TOKEN_RETURN_ARROW";
         case TokenKind::TOKEN_RIGHT_BRACE: return "TOKEN_RIGHT_BRACE";
         case TokenKind::TOKEN_RIGHT_PAREN: return "TOKEN_RIGHT_PAREN";
         case TokenKind::TOKEN_SEMI_COLON: return "TOKEN_SEMI_COLON";

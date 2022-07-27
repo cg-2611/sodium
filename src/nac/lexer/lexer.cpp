@@ -89,7 +89,12 @@ std::unique_ptr<Token> Lexer::getNextToken() {
 
     // otherwise
     switch (string_[index_]) {
-        case ':': return std::make_unique<Token>(TokenKind::TOKEN_COLON, ":");
+        case '-':
+            if (peek() == '>') {
+                return std::make_unique<Token>(TokenKind::TOKEN_RETURN_ARROW, "->");
+            }
+            // temporary until '-' is a valid token
+            throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
         case '{': return std::make_unique<Token>(TokenKind::TOKEN_LEFT_BRACE, "{");
         case '(': return std::make_unique<Token>(TokenKind::TOKEN_LEFT_PAREN, "(");
         case '}': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_BRACE, "}");
@@ -100,7 +105,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
     }
 }
 
-constexpr void Lexer::advance(size_t offset) {
+void Lexer::advance(size_t offset) {
     index_ += offset;
 
     if (index_ > string_.size()) {
@@ -108,10 +113,14 @@ constexpr void Lexer::advance(size_t offset) {
     }
 }
 
-constexpr void Lexer::skipWhitespace() {
+void Lexer::skipWhitespace() {
     while (std::isspace(string_[index_])) {
         advance(1);
     }
+}
+
+constexpr char Lexer::peek() {
+    return string_[index_ + 1];
 }
 
 constexpr size_t Lexer::getIdentifierLength() {
