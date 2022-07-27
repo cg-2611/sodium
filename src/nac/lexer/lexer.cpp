@@ -2,7 +2,7 @@
 
 #include <cctype>
 
-#include "sodium/nac/exceptions/exception.h"
+#include "sodium/nac/exceptions/lexer_exception.h"
 
 namespace nac {
 
@@ -96,9 +96,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
         case ')': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_PAREN, ")");
         case ';': return std::make_unique<Token>(TokenKind::TOKEN_SEMI_COLON, ";");
         default:
-            std::string message = std::string("unexpected token \'\'");
-            message.insert(message.size() - 1, 1, string_[index_]);
-            throw Exception(message);
+            throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
     }
 }
 

@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sodium/nac/exceptions/exception.h"
+#include "sodium/nac/exceptions/io_exception.h"
 
 // operator / is overloaded to concatenate file path in std::filesystem
 static const std::filesystem::path TEMP_DIRECTORY_PATH = std::filesystem::temp_directory_path() / "sodium_test_files";
@@ -44,7 +44,7 @@ protected:
 };
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
-    EXPECT_THROW(auto _ = nac::io::readFile("./file_that_does_not_exist.txt"), nac::Exception);
+    EXPECT_THROW(auto _ = nac::io::readFile("./file_that_does_not_exist.txt"), nac::IOException);
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {

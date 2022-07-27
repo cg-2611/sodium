@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sodium/nac/exceptions/exception.h"
+#include "sodium/nac/exceptions/lexer_exception.h"
 
 TEST(LexerTest, LexerReadsEmptyString) {
     std::string emptyString("");
@@ -144,19 +144,19 @@ TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
 TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
     nac::Lexer lexer("§identifier");
 
-    EXPECT_THROW(auto _ = lexer.tokenize(), nac::Exception);
+    EXPECT_THROW(auto _ = lexer.tokenize(), nac::LexerException);
 }
 
 TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
     nac::Lexer lexer("ident§ifier");
 
-    EXPECT_THROW(auto _ = lexer.tokenize(), nac::Exception);
+    EXPECT_THROW(auto _ = lexer.tokenize(), nac::LexerException);
 }
 
 TEST(LexerTest, LexerRejectsInvalidToken) {
     nac::Lexer lexer("§");
 
-    EXPECT_THROW(auto _ = lexer.tokenize(), nac::Exception);
+    EXPECT_THROW(auto _ = lexer.tokenize(), nac::LexerException);
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {

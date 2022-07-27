@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <filesystem>
 
-#include "sodium/nac/exceptions/exception.h"
+#include "sodium/nac/exceptions/io_exception.h"
 
 namespace nac {
 
@@ -14,7 +14,7 @@ namespace nac {
     std::unique_ptr<std::FILE, decltype(&std::fclose)> file(std::fopen(filePath.c_str(), "r"), &std::fclose);
 
     if (!file) {
-        throw Exception("error opening file " + filePath);
+        throw IOException(Error::FILE_OPEN_FAIL, filePath);
     }
 
     size_t fileSize = static_cast<size_t>(std::filesystem::file_size(filePath));
@@ -24,7 +24,7 @@ namespace nac {
 
     // if these two values differ, then the file has not been read correctly
     if (readLength != fileSize) {
-        throw Exception("error reading contents of file " + filePath);
+        throw IOException(Error::FILE_READ_FAIL, filePath);
     }
 
     return std::make_tuple(fileSize, fileContents);

@@ -27,6 +27,7 @@ public:
     /**
      * Extracts the Sodium programming language tokens from the string.
      * @return An std::unique_ptr<Token> pointer to the first token in the string.
+     * @throws An nac::LexerException when an unrecognised token is encountered.
      */
     [[nodiscard]] std::unique_ptr<Token> tokenize();
 
@@ -35,6 +36,7 @@ private:
     size_t index_;
 
     // returns the next token in the string from the current position of the lexer
+    // throws an nac::LexerException when an unrecognised token is encountered
     // note: index_ is not updated
     std::unique_ptr<Token> getNextToken();
 

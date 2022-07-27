@@ -7,6 +7,8 @@ target_sources(libnac
     PRIVATE
         nac/nac.cpp
         nac/exceptions/exception.cpp
+        nac/exceptions/io_exception.cpp
+        nac/exceptions/lexer_exception.cpp
         nac/io/file.cpp
         nac/io/file_io.cpp
         nac/lexer/lexer.cpp

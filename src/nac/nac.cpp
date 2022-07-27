@@ -16,8 +16,6 @@ static void printTokens(Token* token) {
 }
 
 void compileFile(File& file) {
-    std::cout << "[nac]: tokenizing " << file.path() << '\n';
-
     Lexer lexer = Lexer(file.contents());
 
     std::unique_ptr<Token> token = lexer.tokenize();
