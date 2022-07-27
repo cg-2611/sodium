@@ -21,7 +21,7 @@ public:
      * Constructor for Exception. Data member message_ is initialized and an error message is appended to it.
      * @param error The error for which the message is to be generated.
      */
-    Exception(const Error error);
+    Exception(Error error);
 
     /**
      * Destructor for Exception.

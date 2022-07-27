@@ -16,7 +16,7 @@ public:
      * @param error The error for which the message is to be generated.
      * @param filePath The path to the file involved in the error.
      */
-    IOException(const Error error, const std::string& filePath);
+    IOException(Error error, const std::string& filePath);
 
     /**
      * Destructor for IOException.

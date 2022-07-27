@@ -2,7 +2,7 @@
 
 namespace nac {
 
-LexerException::LexerException(const Error error, const char token) : Exception(error) {
+LexerException::LexerException(Error error, char token) : Exception(error) {
     message_ += " \'\'";
 
     // insert a single character, token, in the penultimate position in message_

@@ -4,7 +4,7 @@
 
 namespace nac {
 
-IOException::IOException(const Error error, const std::string& filePath) : Exception(error) {
+IOException::IOException(Error error, const std::string& filePath) : Exception(error) {
     message_ += " \'" + filePath + "\'";
 
     // if errno is set, get the errno string and append to message_

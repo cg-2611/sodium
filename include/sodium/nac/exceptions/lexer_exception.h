@@ -15,7 +15,7 @@ public:
      * @param error The error for which the message is to be generated.
      * @param token The character that has caused the exception.
      */
-    LexerException(const Error error, const char token);
+    LexerException(Error error, char token);
 
     /**
      * Destructor for LexerException.

@@ -5,7 +5,7 @@ namespace nac {
 // returns a message describing the argument error
 static constexpr std::string_view getErrorMessage(Error error);
 
-Exception::Exception(const Error error) : message_("[nac]: error: ") {
+Exception::Exception(Error error) : message_("[nac]: error: ") {
     message_ += getErrorMessage(error);
 }
 
