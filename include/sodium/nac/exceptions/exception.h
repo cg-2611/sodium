@@ -35,10 +35,6 @@ public:
 
 protected:
     std::string message_; // the error message to be output when what() is called
-
-private:
-    // returns a message describing the argument error
-    static constexpr std::string_view getErrorMessage(Error error);
 };
 
 } // namespace nac

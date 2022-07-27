@@ -2,11 +2,14 @@
 
 namespace nac {
 
+// returns a message describing the argument error
+static constexpr std::string_view getErrorMessage(Error error);
+
 Exception::Exception(const Error error) : message_("[nac]: error: ") {
     message_ += getErrorMessage(error);
 }
 
-constexpr std::string_view Exception::getErrorMessage(Error error) {
+static constexpr std::string_view getErrorMessage(Error error) {
     switch (error) {
         case Error::FILE_OPEN_FAIL: return "failed to open file";
         case Error::FILE_READ_FAIL: return "failed to read contents of file";
