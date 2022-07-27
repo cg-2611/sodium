@@ -42,10 +42,13 @@ private:
 
     // increase index_ by offset characters
     // index_ will not exceed the length of the string
-    constexpr void advance(size_t offset);
+    void advance(size_t offset);
 
     // moves the lexer over all consecutive whitespace characters
-    constexpr void skipWhitespace();
+    void skipWhitespace();
+
+    // returns the next character at index_ + 1 but does nit increment index
+    constexpr char peek();
 
     constexpr size_t getIdentifierLength();     // returns the length of an identifier from index_
     constexpr size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
