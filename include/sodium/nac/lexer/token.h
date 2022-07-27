@@ -41,10 +41,28 @@ public:
      */
     Token(TokenKind kind, std::string value);
 
+    /// Explicitly delete copy constructor as unique_ptr is non-copyable.
+    Token(const Token& other) = delete;
+
+    /**
+     * Default move constructor.
+     * @param other The token of which to move the resources from into this token.
+     */
+    Token(Token&& other) noexcept = default;
+
     /**
      * Destructor for Token.
      */
     ~Token() = default;
+
+    /// Explicitly delete copy assignment operator as unique_ptr is non-copyable.
+    Token& operator=(const Token& other) = delete;
+
+    /**
+     * Default move assignment operator.
+     * @param other The token which is being move assigned to this token.
+     */
+    Token& operator=(Token&& other) noexcept = default;
 
     /**
      * @return The kind of this token.
