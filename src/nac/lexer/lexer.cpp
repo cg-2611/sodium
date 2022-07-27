@@ -2,70 +2,105 @@
 
 #include <cctype>
 
-#include "sodium/nac/error/error.h"
+#include "sodium/nac/exceptions/lexer_exception.h"
 
-nac::Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
+namespace nac {
 
-std::vector<nac::Token> nac::Lexer::tokenize() {
-    std::vector<nac::Token> tokens{};
+// returns true if c is a valid character to begin an identifier
+static constexpr bool isValidIdentifierFirstCharacter(char c) {
+    return std::isalpha(c) || c == '_' || c == '$';
+}
 
-    // skip any leading whitespace
+// returns true if c is a valid character to be anywhere in the identifier after the first character
+static constexpr bool isValidIdentifierCharacter(char c) {
+    return isValidIdentifierFirstCharacter(c) || std::isdigit(c);
+}
+
+// returns true if identifier is a keyword
+static inline bool isKeyword(const std::string& identifier) {
+    return KEYWORDS.find(identifier) != KEYWORDS.end();
+}
+
+// returns true if identifier is a type
+static inline bool isType(const std::string& identifier) {
+    return TYPES.find(identifier) != TYPES.end();
+}
+
+Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
+
+[[nodiscard]] std::unique_ptr<Token> Lexer::tokenize() {
+    // skip leading whitespace
     skipWhitespace();
 
-    while (index_ < string_.size()) {
-        nac::Token token = getNextToken();
-        tokens.push_back(token);
+    std::unique_ptr<Token> eofToken = std::make_unique<Token>(TokenKind::TOKEN_EOF, "");
 
-        advance(token.getValue().size());
+    // return eof token for empty string
+    if (index_ >= string_.size()) {
+        return eofToken;
+    }
+
+    // get the first token
+    std::unique_ptr<Token> token = getNextToken();
+    Token* currentToken = token.get();
+
+    // advance the lexer to the end of the token
+    advance(currentToken->value().size());
+    skipWhitespace();
+
+    // get the remaining tokens
+    while (index_ < string_.size()) {
+        currentToken->next(getNextToken());
+        currentToken = currentToken->next();
+
+        // advance the lexer to the end of the token
+        advance(currentToken->value().size());
         skipWhitespace();
     }
 
-    // add the EOF token to the end of the vector once end of string reached
-    tokens.push_back(nac::Token(nac::TokenKind::TOKEN_EOF, ""));
+    // end the token list with an eof token
+    currentToken->next(std::move(eofToken));
 
-    return tokens;
+    return token;
 }
 
-nac::Token nac::Lexer::getNextToken() {
+std::unique_ptr<Token> Lexer::getNextToken() {
     // if we have come across an identifier
-    if (validIdentifierFirstCharacter(string_[index_])) {
+    if (isValidIdentifierFirstCharacter(string_[index_])) {
         // extract the identifier from the string
         std::string identifier(string_.substr(index_, getIdentifierLength()));
 
         if (isKeyword(identifier)) {
-            return nac::Token(nac::TokenKind::TOKEN_KEYWORD, identifier);
+            return std::make_unique<Token>(TokenKind::TOKEN_KEYWORD, identifier);
         }
 
         if (isType(identifier)) {
-            return nac::Token(nac::TokenKind::TOKEN_TYPE, identifier);
+            return std::make_unique<Token>(TokenKind::TOKEN_TYPE, identifier);
         }
 
-        return nac::Token(nac::TokenKind::TOKEN_IDENTIFIER, identifier);
+        return std::make_unique<Token>(TokenKind::TOKEN_IDENTIFIER, identifier);
     }
 
     // if we have come across a numeric literal
     if (isdigit(string_[index_])) {
         // extract the numeric literal from the string
         std::string numericLiteral(string_.substr(index_, getNumericLiteralLength()));
-        return nac::Token(nac::TokenKind::TOKEN_NUMERIC_LITERAL, numericLiteral);
+        return std::make_unique<Token>(TokenKind::TOKEN_NUMERIC_LITERAL, numericLiteral);
     }
 
     // otherwise
     switch (string_[index_]) {
-        case ':': return nac::Token(nac::TokenKind::TOKEN_COLON, ":");
-        case '{': return nac::Token(nac::TokenKind::TOKEN_LEFT_BRACE, "{");
-        case '(': return nac::Token(nac::TokenKind::TOKEN_LEFT_PAREN, "(");
-        case '}': return nac::Token(nac::TokenKind::TOKEN_RIGHT_BRACE, "}");
-        case ')': return nac::Token(nac::TokenKind::TOKEN_RIGHT_PAREN, ")");
-        case ';': return nac::Token(nac::TokenKind::TOKEN_SEMI_COLON, ";");
+        case ':': return std::make_unique<Token>(TokenKind::TOKEN_COLON, ":");
+        case '{': return std::make_unique<Token>(TokenKind::TOKEN_LEFT_BRACE, "{");
+        case '(': return std::make_unique<Token>(TokenKind::TOKEN_LEFT_PAREN, "(");
+        case '}': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_BRACE, "}");
+        case ')': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_PAREN, ")");
+        case ';': return std::make_unique<Token>(TokenKind::TOKEN_SEMI_COLON, ";");
         default:
-            std::string message = std::string("unexpected token \'\'");
-            message.insert(message.size() - 1, 1, string_[index_]);
-            throw nac::Exception(message);
+            throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
     }
 }
 
-void nac::Lexer::advance(size_t offset) {
+constexpr void Lexer::advance(size_t offset) {
     index_ += offset;
 
     if (index_ > string_.size()) {
@@ -73,42 +108,28 @@ void nac::Lexer::advance(size_t offset) {
     }
 }
 
-void nac::Lexer::skipWhitespace() {
+constexpr void Lexer::skipWhitespace() {
     while (std::isspace(string_[index_])) {
         advance(1);
     }
 }
 
-size_t nac::Lexer::getIdentifierLength() {
+constexpr size_t Lexer::getIdentifierLength() {
     size_t end = index_;
-    while (end < string_.size() && validIdentifierCharacter(string_[end])) {
-        end++;
+    while (end < string_.size() && isValidIdentifierCharacter(string_[end])) {
+        ++end;
     }
 
     return end - index_;
 }
 
-size_t nac::Lexer::getNumericLiteralLength() {
+constexpr size_t Lexer::getNumericLiteralLength() {
     size_t end = index_;
     while (end < string_.size() && std::isdigit(string_[end])) {
-        end++;
+        ++end;
     }
 
     return end - index_;
 }
 
-inline bool nac::Lexer::validIdentifierFirstCharacter(char c) {
-    return std::isalpha(c) || c == '_' || c == '$';
-}
-
-inline bool nac::Lexer::validIdentifierCharacter(char c) {
-    return validIdentifierFirstCharacter(c) || std::isdigit(c);
-}
-
-inline bool nac::Lexer::isKeyword(const std::string &identifier) {
-    return nac::KEYWORDS.find(identifier) != nac::KEYWORDS.end();
-}
-
-inline bool nac::Lexer::isType(const std::string &identifier) {
-    return nac::TYPES.find(identifier) != nac::TYPES.end();
-}
+} // namespace nac
