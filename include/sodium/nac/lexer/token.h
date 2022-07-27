@@ -70,13 +70,6 @@ public:
     TokenKind kind() const noexcept;
 
     /**
-     * Used for debugging. Will be removed eventually.
-     * @return The kind of this token as a string. The string will match the
-     * corresponding nac::TokenKind enum identifier.
-     */
-    std::string kindString() const;
-
-    /**
      * @return The value of this token as a string.
      */
     const std::string& value() const noexcept;
