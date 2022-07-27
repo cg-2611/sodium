@@ -1,5 +1,5 @@
-#ifndef NAC_LEXER_LEXER_H
-#define NAC_LEXER_LEXER_H
+#ifndef SODIUM_NAC_LEXER_LEXER_H
+#define SODIUM_NAC_LEXER_LEXER_H
 
 #include <memory>
 
@@ -51,4 +51,4 @@ private:
 
 } // namespace nac
 
-#endif // NAC_LEXER_LEXER_H
+#endif // SODIUM_NAC_LEXER_LEXER_H

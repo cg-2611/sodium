@@ -1,5 +1,5 @@
-#ifndef NAC_LEXER_TOKEN_H
-#define NAC_LEXER_TOKEN_H
+#ifndef SODIUM_NAC_LEXER_TOKEN_H
+#define SODIUM_NAC_LEXER_TOKEN_H
 
 #include <memory>
 #include <set>
@@ -52,6 +52,7 @@ public:
     TokenKind kind() const noexcept;
 
     /**
+     * Used for debugging. Will be removed eventually.
      * @return The kind of this token as a string. The string will match the
      * corresponding nac::TokenKind enum identifier.
      */
@@ -81,4 +82,4 @@ private:
 
 } // namespace nac
 
-#endif // NAC_LEXER_TOKEN_H
+#endif // SODIUM_NAC_LEXER_TOKEN_H

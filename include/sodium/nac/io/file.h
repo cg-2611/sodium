@@ -1,5 +1,5 @@
-#ifndef NAC_IO_FILE_H
-#define NAC_IO_FILE_H
+#ifndef SODIUM_NAC_IO_FILE_H
+#define SODIUM_NAC_IO_FILE_H
 
 #include <string>
 
@@ -40,9 +40,9 @@ public:
   private:
     std::string path_;
     std::string contents_;
-    size_t size_{};
+    size_t size_;
 };
 
 } // namespace nac
 
-#endif // NAC_IO_FILE_H
+#endif // SODIUM_NAC_IO_FILE_H

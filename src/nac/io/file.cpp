@@ -6,7 +6,7 @@
 
 namespace nac {
 
-File::File(std::string  path) : path_(std::move(path)) {
+File::File(std::string  path) : path_(std::move(path)), size_(0) {
     std::tie(size_, contents_) = io::readFile(path_);
 }
 

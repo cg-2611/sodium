@@ -1,5 +1,5 @@
-#ifndef NAC_IO_FILE_IO_H
-#define NAC_IO_FILE_IO_H
+#ifndef SODIUM_NAC_IO_FILE_IO_H
+#define SODIUM_NAC_IO_FILE_IO_H
 
 #include <string>
 #include <tuple>
@@ -19,4 +19,4 @@ namespace io {
 } // namespace io
 } // namespace nac
 
-#endif // NAC_IO_FILE_IO_H
+#endif // SODIUM_NAC_IO_FILE_IO_H
