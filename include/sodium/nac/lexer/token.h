@@ -36,8 +36,8 @@ class Token {
 public:
     /**
      * Constructor for a token.
-     * @param tokenKind the kind of token being constructed, must be one of nac::TokenKind.
-     * @param tokenValue the value of the token as a string.
+     * @param kind the kind of token being constructed, must be one of nac::TokenKind.
+     * @param value the value of the token as a string.
      */
     Token(TokenKind kind, std::string value);
 

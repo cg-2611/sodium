@@ -6,25 +6,9 @@
 
 namespace nac {
 
-// returns true if c is a valid character to begin an identifier
-static constexpr bool isValidIdentifierFirstCharacter(char c) {
-    return std::isalpha(c) || c == '_' || c == '$';
-}
-
-// returns true if c is a valid character to be anywhere in the identifier after the first character
-static constexpr bool isValidIdentifierCharacter(char c) {
-    return isValidIdentifierFirstCharacter(c) || std::isdigit(c);
-}
-
-// returns true if identifier is a keyword
-static inline bool isKeyword(const std::string& identifier) {
-    return KEYWORDS.find(identifier) != KEYWORDS.end();
-}
-
-// returns true if identifier is a type
-static inline bool isType(const std::string& identifier) {
-    return TYPES.find(identifier) != TYPES.end();
-}
+static constexpr bool isValidIdentifierCharacter(char c);    // returns true if c is a valid identifier character
+static inline bool isKeyword(const std::string& identifier); // returns true if identifier is a keyword
+static inline bool isType(const std::string& identifier);    // returns true if identifier is a type
 
 Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
@@ -65,7 +49,7 @@ Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
 
 std::unique_ptr<Token> Lexer::getNextToken() {
     // if we have come across an identifier
-    if (isValidIdentifierFirstCharacter(string_[index_])) {
+    if (isValidIdentifierCharacter(string_[index_])) {
         // extract the identifier from the string
         std::string identifier(string_.substr(index_, getIdentifierLength()));
 
@@ -100,8 +84,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
         case '}': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_BRACE, "}");
         case ')': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_PAREN, ")");
         case ';': return std::make_unique<Token>(TokenKind::TOKEN_SEMI_COLON, ";");
-        default:
-            throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
+        default: throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
     }
 }
 
@@ -125,7 +108,7 @@ constexpr char Lexer::peek() {
 
 constexpr size_t Lexer::getIdentifierLength() {
     size_t end = index_;
-    while (end < string_.size() && isValidIdentifierCharacter(string_[end])) {
+    while (end < string_.size() && (isValidIdentifierCharacter(string_[end]) || std::isdigit(string_[end]))) {
         ++end;
     }
 
@@ -139,6 +122,18 @@ constexpr size_t Lexer::getNumericLiteralLength() {
     }
 
     return end - index_;
+}
+
+static constexpr bool isValidIdentifierCharacter(char c) {
+    return std::isalpha(c) || c == '_';
+}
+
+static inline bool isKeyword(const std::string& identifier) {
+    return KEYWORDS.find(identifier) != KEYWORDS.end();
+}
+
+static inline bool isType(const std::string& identifier) {
+    return TYPES.find(identifier) != TYPES.end();
 }
 
 } // namespace nac
