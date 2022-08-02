@@ -6,35 +6,21 @@
 
 namespace nac {
 
-enum class Error {
+enum class ExceptionKind {
+    ERRORS_GENERATED,
     FILE_OPEN_FAIL,
-    FILE_READ_FAIL,
-    UNRECOGNISED_TOKEN
+    FILE_READ_FAIL
 };
 
-/**
- * Base class for Sodium compiler exceptions. Inherits std::exception.
- */
 class Exception : public std::exception {
 public:
-    /**
-     * Constructor for Exception. Data member message_ is initialized and an error message is appended to it.
-     * @param error The error for which the message is to be generated.
-     */
-    Exception(Error error);
-
-    /**
-     * Destructor for Exception.
-     */
+    Exception(ExceptionKind kind);
     virtual ~Exception() = default;
 
-    /**
-     * Inherited from std::exception. Overriden in derived classes.
-     */
-    virtual const char* what() const noexcept = 0;
+    virtual const char *what() const noexcept;
 
 protected:
-    std::string message_; // the error message to be output when what() is called
+    std::string message_;
 };
 
 } // namespace nac

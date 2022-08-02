@@ -1,20 +1,28 @@
 #include "sodium/nac/exceptions/exception.h"
 
+#include <string>
+#include <string_view>
+
+#include "sodium/nac/errors/error_manager.h"
+
 namespace nac {
 
-// returns a message describing the argument error
-static constexpr std::string_view getErrorMessage(Error error);
+static std::string_view exceptionMessage(ExceptionKind kind);
 
-Exception::Exception(Error error) : message_("[nac]: error: ") {
-    message_ += getErrorMessage(error);
+Exception::Exception(ExceptionKind kind) : message_("[nac]: ") {
+    message_ += exceptionMessage(kind);
 }
 
-static constexpr std::string_view getErrorMessage(Error error) {
-    switch (error) {
-        case Error::FILE_OPEN_FAIL: return "failed to open file";
-        case Error::FILE_READ_FAIL: return "failed to read contents of file";
-        case Error::UNRECOGNISED_TOKEN: return "unrecognised token";
-        default: return "unknown error code";
+const char *Exception::what() const noexcept {
+    return message_.c_str();
+}
+
+static std::string_view exceptionMessage(ExceptionKind kind) {
+    switch (kind) {
+        case ExceptionKind::ERRORS_GENERATED: return ErrorManager::errorMessages();
+        case ExceptionKind::FILE_OPEN_FAIL: return "error: failed to open file";
+        case ExceptionKind::FILE_READ_FAIL: return "error: failed to read contents of file";
+        default: return "unkown exception";
     }
 }
 

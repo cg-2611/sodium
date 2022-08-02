@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "sodium/nac/errors/error_manager.h"
+#include "sodium/nac/exceptions/exception.h"
 #include "sodium/nac/lexer/lexer.h"
 #include "sodium/nac/lexer/token.h"
 
@@ -10,33 +12,38 @@ namespace nac {
 // used for debugging
 static constexpr std::string_view kindString(TokenKind tokenKind) {
     switch (tokenKind) {
-        case TokenKind::TOKEN_EOF: return "TOKEN_EOF";
-        case TokenKind::TOKEN_KEYWORD: return "TOKEN_KEYWORD";
-        case TokenKind::TOKEN_TYPE: return "TOKEN_TYPE";
-        case TokenKind::TOKEN_IDENTIFIER: return "TOKEN_IDENTIFIER";
-        case TokenKind::TOKEN_NUMERIC_LITERAL: return "TOKEN_NUMERIC_LITERAL";
-        case TokenKind::TOKEN_LEFT_BRACE: return "TOKEN_LEFT_BRACE";
-        case TokenKind::TOKEN_LEFT_PAREN: return "TOKEN_LEFT_PAREN";
-        case TokenKind::TOKEN_RETURN_ARROW: return "TOKEN_RETURN_ARROW";
-        case TokenKind::TOKEN_RIGHT_BRACE: return "TOKEN_RIGHT_BRACE";
-        case TokenKind::TOKEN_RIGHT_PAREN: return "TOKEN_RIGHT_PAREN";
-        case TokenKind::TOKEN_SEMI_COLON: return "TOKEN_SEMI_COLON";
+        case TokenKind::KEYWORD: return "KEYWORD";
+        case TokenKind::TYPE: return "TYPE";
+        case TokenKind::IDENTIFIER: return "IDENTIFIER";
+        case TokenKind::NUMERIC_LITERAL: return "NUMERIC_LITERAL";
+        case TokenKind::LEFT_BRACE: return "LEFT_BRACE";
+        case TokenKind::RIGHT_BRACE: return "RIGHT_BRACE";
+        case TokenKind::LEFT_PAREN: return "LEFT_PAREN";
+        case TokenKind::RIGHT_PAREN: return "RIGHT_PAREN";
+        case TokenKind::ARROW: return "ARROW";
+        case TokenKind::EOF_TOKEN: return "EOF_TOKEN";
+        case TokenKind::ERROR_TOKEN: return "ERROR_TOKEN";
         default: return "UNRECOGNIZED_TOKEN";
     }
 }
 
 // used for debugging
-static void printTokens(Token* token) {
+static void printTokens(Token *token) {
     while (token != nullptr) {
         std::cout << "[nac]: " << kindString(token->kind()) << ": " << token->value() << '\n';
         token = token->next();
     }
 }
 
-void compileFile(File& file) {
-    Lexer lexer = Lexer(file.contents());
+void compileFile(File &file) {
+    Lexer lexer(file.contents());
 
-    std::unique_ptr<Token> token = lexer.tokenize();
+    std::unique_ptr<Token> token(lexer.tokenize());
+
+    if (ErrorManager::hasErrors()) {
+        throw Exception(ExceptionKind::ERRORS_GENERATED);
+    }
+
     printTokens(token.get());
 
     std::cout << "[nac]: compilation complete\n";
