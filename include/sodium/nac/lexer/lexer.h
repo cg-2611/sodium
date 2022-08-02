@@ -2,11 +2,17 @@
 #define SODIUM_NAC_LEXER_LEXER_H
 
 #include <memory>
+#include <unordered_set>
+#include <string_view>
 
-#include "sodium/nac/io/file.h"
 #include "sodium/nac/lexer/token.h"
 
 namespace nac {
+
+/// An std::unordered_set of the keywords (as strings) currently used in Sodium.
+const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
+/// An std::unordered_set of the types (as strings) currently used in Sodium.
+const std::unordered_set<std::string_view> TYPES{"int"};
 
 /**
  * Used to extract, from a string, any tokens used in the Sodium programming language.
@@ -17,7 +23,7 @@ public:
      * Constructor for Lexer. Initializes private members.
      * @param string The string to be tokenized.
      */
-    Lexer(std::string_view string);
+    Lexer(std::string_view src);
 
     /**
      * Destructor for Lexer.
@@ -32,26 +38,21 @@ public:
     [[nodiscard]] std::unique_ptr<Token> tokenize();
 
 private:
-    std::string_view string_;
-    size_t index_;
+    const char *start_;
+    const char *current_;
+    const char *end_;
+    size_t line_;
+    size_t column_;
 
-    // returns the next token in the string from the current position of the lexer
-    // throws an nac::LexerException when an unrecognised token is encountered
-    // note: index_ is not updated
     std::unique_ptr<Token> getNextToken();
+    [[nodiscard]] std::unique_ptr<Token> makeToken(TokenKind kind);
 
-    // increase index_ by offset characters
-    // index_ will not exceed the length of the string
-    void advance(size_t offset);
+    size_t readIdentifier();
+    size_t readNumericLiteral();
 
-    // moves the lexer over all consecutive whitespace characters
-    void skipWhitespace();
-
-    // returns the next character at index_ + 1 but does nit increment index
-    constexpr char peek();
-
-    constexpr size_t getIdentifierLength();     // returns the length of an identifier from index_
-    constexpr size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
+    void advance() noexcept;
+    void skipWhitespace() noexcept;
+    inline bool atEnd() const noexcept;
 };
 
 } // namespace nac

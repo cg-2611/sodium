@@ -1,139 +1,153 @@
 #include "sodium/nac/lexer/lexer.h"
 
-#include <cctype>
+#include <memory>
+#include <string_view>
+#include <utility>
 
-#include "sodium/nac/exceptions/lexer_exception.h"
+#include "sodium/nac/errors/error_manager.h"
+#include "sodium/nac/errors/lexer_error.h"
+#include "sodium/nac/lexer/token.h"
 
 namespace nac {
 
-static constexpr bool isValidIdentifierCharacter(char c);    // returns true if c is a valid identifier character
-static inline bool isKeyword(const std::string& identifier); // returns true if identifier is a keyword
-static inline bool isType(const std::string& identifier);    // returns true if identifier is a type
+static constexpr bool isSpace(char c) noexcept;
+static constexpr bool isDigit(char c) noexcept;
+static constexpr bool isAlpha(char c) noexcept;
+static constexpr bool isIdentifierCharacter(char c) noexcept;
+static inline bool isKeyword(const char *start, size_t length); // returns true if identifier is a keyword
+static inline bool isType(const char *start, size_t length);    // returns true if identifier is a type
 
-Lexer::Lexer(std::string_view string) : string_(string), index_(0) {}
+Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(src.end()), line_(1), column_(1) {}
 
 [[nodiscard]] std::unique_ptr<Token> Lexer::tokenize() {
-    // skip leading whitespace
-    skipWhitespace();
+    std::unique_ptr<Token> token(getNextToken());
 
-    std::unique_ptr<Token> eofToken = std::make_unique<Token>(TokenKind::TOKEN_EOF, "");
-
-    // return eof token for empty string
-    if (index_ >= string_.size()) {
-        return eofToken;
+    while (token->kind() == TokenKind::ERROR_TOKEN) {
+        ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, token.get());
+        token = getNextToken();
     }
 
-    // get the first token
-    std::unique_ptr<Token> token = getNextToken();
-    Token* currentToken = token.get();
+    Token *currentToken = token.get();
 
-    // advance the lexer to the end of the token
-    advance(currentToken->value().size());
-    skipWhitespace();
-
-    // get the remaining tokens
-    while (index_ < string_.size()) {
+    while (!atEnd()) {
         currentToken->next(getNextToken());
+
+        if (currentToken->next()->kind() == TokenKind::ERROR_TOKEN) {
+            ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, currentToken->next());
+            continue;
+        }
+
         currentToken = currentToken->next();
-
-        // advance the lexer to the end of the token
-        advance(currentToken->value().size());
-        skipWhitespace();
     }
-
-    // end the token list with an eof token
-    currentToken->next(std::move(eofToken));
 
     return token;
 }
 
 std::unique_ptr<Token> Lexer::getNextToken() {
-    // if we have come across an identifier
-    if (isValidIdentifierCharacter(string_[index_])) {
-        // extract the identifier from the string
-        std::string identifier(string_.substr(index_, getIdentifierLength()));
+    skipWhitespace();
+    start_ = current_;
 
-        if (isKeyword(identifier)) {
-            return std::make_unique<Token>(TokenKind::TOKEN_KEYWORD, identifier);
-        }
-
-        if (isType(identifier)) {
-            return std::make_unique<Token>(TokenKind::TOKEN_TYPE, identifier);
-        }
-
-        return std::make_unique<Token>(TokenKind::TOKEN_IDENTIFIER, identifier);
+    if (atEnd()) {
+        return makeToken(TokenKind::EOF_TOKEN);
     }
 
-    // if we have come across a numeric literal
-    if (isdigit(string_[index_])) {
-        // extract the numeric literal from the string
-        std::string numericLiteral(string_.substr(index_, getNumericLiteralLength()));
-        return std::make_unique<Token>(TokenKind::TOKEN_NUMERIC_LITERAL, numericLiteral);
+    advance();
+
+    if (isIdentifierCharacter(*start_)) {
+        size_t length = readIdentifier();
+
+        if (isKeyword(start_, length)) {
+            return makeToken(TokenKind::KEYWORD);
+        }
+
+        if (isType(start_, length)) {
+            return makeToken(TokenKind::TYPE);
+        }
+
+        return makeToken(TokenKind::IDENTIFIER);
+    } else if (isDigit(*start_)) {
+        readNumericLiteral();
+        return makeToken(TokenKind::NUMERIC_LITERAL);
     }
 
-    // otherwise
-    switch (string_[index_]) {
+    switch (*start_) {
+        case '{': return makeToken(TokenKind::LEFT_BRACE);
+        case '}': return makeToken(TokenKind::RIGHT_BRACE);
+        case '(': return makeToken(TokenKind::LEFT_PAREN);
+        case ')': return makeToken(TokenKind::RIGHT_PAREN);
         case '-':
-            if (peek() == '>') {
-                return std::make_unique<Token>(TokenKind::TOKEN_RETURN_ARROW, "->");
+            if (*current_ == '>') {
+                advance();
+                return makeToken(TokenKind::ARROW);
             }
-            // temporary until '-' is a valid token
-            throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
-        case '{': return std::make_unique<Token>(TokenKind::TOKEN_LEFT_BRACE, "{");
-        case '(': return std::make_unique<Token>(TokenKind::TOKEN_LEFT_PAREN, "(");
-        case '}': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_BRACE, "}");
-        case ')': return std::make_unique<Token>(TokenKind::TOKEN_RIGHT_PAREN, ")");
-        case ';': return std::make_unique<Token>(TokenKind::TOKEN_SEMI_COLON, ";");
-        default: throw LexerException(Error::UNRECOGNISED_TOKEN, string_[index_]);
+            [[fallthrough]]; // temporary until '-' is a valid token
+        default: return makeToken(TokenKind::ERROR_TOKEN);
     }
 }
 
-void Lexer::advance(size_t offset) {
-    index_ += offset;
+[[nodiscard]] std::unique_ptr<Token> Lexer::makeToken(TokenKind kind) {
+    return std::make_unique<Token>(kind, start_, current_ - start_, line_, column_);
+}
 
-    if (index_ > string_.size()) {
-        index_ = string_.size();
+size_t Lexer::readIdentifier() {
+    while (isIdentifierCharacter(*current_) || isDigit(*current_)) {
+        advance();
+    }
+
+    return current_ - start_;
+}
+
+size_t Lexer::readNumericLiteral() {
+    while (isDigit(*current_)) {
+        advance();
+    }
+
+    return current_ - start_;
+}
+
+// consume current character
+void Lexer::advance() noexcept {
+    ++current_;
+    ++column_;
+}
+
+void Lexer::skipWhitespace() noexcept {
+    while (isSpace(*current_)) {
+        if (*current_ == '\n') {
+            line_++;
+            column_ = 0;
+        }
+
+        advance();
     }
 }
 
-void Lexer::skipWhitespace() {
-    while (std::isspace(string_[index_])) {
-        advance(1);
-    }
+inline bool Lexer::atEnd() const noexcept {
+    return start_ >= end_;
 }
 
-constexpr char Lexer::peek() {
-    return string_[index_ + 1];
+static inline bool isKeyword(const char *start, size_t length) {
+    return KEYWORDS.contains(std::string_view(start, length));
 }
 
-constexpr size_t Lexer::getIdentifierLength() {
-    size_t end = index_;
-    while (end < string_.size() && (isValidIdentifierCharacter(string_[end]) || std::isdigit(string_[end]))) {
-        ++end;
-    }
-
-    return end - index_;
+static inline bool isType(const char *start, size_t length) {
+    return TYPES.contains(std::string_view(start, length));
 }
 
-constexpr size_t Lexer::getNumericLiteralLength() {
-    size_t end = index_;
-    while (end < string_.size() && std::isdigit(string_[end])) {
-        ++end;
-    }
-
-    return end - index_;
+static constexpr bool isIdentifierCharacter(char c) noexcept {
+    return isAlpha(c) || c == '_';
 }
 
-static constexpr bool isValidIdentifierCharacter(char c) {
-    return std::isalpha(c) || c == '_';
+static constexpr bool isAlpha(char c) noexcept {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-static inline bool isKeyword(const std::string& identifier) {
-    return KEYWORDS.find(identifier) != KEYWORDS.end();
+static constexpr bool isDigit(char c) noexcept {
+    return c >= '0' && c <= '9';
 }
 
-static inline bool isType(const std::string& identifier) {
-    return TYPES.find(identifier) != TYPES.end();
+static constexpr bool isSpace(char c) noexcept {
+    return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
 }
 
 } // namespace nac
