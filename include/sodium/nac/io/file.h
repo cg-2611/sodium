@@ -15,7 +15,7 @@ public:
      * when this is called.
      * @param path The path to the file.
      */
-    File(std::string  path);
+    File(std::string path);
 
     /**
      * Destructor for File.
@@ -25,19 +25,19 @@ public:
     /**
      * @return The path of the file as a string.
      */
-    const std::string& path() const noexcept;
+    const std::string &path() const noexcept;
 
     /**
      * @return The contents of the file as a string.
      */
-    const std::string& contents() const noexcept;
+    const std::string &contents() const noexcept;
 
     /**
      * @return The size of the file in bytes.
      */
     size_t size() const noexcept;
 
-  private:
+private:
     std::string path_;
     std::string contents_;
     size_t size_;

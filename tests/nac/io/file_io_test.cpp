@@ -37,7 +37,7 @@ protected:
         try {
             std::filesystem::remove(EMPTY_FILE_PATH);
             std::filesystem::remove(TEST_FILE_PATH);
-        } catch (const std::filesystem::filesystem_error& e) {
+        } catch (const std::filesystem::filesystem_error &e) {
             FAIL() << "FileReaderTest: error removing temporary file: " << e.what() << '\n';
         }
     }

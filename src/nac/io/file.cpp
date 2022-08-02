@@ -1,20 +1,21 @@
 #include "sodium/nac/io/file.h"
 
 #include <utility>
+#include <string>
 
 #include "sodium/nac/io/file_io.h"
 
 namespace nac {
 
-File::File(std::string  path) : path_(std::move(path)), size_(0) {
+File::File(std::string path) : path_(std::move(path)), size_(0) {
     std::tie(size_, contents_) = io::readFile(path_);
 }
 
-const std::string& File::path() const noexcept {
+const std::string &File::path() const noexcept {
     return path_;
 }
 
-const std::string& File::contents() const noexcept {
+const std::string &File::contents() const noexcept {
     return contents_;
 }
 
