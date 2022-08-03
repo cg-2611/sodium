@@ -39,8 +39,11 @@ class Token {
 public:
     /**
      * Constructor for a token.
-     * @param kind the kind of token being constructed, must be one of nac::TokenKind.
-     * @param value the value of the token as a string.
+     * @param kind The kind of token being constructed, must be one of nac::TokenKind.
+     * @param position A pointer to the first character of the token.
+     * @param length The length of the token.
+     * @param line The line the token is on.
+     * @param column The column the token is at.
      */
     Token(TokenKind kind, const char *position, size_t length, size_t line, size_t column);
 
@@ -75,12 +78,26 @@ public:
     /**
      * @return The value of this token as a string.
      */
-    // const std::string& value() const noexcept;
-
     std::string_view value() const noexcept;
+
+    /**
+     * @return A pointer to the first character of the token.
+     */
     const char *position() const noexcept;
+
+    /**
+     * @return The length of the token.
+     */
     int length() const noexcept;
+
+    /**
+     * @return The line the token is on.
+     */
     size_t line() const noexcept;
+
+    /**
+     * @return The column the token is at.
+     */
     size_t column() const noexcept;
 
     /**

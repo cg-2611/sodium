@@ -6,9 +6,21 @@
 
 namespace nac {
 
+/**
+ * A derived class of nac::Error for errors generated in the lexer.
+ */
 class LexerError : public Error {
 public:
-    LexerError(ErrorKind errorKind, Token *token);
+    /**
+     * Constructor for LexerError.
+     * @param kind The kind of the error, must be one of nac::ErrorKind.
+     * @param token The token that has caused the error.
+     */
+    LexerError(ErrorKind kind, Token *token);
+
+    /**
+     * Destructor for LexerError.
+     */
     ~LexerError() = default;
 };
 

@@ -10,6 +10,7 @@
 
 namespace nac {
 
+// helper functions
 static constexpr bool isSpace(char c) noexcept;
 static constexpr bool isDigit(char c) noexcept;
 static constexpr bool isAlpha(char c) noexcept;
@@ -22,7 +23,9 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
 [[nodiscard]] std::unique_ptr<Token> Lexer::tokenize() {
     std::unique_ptr<Token> token(getNextToken());
 
+    // skip all tokens until the first valid token is encountered
     while (token->kind() == TokenKind::ERROR_TOKEN) {
+        // for each error token encountered add it to the vector of errors
         ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, token.get());
         token = getNextToken();
     }
@@ -32,6 +35,7 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
     while (!atEnd()) {
         currentToken->next(getNextToken());
 
+        // if the token is an error, add it to the vector of errors and read the next token
         if (currentToken->next()->kind() == TokenKind::ERROR_TOKEN) {
             ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, currentToken->next());
             continue;
@@ -43,7 +47,8 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
     return token;
 }
 
-std::unique_ptr<Token> Lexer::getNextToken() {
+[[nodiscard]] std::unique_ptr<Token> Lexer::getNextToken() {
+    // skip leading whitespace before the token
     skipWhitespace();
     start_ = current_;
 
@@ -54,6 +59,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
     advance();
 
     if (isIdentifierCharacter(*start_)) {
+        // read an identifier if the current token starts with a valid identifier character
         size_t length = readIdentifier();
 
         if (isKeyword(start_, length)) {
@@ -66,6 +72,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
 
         return makeToken(TokenKind::IDENTIFIER);
     } else if (isDigit(*start_)) {
+        // read a numeric literal if the current token starts with a digit
         readNumericLiteral();
         return makeToken(TokenKind::NUMERIC_LITERAL);
     }
@@ -76,6 +83,7 @@ std::unique_ptr<Token> Lexer::getNextToken() {
         case '(': return makeToken(TokenKind::LEFT_PAREN);
         case ')': return makeToken(TokenKind::RIGHT_PAREN);
         case '-':
+            // if the current token starts with a '-' and the next character is a '>'
             if (*current_ == '>') {
                 advance();
                 return makeToken(TokenKind::ARROW);

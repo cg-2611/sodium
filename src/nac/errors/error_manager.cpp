@@ -10,7 +10,7 @@
 namespace nac {
 
 std::vector<Error> ErrorManager::errors_{};
-std::string ErrorManager::errorMessages_("");
+std::string ErrorManager::errorMessages_{};
 
 bool ErrorManager::hasErrors() noexcept {
     return !errors_.empty();
@@ -22,7 +22,7 @@ size_t ErrorManager::errorCount() noexcept {
 
 std::string_view ErrorManager::errorMessages() {
     for (const Error &error : errors_) {
-        errorMessages_ += error.getMessage() + "\n[nac]: ";
+        errorMessages_ += error.message() + "\n[nac]: ";
     }
 
     errorMessages_ += StringFormatter::formatString("generated %lu errors", errorCount());

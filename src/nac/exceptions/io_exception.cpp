@@ -1,7 +1,6 @@
 #include "sodium/nac/exceptions/io_exception.h"
 
 #include <cerrno>
-#include <cstdio>
 #include <string>
 
 #include "sodium/nac/exceptions/exception.h"

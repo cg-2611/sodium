@@ -9,9 +9,9 @@
 
 namespace nac {
 
-/// An std::unordered_set of the keywords (as strings) currently used in Sodium.
+/// An std::unordered_set of the keywords currently used in Sodium.
 const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
-/// An std::unordered_set of the types (as strings) currently used in Sodium.
+/// An std::unordered_set of the types currently used in Sodium.
 const std::unordered_set<std::string_view> TYPES{"int"};
 
 /**
@@ -20,8 +20,8 @@ const std::unordered_set<std::string_view> TYPES{"int"};
 class Lexer {
 public:
     /**
-     * Constructor for Lexer. Initializes private members.
-     * @param string The string to be tokenized.
+     * Constructor for Lexer.
+     * @param src The string to be tokenized.
      */
     Lexer(std::string_view src);
 
@@ -33,26 +33,31 @@ public:
     /**
      * Extracts the Sodium programming language tokens from the string.
      * @return An std::unique_ptr<Token> pointer to the first token in the string.
-     * @throws An nac::LexerException when an unrecognised token is encountered.
      */
     [[nodiscard]] std::unique_ptr<Token> tokenize();
 
 private:
-    const char *start_;
-    const char *current_;
-    const char *end_;
+    const char *start_;   // the start of the current token being lexed
+    const char *current_; // the current character being lexed
+    const char *end_;     // the end of the string
     size_t line_;
     size_t column_;
 
-    std::unique_ptr<Token> getNextToken();
+    // returns a unique pointer to the next token in the string
+    [[nodiscard]] std::unique_ptr<Token> getNextToken();
+
+    // constructs and returns a token of the specified kind
     [[nodiscard]] std::unique_ptr<Token> makeToken(TokenKind kind);
 
+    // advances the lexer to the character after the end of an identifier
     size_t readIdentifier();
+
+    // advances the lexer to the character after the end of a numeric literal
     size_t readNumericLiteral();
 
     void advance() noexcept;
     void skipWhitespace() noexcept;
-    inline bool atEnd() const noexcept;
+    inline bool atEnd() const noexcept; // returns true if the end of the string is reached
 };
 
 } // namespace nac

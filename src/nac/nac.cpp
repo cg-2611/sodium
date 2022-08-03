@@ -1,6 +1,7 @@
 #include "sodium/nac/nac.h"
 
 #include <iostream>
+#include <string_view>
 
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/exceptions/exception.h"
@@ -40,6 +41,7 @@ void compileFile(File &file) {
 
     std::unique_ptr<Token> token(lexer.tokenize());
 
+    // if errors have been encountered during tokenizing, throw an exception
     if (ErrorManager::hasErrors()) {
         throw Exception(ExceptionKind::ERRORS_GENERATED);
     }

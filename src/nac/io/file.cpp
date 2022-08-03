@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <string>
+#include <tuple>
 
 #include "sodium/nac/io/file_io.h"
 

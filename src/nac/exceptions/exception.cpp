@@ -6,6 +6,7 @@
 
 namespace nac {
 
+// returns the corresponding string describing the kind of exception passed
 static std::string_view getExceptionMessage(ExceptionKind kind);
 
 Exception::Exception(ExceptionKind kind) : message_("[nac]: ") {
