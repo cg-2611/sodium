@@ -11,7 +11,7 @@ namespace nac {
 
 class ErrorManager {
 public:
-    template<class E, class... Args>
+    template<class E, typename... Args>
     static void addError(Args &&...args) {
         errors_.push_back(E(std::forward<Args>(args)...));
     }

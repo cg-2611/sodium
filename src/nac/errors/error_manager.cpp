@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "sodium/nac/errors/error.h"
+#include "sodium/nac/util/string_formatter.h"
 
 namespace nac {
 
@@ -24,7 +25,7 @@ std::string_view ErrorManager::errorMessages() {
         errorMessages_ += error.getMessage() + "\n[nac]: ";
     }
 
-    errorMessages_ += "generated " + std::to_string(errorCount()) + " errors";
+    errorMessages_ += StringFormatter::formatString("generated %lu errors", errorCount());
 
     return std::string_view(errorMessages_);
 }

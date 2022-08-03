@@ -5,22 +5,16 @@
 #include <string>
 
 #include "sodium/nac/exceptions/exception.h"
+#include "sodium/nac/util/string_formatter.h"
 
 namespace nac {
 
-IOException::IOException(ExceptionKind exceptionKind, const std::string &filePath) : Exception(exceptionKind) {
-    size_t mLength = filePath.size() + 3;
-    std::string m(mLength, '\0');
-    std::sprintf(m.data(), " \'%s\'", filePath.c_str());
-    message_ += m;
+IOException::IOException(ExceptionKind kind, const std::string &filePath) : Exception(kind) {
+    message_ += StringFormatter::formatString(" \'%s\'", filePath.c_str());
 
     // if errno is set, get the errno string and append to message_
     if (errno != 0) {
-        std::string errnoMessage(std::strerror(errno));
-        const size_t nLength = errnoMessage.size() + std::to_string(errno).size() + 11;
-        std::string n(nLength, '\0');
-        std::sprintf(n.data(), ": %s (errno %d)", errnoMessage.c_str(), errno);
-        message_ += n;
+        message_ += StringFormatter::formatString(": %s (errno %d)", std::strerror(errno), errno);
     }
 }
 

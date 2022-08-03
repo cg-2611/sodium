@@ -9,7 +9,7 @@ namespace nac {
 
 class IOException : public Exception {
 public:
-    IOException(ExceptionKind exceptionKind, const std::string &filePath);
+    IOException(ExceptionKind kind, const std::string &filePath);
     ~IOException() = default;
 
     const char *what() const noexcept override;
