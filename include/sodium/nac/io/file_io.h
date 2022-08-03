@@ -5,7 +5,7 @@
 #include <tuple>
 
 namespace nac {
-namespace io {
+namespace IO {
 
 /**
  * Function used to read the contents of a file.
@@ -16,7 +16,7 @@ namespace io {
  */
 [[nodiscard]] std::tuple<size_t, std::string> readFile(const std::string &filePath);
 
-} // namespace io
+} // namespace IO
 } // namespace nac
 
 #endif // SODIUM_NAC_IO_FILE_IO_H

@@ -11,7 +11,7 @@
 
 namespace nac {
 
-[[nodiscard]] std::tuple<size_t, std::string> io::readFile(const std::string &filePath) {
+[[nodiscard]] std::tuple<size_t, std::string> IO::readFile(const std::string &filePath) {
     // create a unique pointer for the file descriptor
     // the file is opened in read mode on construction and uses fclose in the custom deleter
     // this ensures that the file is always closed on destruction of the unique pointer
