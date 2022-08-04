@@ -23,6 +23,7 @@ static constexpr std::string_view kindString(TokenKind tokenKind) {
         case TokenKind::RIGHT_PAREN: return "RIGHT_PAREN";
         case TokenKind::ARROW: return "ARROW";
         case TokenKind::EOF_TOKEN: return "EOF_TOKEN";
+        case TokenKind::EOL_TOKEN: return "EOL_TOKEN";
         case TokenKind::ERROR_TOKEN: return "ERROR_TOKEN";
         default: return "UNRECOGNIZED_TOKEN";
     }

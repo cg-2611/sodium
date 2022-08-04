@@ -29,6 +29,7 @@ enum class TokenKind {
 
     // miscellaneous tokens
     EOF_TOKEN,
+    EOL_TOKEN,
     ERROR_TOKEN
 };
 
@@ -76,9 +77,14 @@ public:
     TokenKind kind() const noexcept;
 
     /**
-     * @return The value of this token as a string.
+     * @return The line the token is on.
      */
-    std::string_view value() const noexcept;
+    size_t line() const noexcept;
+
+    /**
+     * @return The column the token is at.
+     */
+    size_t column() const noexcept;
 
     /**
      * @return A pointer to the first character of the token.
@@ -91,14 +97,9 @@ public:
     int length() const noexcept;
 
     /**
-     * @return The line the token is on.
+     * @return The value of this token as a string.
      */
-    size_t line() const noexcept;
-
-    /**
-     * @return The column the token is at.
-     */
-    size_t column() const noexcept;
+    std::string_view value() const noexcept;
 
     /**
      * @return A raw pointer to the token that comes after this token.
@@ -113,11 +114,14 @@ public:
 
 private:
     TokenKind kind_;
-    const char *position_;
-    int length_;
+
     size_t line_;
     size_t column_;
+
+    const char *position_; // pointer to start of token
+    int length_;
     std::string_view value_;
+
     std::unique_ptr<Token> next_;
 };
 

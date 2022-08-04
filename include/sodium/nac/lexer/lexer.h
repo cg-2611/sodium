@@ -57,7 +57,8 @@ private:
 
     void advance() noexcept;
     void skipWhitespace() noexcept;
-    inline bool atEnd() const noexcept; // returns true if the end of the string is reached
+    inline bool atEndOfString() const noexcept; // returns true if the end of the string is reached
+    inline bool atEndOfLine() const noexcept; // returns true if the end of the current line is reached
 };
 
 } // namespace nac

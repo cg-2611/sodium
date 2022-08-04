@@ -140,6 +140,15 @@ TEST(LexerTest, LexerReadsEmptyString) {
     EXPECT_EQ(emptyString, token->value());
 }
 
+TEST(LexerTest, LexerReadsEndOfLine) {
+    std::string endOfLineString("\n");
+    nac::Lexer lexer(endOfLineString);
+    std::unique_ptr<nac::Token> token = lexer.tokenize();
+
+    EXPECT_EQ(nac::TokenKind::EOL_TOKEN, token->kind());
+    EXPECT_EQ(endOfLineString, token->value());
+}
+
 TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
     nac::Lexer lexer("identifier 2 { -> )");
     std::unique_ptr<nac::Token> firstToken = lexer.tokenize();
@@ -167,7 +176,7 @@ TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {
-    nac::Lexer lexer("  \n    \t \r\f \v   ");
+    nac::Lexer lexer("    \t \r\f \v   ");
     std::unique_ptr<nac::Token> token = lexer.tokenize();
 
     EXPECT_EQ(nac::TokenKind::EOF_TOKEN, token->kind());
@@ -175,7 +184,7 @@ TEST(LexerTest, LexerSkipsWhitespace1) {
 }
 
 TEST(LexerTest, LexerSkipsWhitespace2) {
-    nac::Lexer lexer("  \n    \t \ridentifier\f \v   ");
+    nac::Lexer lexer("    \t \ridentifier\f \v   ");
     std::unique_ptr<nac::Token> token = lexer.tokenize();
 
     EXPECT_EQ(nac::TokenKind::IDENTIFIER, token->kind());

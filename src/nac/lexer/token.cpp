@@ -8,19 +8,15 @@ namespace nac {
 
 Token::Token(TokenKind kind, const char *position, size_t length, size_t line, size_t column)
         : kind_(kind),
-          position_(position),
-          length_(length),
           line_(line),
           column_(column - length),
+          position_(position),
+          length_(length),
           value_(position_, length_),
           next_(nullptr) {}
 
 TokenKind Token::kind() const noexcept {
     return kind_;
-}
-
-std::string_view Token::value() const noexcept {
-    return value_;
 }
 
 size_t Token::line() const noexcept{
@@ -37,6 +33,10 @@ const char *Token::position() const noexcept {
 
 int Token::length() const noexcept {
     return length_;
+}
+
+std::string_view Token::value() const noexcept {
+    return value_;
 }
 
 Token *Token::next() const noexcept {

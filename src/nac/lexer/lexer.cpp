@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "sodium/nac/errors/error_manager.h"
+#include "sodium/nac/errors/error.h"
 #include "sodium/nac/errors/lexer_error.h"
 #include "sodium/nac/lexer/token.h"
 
@@ -32,7 +33,7 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
 
     Token *currentToken = token.get();
 
-    while (!atEnd()) {
+    while (!atEndOfString()) {
         currentToken->next(getNextToken());
 
         // if the token is an error, add it to the vector of errors and read the next token
@@ -52,8 +53,15 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
     skipWhitespace();
     start_ = current_;
 
-    if (atEnd()) {
+    if (atEndOfString()) {
         return makeToken(TokenKind::EOF_TOKEN);
+    }
+
+    if (atEndOfLine()) {
+        advance();
+        ++line_;
+        column_ = 1;
+        return makeToken(TokenKind::EOL_TOKEN);
     }
 
     advance();
@@ -113,7 +121,6 @@ size_t Lexer::readNumericLiteral() {
     return current_ - start_;
 }
 
-// consume current character
 void Lexer::advance() noexcept {
     ++current_;
     ++column_;
@@ -121,17 +128,16 @@ void Lexer::advance() noexcept {
 
 void Lexer::skipWhitespace() noexcept {
     while (isSpace(*current_)) {
-        if (*current_ == '\n') {
-            line_++;
-            column_ = 0;
-        }
-
         advance();
     }
 }
 
-inline bool Lexer::atEnd() const noexcept {
+inline bool Lexer::atEndOfString() const noexcept {
     return start_ >= end_;
+}
+
+inline bool Lexer::atEndOfLine() const noexcept {
+    return *start_ == '\n';
 }
 
 static inline bool isKeyword(const char *start, size_t length) {
@@ -155,7 +161,7 @@ static constexpr bool isDigit(char c) noexcept {
 }
 
 static constexpr bool isSpace(char c) noexcept {
-    return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
+    return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
 }
 
 } // namespace nac
