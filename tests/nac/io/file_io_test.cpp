@@ -37,25 +37,25 @@ protected:
         try {
             std::filesystem::remove(EMPTY_FILE_PATH);
             std::filesystem::remove(TEST_FILE_PATH);
-        } catch (const std::filesystem::filesystem_error& e) {
+        } catch (const std::filesystem::filesystem_error &e) {
             FAIL() << "FileReaderTest: error removing temporary file: " << e.what() << '\n';
         }
     }
 };
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
-    EXPECT_THROW(auto _ = nac::io::readFile("./file_that_does_not_exist.txt"), nac::IOException);
+    EXPECT_THROW(auto _ = nac::IO::readFile("./file_that_does_not_exist.txt"), nac::IOException);
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {
-    auto [fileSize, fileContents] = nac::io::readFile(TEST_FILE_PATH);
+    auto [fileSize, fileContents] = nac::IO::readFile(TEST_FILE_PATH);
 
     EXPECT_EQ(TEST_FILE_TEXT, fileContents);
     EXPECT_EQ(fileSize, fileContents.size());
 }
 
 TEST_F(FileReaderTest, EmptyFileCanBeRead) {
-    auto [fileSize, fileContents] = nac::io::readFile(EMPTY_FILE_PATH.string());
+    auto [fileSize, fileContents] = nac::IO::readFile(EMPTY_FILE_PATH.string());
 
     EXPECT_EQ("", fileContents);
     EXPECT_EQ(fileSize, fileContents.size());

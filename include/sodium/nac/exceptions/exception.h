@@ -6,10 +6,13 @@
 
 namespace nac {
 
-enum class Error {
+/**
+ * An enum of the different kinds of exception that can be thrown.
+ */
+enum class ExceptionKind {
+    ERRORS_GENERATED,
     FILE_OPEN_FAIL,
-    FILE_READ_FAIL,
-    UNRECOGNISED_TOKEN
+    FILE_READ_FAIL
 };
 
 /**
@@ -18,10 +21,10 @@ enum class Error {
 class Exception : public std::exception {
 public:
     /**
-     * Constructor for Exception. Data member message_ is initialized and an error message is appended to it.
-     * @param error The error for which the message is to be generated.
+     * Constructor for Exception.
+     * @param kind The kind of the exception, must be one of nac::ExceptionKind.
      */
-    Exception(Error error);
+    Exception(ExceptionKind kind);
 
     /**
      * Destructor for Exception.
@@ -31,10 +34,10 @@ public:
     /**
      * Inherited from std::exception. Overriden in derived classes.
      */
-    virtual const char* what() const noexcept = 0;
+    virtual const char *what() const noexcept;
 
 protected:
-    std::string message_; // the error message to be output when what() is called
+    std::string message_; // the string to be output when what() is called
 };
 
 } // namespace nac

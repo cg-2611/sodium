@@ -7,6 +7,7 @@ target_sources(nac_test
     PRIVATE
         nac/io/file_io_test.cpp
         nac/lexer/lexer_test.cpp
+        nac/util/string_formatter_test.cpp
 )
 
 add_test(NAME nac_test COMMAND nac_test)

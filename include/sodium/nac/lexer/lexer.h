@@ -2,11 +2,17 @@
 #define SODIUM_NAC_LEXER_LEXER_H
 
 #include <memory>
+#include <unordered_set>
+#include <string_view>
 
-#include "sodium/nac/io/file.h"
 #include "sodium/nac/lexer/token.h"
 
 namespace nac {
+
+/// An std::unordered_set of the keywords currently used in Sodium.
+const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
+/// An std::unordered_set of the types currently used in Sodium.
+const std::unordered_set<std::string_view> TYPES{"int"};
 
 /**
  * Used to extract, from a string, any tokens used in the Sodium programming language.
@@ -14,10 +20,10 @@ namespace nac {
 class Lexer {
 public:
     /**
-     * Constructor for Lexer. Initializes private members.
-     * @param string The string to be tokenized.
+     * Constructor for Lexer.
+     * @param src The string to be tokenized.
      */
-    Lexer(std::string_view string);
+    Lexer(std::string_view src);
 
     /**
      * Destructor for Lexer.
@@ -27,31 +33,32 @@ public:
     /**
      * Extracts the Sodium programming language tokens from the string.
      * @return An std::unique_ptr<Token> pointer to the first token in the string.
-     * @throws An nac::LexerException when an unrecognised token is encountered.
      */
     [[nodiscard]] std::unique_ptr<Token> tokenize();
 
 private:
-    std::string_view string_;
-    size_t index_;
+    const char *start_;   // the start of the current token being lexed
+    const char *current_; // the current character being lexed
+    const char *end_;     // the end of the string
+    size_t line_;
+    size_t column_;
 
-    // returns the next token in the string from the current position of the lexer
-    // throws an nac::LexerException when an unrecognised token is encountered
-    // note: index_ is not updated
-    std::unique_ptr<Token> getNextToken();
+    // returns a unique pointer to the next token in the string
+    [[nodiscard]] std::unique_ptr<Token> getNextToken();
 
-    // increase index_ by offset characters
-    // index_ will not exceed the length of the string
-    void advance(size_t offset);
+    // constructs and returns a token of the specified kind
+    [[nodiscard]] std::unique_ptr<Token> makeToken(TokenKind kind);
 
-    // moves the lexer over all consecutive whitespace characters
-    void skipWhitespace();
+    // advances the lexer to the character after the end of an identifier
+    size_t readIdentifier();
 
-    // returns the next character at index_ + 1 but does nit increment index
-    constexpr char peek();
+    // advances the lexer to the character after the end of a numeric literal
+    size_t readNumericLiteral();
 
-    constexpr size_t getIdentifierLength();     // returns the length of an identifier from index_
-    constexpr size_t getNumericLiteralLength(); // returns the length of a numeric literal from index_
+    void advance() noexcept;
+    void skipWhitespace() noexcept;
+    inline bool atEndOfString() const noexcept; // returns true if the end of the string is reached
+    inline bool atEndOfLine() const noexcept; // returns true if the end of the current line is reached
 };
 
 } // namespace nac

@@ -1,20 +1,45 @@
 #include "sodium/nac/lexer/token.h"
 
+#include <memory>
+#include <string_view>
 #include <utility>
 
 namespace nac {
 
-Token::Token(TokenKind kind, std::string  value) : kind_(kind), value_(std::move(value)), next_(nullptr) {}
+Token::Token(TokenKind kind, const char *position, size_t length, size_t line, size_t column)
+        : kind_(kind),
+          line_(line),
+          column_(column - length),
+          position_(position),
+          length_(length),
+          value_(position_, length_),
+          next_(nullptr) {}
 
 TokenKind Token::kind() const noexcept {
     return kind_;
 }
 
-const std::string& Token::value() const noexcept {
+size_t Token::line() const noexcept{
+    return line_;
+}
+
+size_t Token::column() const noexcept{
+    return column_;
+}
+
+const char *Token::position() const noexcept {
+    return position_;
+}
+
+int Token::length() const noexcept {
+    return length_;
+}
+
+std::string_view Token::value() const noexcept {
     return value_;
 }
 
-Token* Token::next() const noexcept {
+Token *Token::next() const noexcept {
     return next_.get();
 }
 

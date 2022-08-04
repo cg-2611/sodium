@@ -6,9 +6,11 @@ target_include_directories(libnac PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_sources(libnac
     PRIVATE
         nac/nac.cpp
+        nac/errors/error.cpp
+        nac/errors/error_manager.cpp
+        nac/errors/lexer_error.cpp
         nac/exceptions/exception.cpp
         nac/exceptions/io_exception.cpp
-        nac/exceptions/lexer_exception.cpp
         nac/io/file.cpp
         nac/io/file_io.cpp
         nac/lexer/lexer.cpp
