@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace nac {
+namespace sodium {
 
 /**
  * Used to store information about a file, such as its path, size and contents.
@@ -43,6 +43,6 @@ private:
     size_t size_;
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_IO_FILE_H

@@ -5,16 +5,16 @@
 
 #include "sodium/nac/exceptions/exception.h"
 
-namespace nac {
+namespace sodium {
 
 /**
- * A derived class of nac::Exception for exceptions generated during file i/o.
+ * A derived class of sodium::Exception for exceptions generated during file i/o.
  */
 class IOException : public Exception {
 public:
     /**
      * Constructor for IOException. If errno is set, the errno string is appended to the exception message.
-     * @param kind The kind of the exception, must be one of nac::ExceptionKind.
+     * @param kind The kind of the exception, must be one of sodium::ExceptionKind.
      * @param filePath The path of the file that has caused the exception to be thrown.
      */
     IOException(ExceptionKind kind, const std::string &filePath);
@@ -30,6 +30,6 @@ public:
     const char *what() const noexcept override;
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_EXCEPTIONS_IO_EXCEPTION_H

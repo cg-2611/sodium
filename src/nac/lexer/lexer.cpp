@@ -9,7 +9,7 @@
 #include "sodium/nac/errors/lexer_error.h"
 #include "sodium/nac/lexer/token.h"
 
-namespace nac {
+namespace sodium {
 
 // helper functions
 static constexpr bool isSpace(char c) noexcept;
@@ -164,4 +164,4 @@ static constexpr bool isSpace(char c) noexcept {
     return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
 }
 
-} // namespace nac
+} // namespace sodium

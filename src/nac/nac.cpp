@@ -8,7 +8,7 @@
 #include "sodium/nac/lexer/lexer.h"
 #include "sodium/nac/lexer/token.h"
 
-namespace nac {
+namespace sodium {
 
 // used for debugging
 static constexpr std::string_view kindString(TokenKind tokenKind) {
@@ -52,4 +52,4 @@ void compileFile(File &file) {
     std::cout << "[nac]: compilation complete\n";
 }
 
-} // namespace nac
+} // namespace sodium

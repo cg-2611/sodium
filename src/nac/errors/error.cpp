@@ -4,7 +4,7 @@
 
 #include "sodium/nac/util/string_formatter.h"
 
-namespace nac {
+namespace sodium {
 
 // returns the corresponding string describing the kind of error passed
 static std::string_view getErrorMessage(ErrorKind kind);
@@ -25,4 +25,4 @@ static std::string_view getErrorMessage(ErrorKind kind) {
     }
 }
 
-} // namespace nac
+} // namespace sodium

@@ -4,16 +4,16 @@
 #include "sodium/nac/errors/error.h"
 #include "sodium/nac/lexer/token.h"
 
-namespace nac {
+namespace sodium {
 
 /**
- * A derived class of nac::Error for errors generated in the lexer.
+ * A derived class of sodium::Error for errors generated in the lexer.
  */
 class LexerError : public Error {
 public:
     /**
      * Constructor for LexerError.
-     * @param kind The kind of the error, must be one of nac::ErrorKind.
+     * @param kind The kind of the error, must be one of sodium::ErrorKind.
      * @param token The token that has caused the error.
      */
     LexerError(ErrorKind kind, Token *token);
@@ -24,6 +24,6 @@ public:
     ~LexerError() = default;
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_ERROR_LEXER_ERROR_H

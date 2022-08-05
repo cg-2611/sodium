@@ -9,7 +9,7 @@
 #include "sodium/nac/exceptions/exception.h"
 #include "sodium/nac/exceptions/io_exception.h"
 
-namespace nac {
+namespace sodium {
 
 [[nodiscard]] std::tuple<size_t, std::string> IO::readFile(const std::string &filePath) {
     // create a unique pointer for the file descriptor
@@ -34,4 +34,4 @@ namespace nac {
     return std::make_tuple(fileSize, fileContents);
 }
 
-} // namespace nac
+} // namespace sodium

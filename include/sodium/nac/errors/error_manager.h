@@ -8,7 +8,7 @@
 
 #include "error.h"
 
-namespace nac {
+namespace sodium {
 
 /**
  * A static class used to collect errors that are generated  during compilation.
@@ -16,8 +16,8 @@ namespace nac {
 class ErrorManager {
 public:
     /**
-     * Creates and pushes an nac::Error of class E to the vector of errors.
-     * @param args The arguments required to construct a new nac::Error of class E.
+     * Creates and pushes an sodium::Error of class E to the vector of errors.
+     * @param args The arguments required to construct a new sodium::Error of class E.
      */
     template<class E, typename... Args>
     static void addError(Args &&...args) {
@@ -25,12 +25,12 @@ public:
     }
 
     /**
-     * @return True if the errors vector contains instances of nac::Errors.
+     * @return True if the errors vector contains instances of sodium::Errors.
      */
     static bool hasErrors() noexcept;
 
     /**
-     * @return The total number of nac::Error objects in the errors vector.
+     * @return The total number of sodium::Error objects in the errors vector.
      */
     static size_t errorCount() noexcept;
 
@@ -49,6 +49,6 @@ private:
     ~ErrorManager() = default;
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_ERROR_ERROR_MANAGER_H

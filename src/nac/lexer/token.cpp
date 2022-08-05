@@ -4,7 +4,7 @@
 #include <string_view>
 #include <utility>
 
-namespace nac {
+namespace sodium {
 
 Token::Token(TokenKind kind, const char *position, size_t length, size_t line, size_t column)
         : kind_(kind),
@@ -47,4 +47,4 @@ void Token::next(std::unique_ptr<Token> next) noexcept {
     next_ = std::move(next);
 }
 
-} // namespace nac
+} // namespace sodium

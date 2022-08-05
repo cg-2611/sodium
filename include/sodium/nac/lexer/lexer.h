@@ -7,7 +7,7 @@
 
 #include "sodium/nac/lexer/token.h"
 
-namespace nac {
+namespace sodium {
 
 /// An std::unordered_set of the keywords currently used in Sodium.
 const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
@@ -61,6 +61,6 @@ private:
     inline bool atEndOfLine() const noexcept; // returns true if the end of the current line is reached
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_LEXER_LEXER_H

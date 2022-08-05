@@ -4,7 +4,7 @@
 
 #include "sodium/nac/errors/error_manager.h"
 
-namespace nac {
+namespace sodium {
 
 // returns the corresponding string describing the kind of exception passed
 static std::string_view getExceptionMessage(ExceptionKind kind);
@@ -26,4 +26,4 @@ static std::string_view getExceptionMessage(ExceptionKind kind) {
     }
 }
 
-} // namespace nac
+} // namespace sodium
