@@ -3,7 +3,7 @@
 
 #include "sodium/nac/io/file.h"
 
-namespace nac {
+namespace sodium {
 
 /**
  * --- UNFINISHED --- when finished it will compile a file, currently tokenizes a file.
@@ -12,6 +12,6 @@ namespace nac {
  */
 void compileFile(File &file);
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_NAC_H

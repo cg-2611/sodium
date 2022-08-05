@@ -6,7 +6,7 @@
 #include "sodium/nac/exceptions/exception.h"
 #include "sodium/nac/util/string_formatter.h"
 
-namespace nac {
+namespace sodium {
 
 IOException::IOException(ExceptionKind kind, const std::string &filePath) : Exception(kind) {
     message_ += StringFormatter::formatString(" \'%s\'", filePath.c_str());
@@ -21,4 +21,4 @@ const char *IOException::what() const noexcept {
     return message_.c_str();
 }
 
-} // namespace nac
+} // namespace sodium

@@ -4,7 +4,7 @@
 #include <memory>
 #include <string_view>
 
-namespace nac {
+namespace sodium {
 
 /**
  * An enum of the different kinds of tokens currently used in Sodium.
@@ -40,7 +40,7 @@ class Token {
 public:
     /**
      * Constructor for a token.
-     * @param kind The kind of token being constructed, must be one of nac::TokenKind.
+     * @param kind The kind of token being constructed, must be one of sodium::TokenKind.
      * @param position A pointer to the first character of the token.
      * @param length The length of the token.
      * @param line The line the token is on.
@@ -125,6 +125,6 @@ private:
     std::unique_ptr<Token> next_;
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_LEXER_TOKEN_H

@@ -10,8 +10,8 @@ int main(int argc, const char *argv[]) {
     }
 
     try {
-        nac::File file(argv[1]);
-        nac::compileFile(file);
+        sodium::File file(argv[1]);
+        sodium::compileFile(file);
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;

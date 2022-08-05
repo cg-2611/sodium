@@ -4,7 +4,7 @@
 #include <exception>
 #include <string>
 
-namespace nac {
+namespace sodium {
 
 /**
  * An enum of the different kinds of exception that can be thrown.
@@ -22,7 +22,7 @@ class Exception : public std::exception {
 public:
     /**
      * Constructor for Exception.
-     * @param kind The kind of the exception, must be one of nac::ExceptionKind.
+     * @param kind The kind of the exception, must be one of sodium::ExceptionKind.
      */
     Exception(ExceptionKind kind);
 
@@ -40,6 +40,6 @@ protected:
     std::string message_; // the string to be output when what() is called
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_EXCEPTIONS_EXCEPTION_H

@@ -7,7 +7,7 @@
 #include "sodium/nac/errors/error.h"
 #include "sodium/nac/util/string_formatter.h"
 
-namespace nac {
+namespace sodium {
 
 std::vector<Error> ErrorManager::errors_{};
 std::string ErrorManager::errorMessages_{};
@@ -30,4 +30,4 @@ std::string_view ErrorManager::errorMessages() {
     return std::string_view(errorMessages_);
 }
 
-} // namespace nac
+} // namespace sodium

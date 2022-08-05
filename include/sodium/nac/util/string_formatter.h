@@ -5,7 +5,7 @@
 #include <string>
 #include <utility>
 
-namespace nac {
+namespace sodium {
 namespace StringFormatter {
 
 /**
@@ -26,6 +26,6 @@ static std::string formatString(const std::string &format, Args &&...args) {
 }
 
 } // namespace StringFormatter
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_UTIL_STRING_FORMATTER_H

@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace nac {
+namespace sodium {
 
 /**
  * An enum of the different kinds of errors that can be generated.
@@ -19,7 +19,7 @@ class Error {
 public:
     /**
      * Constructor for Error.
-     * @param kind The kind of the error, must be one of nac::ErrorKind.
+     * @param kind The kind of the error, must be one of sodium::ErrorKind.
      * @param line The line at which the error has occurred.
      * @param column The column at which the error has occurred.
      */
@@ -39,6 +39,6 @@ protected:
     std::string message_;
 };
 
-} // namespace nac
+} // namespace sodium
 
 #endif // SODIUM_NAC_ERROR_ERROR_H
