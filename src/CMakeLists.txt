@@ -6,16 +6,13 @@ target_include_directories(libnac PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_sources(libnac
     PRIVATE
         nac/nac.cpp
-        nac/errors/error.cpp
-        nac/errors/error_manager.cpp
-        nac/errors/lexer_error.cpp
-        nac/exceptions/exception.cpp
-        nac/exceptions/io_exception.cpp
-        nac/io/file.cpp
-        nac/io/file_io.cpp
-        nac/lexer/lexer.cpp
-        nac/lexer/token.cpp
 )
+
+add_subdirectory(nac/errors)
+add_subdirectory(nac/exceptions)
+add_subdirectory(nac/io)
+add_subdirectory(nac/lexer)
+add_subdirectory(nac/parser)
 
 # for nac target
 target_compile_features(nac PRIVATE cxx_std_20)
