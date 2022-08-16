@@ -36,7 +36,7 @@ public:
      *
      * @param decl The Decl being visited.
      */
-    virtual void visit(const Decl *decl) const = 0;
+    virtual void visit(const Decl *decl) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -44,7 +44,7 @@ public:
      *
      * @param signature The Signature being visited.
      */
-    virtual void visit(const Signature *signature) const = 0;
+    virtual void visit(const Signature *signature) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -52,7 +52,7 @@ public:
      *
      * @param funcDecl The FuncDecl being visited.
      */
-    virtual void visit(const FuncDecl *funcDecl) const = 0;
+    virtual void visit(const FuncDecl *funcDecl) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -60,7 +60,7 @@ public:
      *
      * @param expr The Expr being visited.
      */
-    virtual void visit(const Expr *expr) const = 0;
+    virtual void visit(const Expr *expr) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -68,7 +68,7 @@ public:
      *
      * @param LiteralExpr The LiteralExpr being visited.
      */
-    virtual void visit(const LiteralExpr *LiteralExpr) const = 0;
+    virtual void visit(const LiteralExpr *LiteralExpr) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -76,7 +76,7 @@ public:
      *
      * @param numericLiteralExpr The numericLiteralExpr being visited.
      */
-    virtual void visit(const NumericLiteralExpr *numericLiteralExpr) const = 0;
+    virtual void visit(const NumericLiteralExpr *numericLiteralExpr) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -84,7 +84,7 @@ public:
      *
      * @param identifier The Identifier being visited.
      */
-    virtual void visit(const Identifier *identifier) const = 0;
+    virtual void visit(const Identifier *identifier) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -92,7 +92,7 @@ public:
      *
      * @param parameter The Parameter being visited.
      */
-    virtual void visit(const Parameter *parameter) const = 0;
+    virtual void visit(const Parameter *parameter) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -100,7 +100,7 @@ public:
      *
      * @param parameterList The ParameterList being visited.
      */
-    virtual void visit(const ParameterList *parameterList) const = 0;
+    virtual void visit(const ParameterList *parameterList) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -108,7 +108,7 @@ public:
      *
      * @param sourceFile The SourceFile being visited.
      */
-    virtual void visit(const SourceFile *sourceFile) const = 0;
+    virtual void visit(const SourceFile *sourceFile) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -116,7 +116,7 @@ public:
      *
      * @param stmt The Stmt being visited.
      */
-    virtual void visit(const Stmt *stmt) const = 0;
+    virtual void visit(const Stmt *stmt) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -124,7 +124,7 @@ public:
      *
      * @param block The Block being visited.
      */
-    virtual void visit(const Block *block) const = 0;
+    virtual void visit(const Block *block) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -132,7 +132,7 @@ public:
      *
      * @param returnStmt The ReturnStmt being visited.
      */
-    virtual void visit(const ReturnStmt *returnStmt) const = 0;
+    virtual void visit(const ReturnStmt *returnStmt) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -140,7 +140,7 @@ public:
      *
      * @param type The Type being visited.
      */
-    virtual void visit(const Type *type) const = 0;
+    virtual void visit(const Type *type) = 0;
 
 protected:
     /**

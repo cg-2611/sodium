@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "sodium/nac/ast/ast.h"
+#include "sodium/nac/ast/ast_printer.h"
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/exceptions/exception.h"
 #include "sodium/nac/lexer/lexer.h"
@@ -23,6 +24,9 @@ void compileFile(const File &file) {
 
     Parser parser(token.get());
     std::unique_ptr<AST> ast(parser.parse());
+
+    // temporary for debugging
+    ASTPrinter(2).printAST(ast.get());
 
     std::cout << "[nac]: compilation complete\n";
 }
