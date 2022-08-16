@@ -24,54 +24,56 @@
 
 ### Grammar
 ---
-
 Terminal symbol names are in all UPPERCASE.
 Non-terminal symbol names are in CamelCase.
 
-
-SodiumFile = Declaration EOF ;
-
-
+```
+SourceFile = Declaration* EOF ;
+```
+```
 Declaration = FunctionDeclaration ;
-
-
-FunctionDeclaration = **func** FunctionName FunctionParameters FunctionSignature FunctionBody ;
-
-FunctionName = IDENTIFIER ;
-
-FunctionParameters = **(** **)** ;
-
-FunctionSignature = **->** TYPE ;
-
+```
+```
+FunctionDeclaration = func FunctionSignature FunctionBody ;
+FunctionSignature = FunctionName FunctionParameters FunctionReturnType ;
 FunctionBody = Block ;
-
-
-Block = Block = **{** Statement* **}** ;
-
-
-Statement = ReturnStatement  EOL;
-
-ReturnStatement = **return** Expression ;
-
-
+```
+```
+FunctionName = Identifier ;
+FunctionParameters = ( ParameterList? ) ;
+FunctionReturnType = -> Type ;
+```
+```
+ParameterList = Parameter Parameter* ;
+Parameter = Identifier ;
+```
+```
+Block = { Statement* } ;
+```
+```
+Statement = ReturnStatement | Block ;
+ReturnStatement = return Expression StatementTerminator ;
+StatementTerminator = EOL | } ;
+```
+```
 Expression = LiteralExpression ;
-
-LiteralExpression = NUMERIC_LITERAL ;
-
-
-TYPE = IDENTIFIER
-
-
+LiteralExpression = NumericLiteralExpression ;
+NumericLiteralExpression = NUMERIC_LITERAL ;
+```
+```
+Identifier = IDENTIFIER ;
+```
+```
+Type = TYPE ;
+TYPE = IDENTIFIER ;
+```
 IDENTIFIER = IDENTIFIER_HEAD IDENTIFIER_CHARACTER* ;
-
 IDENTIFIER_HEAD = "_" | LETTER ;
-
 IDENTIFIER_CHARACTER = IDENTIFIER_HEAD | DIGIT ;
-
-
+```
 NUMERIC_LITERAL = DIGIT* ;
-
-
+```
+```
 LETTER = [a-zA-Z] ;
-
 DIGIT = [0-9] ;
+```
