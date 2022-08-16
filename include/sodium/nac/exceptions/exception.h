@@ -7,7 +7,8 @@
 namespace sodium {
 
 /**
- * An enum of the different kinds of exception that can be thrown.
+ * @brief An enum of the different kinds of exception that can be thrown.
+ *
  */
 enum class ExceptionKind {
     ERRORS_GENERATED,
@@ -16,23 +17,28 @@ enum class ExceptionKind {
 };
 
 /**
- * Base class for Sodium compiler exceptions. Inherits std::exception.
+ * @brief Base class for Sodium compiler exceptions. Inherits std::exception.
+ *
  */
 class Exception : public std::exception {
 public:
     /**
-     * Constructor for Exception.
-     * @param kind The kind of the exception, must be one of sodium::ExceptionKind.
+     * @brief Construct a new Exception object.
+     *
+     * @param kind The kind of the exception, must be one of ExceptionKind.
      */
     Exception(ExceptionKind kind);
 
     /**
-     * Destructor for Exception.
+     * @brief Destroy the Exception object.
+     *
      */
     virtual ~Exception() = default;
 
     /**
-     * Inherited from std::exception. Overriden in derived classes.
+     * @brief Inherited from std::exception. Overriden in derived classes.
+     *
+     * @return const char* that is the exception message.
      */
     virtual const char *what() const noexcept;
 

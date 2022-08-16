@@ -11,12 +11,16 @@
 namespace sodium {
 
 /**
- * A static class used to collect errors that are generated  during compilation.
+ * @brief A static class used to collect errors that are generated  during compilation.
+ *
  */
 class ErrorManager {
 public:
     /**
-     * Creates and pushes an sodium::Error of class E to the vector of errors.
+     * @brief Creates and pushes an Error to the vector of errors.
+     *
+     * @tparam E The error type being pushed to the vector of errors.
+     * @tparam Args Variadic template arguments that are forwarded to the constructor of E.
      * @param args The arguments required to construct a new sodium::Error of class E.
      */
     template<class E, typename... Args>
@@ -25,18 +29,25 @@ public:
     }
 
     /**
-     * @return True if the errors vector contains instances of sodium::Errors.
+     * @brief Check if errors have been added to the vector of errors.
+     *
+     * @return true if there are errors in the vector,
+     * @return false otherwise.
      */
     static bool hasErrors() noexcept;
 
     /**
-     * @return The total number of sodium::Error objects in the errors vector.
+     * @brief Get the number of errors that are in the vector of errors.
+     *
+     * @return size_t The number of vectors in the vector of errors.
      */
     static size_t errorCount() noexcept;
 
     /**
-     * Constructs a string containing the messages for all the errors in the errors vector.
-     * @return A formatted std::string containing all the error messages from the errors in the errors vector.
+     * @brief Constructs an std::string_view containing the messages for all the errors in the errors vector.
+     *
+     * @return std::string_view that is a formatted string containing all the error messages from the errors in the
+     *         errors vector.
      */
     static std::string_view errorMessages();
 
@@ -45,6 +56,7 @@ private:
     static std::vector<Error> errors_;
     static std::string errorMessages_;
 
+    // private constructor and destructor for static class
     ErrorManager() = default;
     ~ErrorManager() = default;
 };

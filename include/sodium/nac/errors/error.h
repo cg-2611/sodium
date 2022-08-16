@@ -6,32 +6,38 @@
 namespace sodium {
 
 /**
- * An enum of the different kinds of errors that can be generated.
+ * @brief An enum of the different kinds of errors that can be generated.
+ *
  */
 enum class ErrorKind {
     UNRECOGNISED_TOKEN
 };
 
 /**
- * A base class for errors generated in the Sodium compiler.
+ * @brief A base class for errors generated in the Sodium compiler.
+ *
  */
 class Error {
 public:
     /**
-     * Constructor for Error.
-     * @param kind The kind of the error, must be one of sodium::ErrorKind.
+     * @brief Construct a new Error object.
+     *
+     * @param kind The kind of the error, must be one of ErrorKind.
      * @param line The line at which the error has occurred.
      * @param column The column at which the error has occurred.
      */
     Error(ErrorKind kind, size_t line, size_t column);
 
     /**
-     * Destructor for Error.
+     * @brief Destroy the Error object.
+     *
      */
     virtual ~Error() = default;
 
     /**
-     * @return The specific message generated for this error.
+     * @brief Get the specific error message generated for this error.
+     *
+     * @return const std::string& that is the specific error message generated for this error.
      */
     const std::string &message() const;
 

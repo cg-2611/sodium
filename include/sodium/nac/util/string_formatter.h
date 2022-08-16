@@ -9,10 +9,12 @@ namespace sodium {
 namespace StringFormatter {
 
 /**
- * Performs string formatting similar to std::sprintf();
+ * @brief Performs string formatting similar to std::sprintf().
+ *
+ * @tparam Args Variadic template arguments that are used to populate the formatted string.
  * @param format The format for the returned string.
  * @param args The arguments to populate the formatted string with.
- * @return An std::string of the formatted string using format and args.
+ * @return std::string that is the formatted string using format and args.
  */
 template<typename... Args>
 static std::string formatString(const std::string &format, Args &&...args) {

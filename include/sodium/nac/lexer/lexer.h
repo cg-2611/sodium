@@ -9,30 +9,35 @@
 
 namespace sodium {
 
-/// An std::unordered_set of the keywords currently used in Sodium.
+/// @brief std::unordered_set of the keywords currently used in Sodium.
 const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
-/// An std::unordered_set of the types currently used in Sodium.
+
+/// @brief An std::unordered_set of the types currently used in Sodium.
 const std::unordered_set<std::string_view> TYPES{"int"};
 
 /**
- * Used to extract, from a string, any tokens used in the Sodium programming language.
+ * @brief Used to extract, from a string, any tokens used in the Sodium programming language.
+ *
  */
 class Lexer {
 public:
     /**
-     * Constructor for Lexer.
-     * @param src The string to be tokenized.
+     * @brief Construct a new Lexer object.
+     *
+     * @param src The std::string_view to be tokenized.
      */
     Lexer(std::string_view src);
 
     /**
-     * Destructor for Lexer.
+     * @brief Destroy the Lexer object.
+     *
      */
     ~Lexer() = default;
 
     /**
-     * Extracts the Sodium programming language tokens from the string.
-     * @return An std::unique_ptr<Token> pointer to the first token in the string.
+     * @brief Extracts the Sodium programming language tokens from the string.
+     *
+     * @return std::unique_ptr<Token> to the first token in the string.
      */
     [[nodiscard]] std::unique_ptr<Token> tokenize();
 
@@ -40,8 +45,8 @@ private:
     const char *start_;   // the start of the current token being lexed
     const char *current_; // the current character being lexed
     const char *end_;     // the end of the string
-    size_t line_;
-    size_t column_;
+    size_t line_;         // the current line of the string
+    size_t column_;       // the current column of the current line
 
     // returns a unique pointer to the next token in the string
     [[nodiscard]] std::unique_ptr<Token> getNextToken();
@@ -55,10 +60,10 @@ private:
     // advances the lexer to the character after the end of a numeric literal
     size_t readNumericLiteral();
 
-    void advance() noexcept;
-    void skipWhitespace() noexcept;
+    void advance() noexcept;                    // advance current_ to the next character in the string
+    void skipWhitespace() noexcept;             // skip whitespace characters that are not '\n'
     inline bool atEndOfString() const noexcept; // returns true if the end of the string is reached
-    inline bool atEndOfLine() const noexcept; // returns true if the end of the current line is reached
+    inline bool atEndOfLine() const noexcept;   // returns true if the end of the current line is reached
 };
 
 } // namespace sodium

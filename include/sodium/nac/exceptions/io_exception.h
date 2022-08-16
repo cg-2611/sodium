@@ -8,24 +8,30 @@
 namespace sodium {
 
 /**
- * A derived class of sodium::Exception for exceptions generated during file i/o.
+ * @brief A derived class of sodium::Exception for exceptions generated during file i/o.
+ *
  */
 class IOException : public Exception {
 public:
     /**
-     * Constructor for IOException. If errno is set, the errno string is appended to the exception message.
-     * @param kind The kind of the exception, must be one of sodium::ExceptionKind.
+     * @brief Construct a new IOException object. If errno is set, the errno string is appended to the exception
+     *        message.
+     *
+     * @param kind The kind of the exception, must be one of ExceptionKind.
      * @param filePath The path of the file that has caused the exception to be thrown.
      */
     IOException(ExceptionKind kind, const std::string &filePath);
 
     /**
-     * Destructor for IOException.
+     * @brief Destroy the IOException object.
+     *
      */
     ~IOException() = default;
 
     /**
-     * @return The exception message.
+     * @brief Get the generated message for this exception.
+     *
+     * @return const char* that is the message for this exception.
      */
     const char *what() const noexcept override;
 };
