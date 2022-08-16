@@ -1,0 +1,13 @@
+target_sources(libnac
+    PRIVATE
+        ast.cpp
+        ast_node.cpp
+        ast_printer.cpp
+        decl.cpp
+        expr.cpp
+        identifier.cpp
+        parameter_list.cpp
+        source_file.cpp
+        stmt.cpp
+        type.cpp
+)
