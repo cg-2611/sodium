@@ -7,7 +7,6 @@
 #include "sodium/nac/ast/decl.h"
 #include "sodium/nac/ast/expr.h"
 #include "sodium/nac/ast/identifier.h"
-#include "sodium/nac/ast/parameter_list.h"
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/ast/type.h"
@@ -19,17 +18,27 @@ ASTPrinter::ASTPrinter(int spaces) : indentationSpaces_(spaces), indentationLeve
 void ASTPrinter::printAST(const AST *ast) {
     ASTNode *root = ast->root();
     switch (root->nodeKind()) {
+        case ASTNodeKind::SOURCE_FILE: visit(static_cast<const SourceFile *>(root)); break;
         case ASTNodeKind::DECL: visit(static_cast<const Decl *>(root)); break;
         case ASTNodeKind::EXPR: visit(static_cast<const Expr *>(root)); break;
-        case ASTNodeKind::IDENTIFIER: visit(static_cast<const Identifier *>(root)); break;
-        case ASTNodeKind::PARAMETER: visit(static_cast<const Parameter *>(root)); break;
-        case ASTNodeKind::PARAMETER_LIST: visit(static_cast<const ParameterList *>(root)); break;
-        case ASTNodeKind::SOURCE_FILE: visit(static_cast<const SourceFile *>(root)); break;
-        case ASTNodeKind::SIGNATURE: visit(static_cast<const Signature *>(root)); break;
         case ASTNodeKind::STMT: visit(static_cast<const Stmt *>(root)); break;
+        case ASTNodeKind::IDENTIFIER: visit(static_cast<const Identifier *>(root)); break;
         case ASTNodeKind::TYPE: visit(static_cast<const Type *>(root)); break;
         default: std::cout << "unknown ast node kind\n"; break;
     }
+}
+
+void ASTPrinter::visit(const SourceFile *sourceFile) {
+    std::cout << "source file:\n";
+
+    indent();
+
+    // visit the declarations in the source file
+    for (const std::unique_ptr<Decl> &decl : sourceFile->decls()) {
+        visit(decl.get());
+    }
+
+    dedent();
 }
 
 void ASTPrinter::visit(const Decl *decl) {
@@ -37,19 +46,6 @@ void ASTPrinter::visit(const Decl *decl) {
         case DeclKind::FUNCTION: visit(static_cast<const FuncDecl *>(decl)); break;
         default: std::cout << "unknown declaration kind\n"; break;
     }
-}
-
-void ASTPrinter::visit(const Signature *signature) {
-    printIndentation();
-    std::cout << "signature:\n";
-
-    indent();
-
-    visit(signature->name());
-    visit(signature->parameters());
-    visit(signature->returnType());
-
-    dedent();
 }
 
 void ASTPrinter::visit(const FuncDecl *funcDecl) {
@@ -64,36 +60,15 @@ void ASTPrinter::visit(const FuncDecl *funcDecl) {
     dedent();
 }
 
-void ASTPrinter::visit(const Expr *expr) {
-    switch (expr->exprKind()) {
-        case ExprKind::LITERAL: visit(static_cast<const LiteralExpr *>(expr)); break;
-        default: std::cout << "unknown expression kind\n"; break;
-    }
-}
-void ASTPrinter::visit(const LiteralExpr *literalExpr) {
-    switch (literalExpr->literalKind()) {
-        case LiteralKind::NUMERIC_LITERAL: visit(static_cast<const NumericLiteralExpr *>(literalExpr)); break;
-        default: std::cout << "unknown literal expression kind\n"; break;
-    }
-}
-
-void ASTPrinter::visit(const NumericLiteralExpr *numericLiteralExpr) {
+void ASTPrinter::visit(const FunctionSignature *functionSignature) {
     printIndentation();
-    std::cout << "value: " << numericLiteralExpr->value() << '\n';
-}
-
-void ASTPrinter::visit(const Identifier *identifier) {
-    printIndentation();
-    std::cout << "identifier: " << identifier->value() << '\n';
-}
-
-void ASTPrinter::visit(const Parameter *parameter) {
-    printIndentation();
-    std::cout << "parameter:\n";
+    std::cout << "signature:\n";
 
     indent();
 
-    visit(parameter->identifier());
+    visit(functionSignature->name());
+    visit(functionSignature->parameterList());
+    visit(functionSignature->returnType());
 
     dedent();
 }
@@ -101,28 +76,6 @@ void ASTPrinter::visit(const Parameter *parameter) {
 void ASTPrinter::visit(const ParameterList *parameterList) {
     printIndentation();
     std::cout << "parameters:\n";
-
-    indent();
-
-    // visit the parameters in the parameter list
-    for (const std::unique_ptr<Parameter> &parameter : parameterList->parameters()) {
-        visit(parameter.get());
-    }
-
-    dedent();
-}
-
-void ASTPrinter::visit(const SourceFile *sourceFile) {
-    std::cout << "source file:\n";
-
-    indent();
-
-    // visit the declarations in the source file
-    for (const std::unique_ptr<Decl> &decl : sourceFile->decls()) {
-        visit(decl.get());
-    }
-
-    dedent();
 }
 
 void ASTPrinter::visit(const Stmt *stmt) {
@@ -156,6 +109,29 @@ void ASTPrinter::visit(const ReturnStmt *returnStmt) {
     visit(returnStmt->expr());
 
     dedent();
+}
+
+void ASTPrinter::visit(const Expr *expr) {
+    switch (expr->exprKind()) {
+        case ExprKind::LITERAL: visit(static_cast<const LiteralExpr *>(expr)); break;
+        default: std::cout << "unknown expression kind\n"; break;
+    }
+}
+void ASTPrinter::visit(const LiteralExpr *literalExpr) {
+    switch (literalExpr->literalKind()) {
+        case LiteralKind::NUMERIC_LITERAL: visit(static_cast<const NumericLiteralExpr *>(literalExpr)); break;
+        default: std::cout << "unknown literal expression kind\n"; break;
+    }
+}
+
+void ASTPrinter::visit(const NumericLiteralExpr *numericLiteralExpr) {
+    printIndentation();
+    std::cout << "value: " << numericLiteralExpr->value() << '\n';
+}
+
+void ASTPrinter::visit(const Identifier *identifier) {
+    printIndentation();
+    std::cout << "identifier: " << identifier->value() << '\n';
 }
 
 void ASTPrinter::visit(const Type *type) {

@@ -89,7 +89,7 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionDeclaration) {
     EXPECT_EQ(sodium::ASTNodeKind::DECL, funcDecl->nodeKind());
     EXPECT_EQ(sodium::DeclKind::FUNCTION, funcDecl->declKind());
     EXPECT_EQ(functionNameString, funcDecl->signature()->name()->value());
-    EXPECT_EQ(0, funcDecl->signature()->parameters()->parameters().size());
+    EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, funcDecl->signature()->parameterList()->declKind());
     EXPECT_EQ(returnTypeString, funcDecl->signature()->returnType()->name());
     EXPECT_EQ(sodium::ASTNodeKind::STMT, funcDecl->body()->nodeKind());
     EXPECT_EQ(sodium::StmtKind::BLOCK, funcDecl->body()->stmtKind());
@@ -124,11 +124,11 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionSignature) {
     funcKeyword->next(std::move(functionName));
 
     sodium::Parser parser(funcKeyword.get());
-    auto signature = parser.parseSignature();
+    auto signature = parser.parseFunctionSignature();
 
-    EXPECT_EQ(sodium::ASTNodeKind::SIGNATURE, signature->nodeKind());
+    EXPECT_EQ(sodium::DeclKind::FUNCTION_SIGNATURE, signature->declKind());
     EXPECT_EQ(functionNameString, signature->name()->value());
-    EXPECT_EQ(0, signature->parameters()->parameters().size());
+    EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, signature->parameterList()->declKind());
     EXPECT_EQ(returnTypeString, signature->returnType()->name());
 }
 
@@ -145,80 +145,8 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAnEmptyParameterList) {
     sodium::Parser parser(leftParen.get());
     auto parameterList = parser.parseParameterList();
 
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER_LIST, parameterList->nodeKind());
-    EXPECT_EQ(0, parameterList->parameters().size());
-}
-
-/*
-    tests parameter list:
-        (param)
-*/
-TEST(ParseDeclTest, ParserCorrectlyParsesAnParameterListWithASingleParameter) {
-    std::string_view parameterString("param");
-
-    auto leftParen = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_PAREN, ")", 1, 0, 0);
-    auto parameter = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, parameterString.data(),
-                                                     parameterString.size(), 0, 0);
-    auto rightParen = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_PAREN, "(", 1, 0, 0);
-
-    parameter->next(std::move(rightParen));
-    leftParen->next(std::move(parameter));
-
-    sodium::Parser parser(leftParen.get());
-    auto parameterList = parser.parseParameterList();
-
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER_LIST, parameterList->nodeKind());
-
-    ASSERT_EQ(1, parameterList->parameters().size());
-
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER, parameterList->parameters()[0]->nodeKind());
-    EXPECT_EQ(parameterString, parameterList->parameters()[0]->identifier()->value());
-}
-
-TEST(ParseDeclTest, ParserCorrectlyParsesAnParameterListWithMultipleParameters) {
-    std::string_view parameterString1("param1");
-    std::string_view parameterString2("param2");
-
-    auto leftParen = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_PAREN, ")", 1, 0, 0);
-    auto parameter1 = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, parameterString1.data(),
-                                                      parameterString1.size(), 0, 0);
-    auto parameter2 = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, parameterString2.data(),
-                                                      parameterString2.size(), 0, 0);
-    auto rightParen = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_PAREN, "(", 1, 0, 0);
-
-    parameter2->next(std::move(rightParen));
-    parameter1->next(std::move(parameter2));
-    leftParen->next(std::move(parameter1));
-
-    sodium::Parser parser(leftParen.get());
-    auto parameterList = parser.parseParameterList();
-
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER_LIST, parameterList->nodeKind());
-
-    ASSERT_EQ(2, parameterList->parameters().size());
-
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER, parameterList->parameters()[0]->nodeKind());
-    EXPECT_EQ(parameterString1, parameterList->parameters()[0]->identifier()->value());
-
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER, parameterList->parameters()[1]->nodeKind());
-    EXPECT_EQ(parameterString2, parameterList->parameters()[1]->identifier()->value());
-}
-
-/*
-    tests parameter:
-        param
-*/
-TEST(ParseDeclTest, ParserCorrectlyParsesAParameter) {
-    std::string_view parameterString("param");
-
-    auto parameter = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, parameterString.data(),
-                                                     parameterString.size(), 0, 0);
-
-    sodium::Parser parser(parameter.get());
-    auto parameterNode = parser.parseParameter();
-
-    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER, parameterNode->nodeKind());
-    EXPECT_EQ(parameterString, parameterNode->identifier()->value());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, parameterList->nodeKind());
+    EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, parameterList->declKind());
 }
 
 /*

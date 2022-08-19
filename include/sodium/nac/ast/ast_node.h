@@ -8,14 +8,11 @@ namespace sodium {
  *
  */
 enum class ASTNodeKind {
+    SOURCE_FILE,
     DECL,
     EXPR,
-    IDENTIFIER,
-    PARAMETER,
-    PARAMETER_LIST,
-    SIGNATURE,
-    SOURCE_FILE,
     STMT,
+    IDENTIFIER,
     TYPE
 };
 

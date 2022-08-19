@@ -30,6 +30,13 @@ public:
     void printAST(const AST *ast);
 
     /**
+     * @brief Prints a SourceFile. The visit method of each Decl is called.
+     *
+     * @param sourceFile The SourceFile node to be printed.
+     */
+    void visit(const SourceFile *sourceFile) override;
+
+    /**
      * @brief Visit a Decl node in the AST. Dispatches the specific visit method for the derived class of Decl.
      *
      * @param decl The Decl node being visited.
@@ -37,19 +44,47 @@ public:
     void visit(const Decl *decl) override;
 
     /**
-     * @brief Print a function signature. The visit method of the Identifier, ParameterList and return Type of the
-     *        function are called.
-     *
-     * @param signature The function signature to be printed.
-     */
-    void visit(const Signature *signature) override;
-
-    /**
      * @brief Print a function declaration. The visit method of the Signature and the Block of the function are called.
      *
      * @param funcDecl The function declaration to be printed.
      */
     void visit(const FuncDecl *funcDecl) override;
+
+    /**
+     * @brief Print a function signature. The visit method of the Identifier, ParameterList and return Type of the
+     *        function are called.
+     *
+     * @param functionSignature The function signature to be printed.
+     */
+    void visit(const FunctionSignature *functionSignature) override;
+
+    /**
+     * @brief Prints a ParameterList. The visit method of each Parameter in the list is called.
+     *
+     * @param parameterList The ParameterList to be printed.
+     */
+    void visit(const ParameterList *parameterList) override;
+
+    /**
+     * @brief Visit an Stmt node in the AST. Dispatches the specific visit method for the derived class of Stmt.
+     *
+     * @param stmt The Stmt node being visited.
+     */
+    void visit(const Stmt *stmt) override;
+
+    /**
+     * @brief Prints a Block. The visit method of each Stmt in the block is called.
+     *
+     * @param block The Block to be printed.
+     */
+    void visit(const Block *block) override;
+
+    /**
+     * @brief Prints a ReturnStmt. The visit method of the returned expression is called.
+     *
+     * @param returnStmt The ReturnStmt to be printed.
+     */
+    void visit(const ReturnStmt *returnStmt) override;
 
     /**
      * @brief Visit an Expr node in the AST. Dispatches the specific visit method for the derived class of Expr.
@@ -79,48 +114,6 @@ public:
      * @param identifier The identifier to be printed.
      */
     void visit(const Identifier *identifier) override;
-
-    /**
-     * @brief Prints parameter.
-     *
-     * @param parameter The parameter to be printed.
-     */
-    void visit(const Parameter *parameter) override;
-
-    /**
-     * @brief Prints a ParameterList. The visit method of each Parameter in the list is called.
-     *
-     * @param parameterList The ParameterList to be printed.
-     */
-    void visit(const ParameterList *parameterList) override;
-
-    /**
-     * @brief Prints a SourceFile. The visit method of each Decl is called.
-     *
-     * @param sourceFile The SourceFile node to be printed.
-     */
-    void visit(const SourceFile *sourceFile) override;
-
-    /**
-     * @brief Visit an Stmt node in the AST. Dispatches the specific visit method for the derived class of Stmt.
-     *
-     * @param stmt The Stmt node being visited.
-     */
-    void visit(const Stmt *stmt) override;
-
-    /**
-     * @brief Prints a Block. The visit method of each Stmt in the block is called.
-     *
-     * @param block The Block to be printed.
-     */
-    void visit(const Block *block) override;
-
-    /**
-     * @brief Prints a ReturnStmt. The visit method of the returned expression is called.
-     *
-     * @param returnStmt The ReturnStmt to be printed.
-     */
-    void visit(const ReturnStmt *returnStmt) override;
 
     /**
      * @brief Prints a Type.

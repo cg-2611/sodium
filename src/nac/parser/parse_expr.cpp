@@ -21,13 +21,12 @@ std::unique_ptr<LiteralExpr> Parser::parseLiteralExpr() {
         literalExpr = parseNumericLiteralExpr();
     }
 
-    // error, expected numeric literal, but did not receive one
+    // expected numeric literal
 
     return literalExpr;
 }
 
-// NumericLiteralExpression = NUMERIC_LITERAL ;
-// NUMERIC_LITERAL = DIGIT* ;
+// NumericLiteralExpression = NumericLiteral ;
 std::unique_ptr<NumericLiteralExpr> Parser::parseNumericLiteralExpr() {
     // extract the integer value from the digit characters
     int value;

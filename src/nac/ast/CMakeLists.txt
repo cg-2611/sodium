@@ -6,7 +6,6 @@ target_sources(libnac
         decl.cpp
         expr.cpp
         identifier.cpp
-        parameter_list.cpp
         source_file.cpp
         stmt.cpp
         type.cpp

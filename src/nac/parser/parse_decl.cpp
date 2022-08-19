@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "sodium/nac/ast/decl.h"
-#include "sodium/nac/ast/parameter_list.h"
 #include "sodium/nac/ast/type.h"
 #include "sodium/nac/lexer/token.h"
 
@@ -19,15 +18,14 @@ std::unique_ptr<Decl> Parser::parseDecl() {
         decl = parseFuncDecl();
     }
 
-    // error, expected declaration, did not receive one
+    // expected a declaration
 
     return decl;
 }
 
-// FunctionDeclaration = func FunctionSignature FunctionBody ;
-// FunctionBody = Block ;
+// FunctionDeclaration = func FunctionSignature Block ;
 std::unique_ptr<FuncDecl> Parser::parseFuncDecl() {
-    std::unique_ptr<Signature> functionSignature(parseSignature());
+    std::unique_ptr<FunctionSignature> functionSignature(parseFunctionSignature());
 
     advance(); // advance to expected block
 
@@ -36,10 +34,8 @@ std::unique_ptr<FuncDecl> Parser::parseFuncDecl() {
     return std::make_unique<FuncDecl>(std::move(functionSignature), std::move(functionBody));
 }
 
-// FunctionSignature = FunctionName FunctionParameters FunctionReturnType ;
-// FunctionName = Identifier ;
-// FunctionParameters = ( ParameterList? ) ;
-std::unique_ptr<Signature> Parser::parseSignature() {
+// FunctionSignature = Identifier ParameterList ReturnType ;
+std::unique_ptr<FunctionSignature> Parser::parseFunctionSignature() {
     advance(); // advance to expected identifier
     std::unique_ptr<Identifier> functionName(parseIdentifier());
 
@@ -49,41 +45,29 @@ std::unique_ptr<Signature> Parser::parseSignature() {
     advance(); // advance to expected return type
     std::unique_ptr<Type> functionReturnType(parseReturnType());
 
-    return std::make_unique<Signature>(std::move(functionName), std::move(functionParameters),
-                                       std::move(functionReturnType));
+    return std::make_unique<FunctionSignature>(std::move(functionName), std::move(functionParameters),
+                                               std::move(functionReturnType));
 }
 
 // ParameterList = Parameter Parameter* ;
 std::unique_ptr<ParameterList> Parser::parseParameterList() {
     if (token_->kind() != TokenKind::LEFT_PAREN) {
-        // error, expected a parameter list, but did not receive one
-    }
-
-    std::vector<std::unique_ptr<Parameter>> parameters{};
-
-    // parse parameters until we reach the end of the parameter list
-    while (nextToken()->kind() != TokenKind::RIGHT_PAREN) {
-        advance(); // advance to expected parameter
-        parameters.push_back(parseParameter());
+        // expected (
     }
 
     advance(); // advance to the ) token
 
-    // TODO: error if bracket pair never closed
-    // TODO: maximum number of parameters
+    if (token_->kind() != TokenKind::RIGHT_PAREN) {
+        // expected a )
+    }
 
-    return std::make_unique<ParameterList>(std::move(parameters));
+    return std::make_unique<ParameterList>();
 }
 
-// Parameter = Identifier ;
-std::unique_ptr<Parameter> Parser::parseParameter() {
-    return std::make_unique<Parameter>(parseIdentifier());
-}
-
-// FunctionReturnType = -> Type ;
+// ReturnType = -> Type ;
 std::unique_ptr<Type> Parser::parseReturnType() {
     if (token_->kind() != TokenKind::ARROW) {
-        // error, expected an arrow, but did not receive one
+        // expected arrow
     }
 
     advance(); // advance to expected type

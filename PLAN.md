@@ -27,53 +27,58 @@
 Terminal symbol names are in all UPPERCASE.
 Non-terminal symbol names are in CamelCase.
 
+#### Lexical Structure
+The lexical structure describes the sequence of characters that form valid tokens of Sodium.
+A token consists of an reserved words, punctuation, identifier or literal.
+```
+ReservedWord = Keyword | Type ;
+
+Keyword = func | return ;
+Type = int ;
+
+Punctuation = -> | { | } | ( | ) ;
+
+Identifier = IdentifierHead IdentifierCharacter* ;
+IdentifierHead = "_" | LETTER ;
+IdentifierCharacter = IdentifierHead | DIGIT ;
+
+NumericLiteral = DIGIT* ;
+
+LETTER = [a-zA-Z] ;
+
+DIGIT = [0-9] ;
+
+EOL = \n ;
+```
+
+#### Syntactic Structure
+The syntactic structure describes the sequence of valid tokens that form valid syntax of Sodium.
 ```
 SourceFile = Declaration* EOF ;
 ```
 ```
 Declaration = FunctionDeclaration ;
+
+FunctionDeclaration = func FunctionSignature Block ;
+FunctionSignature = Identifier ParameterList ReturnType ;
+
+ParameterList = () ;
+
+ReturnType = -> Type ;
 ```
 ```
-FunctionDeclaration = func FunctionSignature FunctionBody ;
-FunctionSignature = FunctionName FunctionParameters FunctionReturnType ;
-FunctionBody = Block ;
-```
-```
-FunctionName = Identifier ;
-FunctionParameters = ( ParameterList? ) ;
-FunctionReturnType = -> Type ;
-```
-```
-ParameterList = Parameter Parameter* ;
-Parameter = Identifier ;
-```
-```
+Statement = Block | ReturnStatement ;
+
 Block = { Statement* } ;
-```
-```
-Statement = ReturnStatement | Block ;
+
 ReturnStatement = return Expression StatementTerminator ;
+
 StatementTerminator = EOL | } ;
 ```
 ```
 Expression = LiteralExpression ;
+
 LiteralExpression = NumericLiteralExpression ;
-NumericLiteralExpression = NUMERIC_LITERAL ;
-```
-```
-Identifier = IDENTIFIER ;
-```
-```
-Type = TYPE ;
-TYPE = IDENTIFIER ;
-```
-IDENTIFIER = IDENTIFIER_HEAD IDENTIFIER_CHARACTER* ;
-IDENTIFIER_HEAD = "_" | LETTER ;
-IDENTIFIER_CHARACTER = IDENTIFIER_HEAD | DIGIT ;
-```
-NUMERIC_LITERAL = DIGIT* ;
-```
-```
-LETTER = [a-zA-Z] ;
-DIGIT = [0-9] ;
+
+NumericLiteralExpression = NumericLiteral ;
 ```

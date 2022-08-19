@@ -3,19 +3,18 @@
 
 namespace sodium {
 
+class SourceFile;
 class Decl;
-class Signature;
 class FuncDecl;
+class FunctionSignature;
+class ParameterList;
+class Stmt;
+class ReturnStmt;
+class Block;
 class Expr;
 class LiteralExpr;
 class NumericLiteralExpr;
 class Identifier;
-class Parameter;
-class ParameterList;
-class SourceFile;
-class Stmt;
-class Block;
-class ReturnStmt;
 class Type;
 
 /**
@@ -32,6 +31,14 @@ public:
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
+     *        Used to visit a SourceFile AST node.
+     *
+     * @param sourceFile The SourceFile being visited.
+     */
+    virtual void visit(const SourceFile *sourceFile) = 0;
+
+    /**
+     * @brief Pure virtual method. Must be overriden in derived classes.
      *        Used to visit a Decl AST node.
      *
      * @param decl The Decl being visited.
@@ -40,19 +47,51 @@ public:
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a Signature AST node.
-     *
-     * @param signature The Signature being visited.
-     */
-    virtual void visit(const Signature *signature) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
      *        Used to visit a FuncDecl AST node.
      *
      * @param funcDecl The FuncDecl being visited.
      */
     virtual void visit(const FuncDecl *funcDecl) = 0;
+
+    /**
+     * @brief Pure virtual method. Must be overriden in derived classes.
+     *        Used to visit a FunctionSignature AST node.
+     *
+     * @param functionSignature The FunctionSignature being visited.
+     */
+    virtual void visit(const FunctionSignature *functionSignature) = 0;
+
+    /**
+     * @brief Pure virtual method. Must be overriden in derived classes.
+     *        Used to visit a ParameterList AST node.
+     *
+     * @param parameterList The ParameterList being visited.
+     */
+    virtual void visit(const ParameterList *parameterList) = 0;
+
+    /**
+     * @brief Pure virtual method. Must be overriden in derived classes.
+     *        Used to visit a Stmt AST node.
+     *
+     * @param stmt The Stmt being visited.
+     */
+    virtual void visit(const Stmt *stmt) = 0;
+
+    /**
+     * @brief Pure virtual method. Must be overriden in derived classes.
+     *        Used to visit a Block AST node.
+     *
+     * @param block The Block being visited.
+     */
+    virtual void visit(const Block *block) = 0;
+
+    /**
+     * @brief Pure virtual method. Must be overriden in derived classes.
+     *        Used to visit a ReturnStmt AST node.
+     *
+     * @param returnStmt The ReturnStmt being visited.
+     */
+    virtual void visit(const ReturnStmt *returnStmt) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -85,54 +124,6 @@ public:
      * @param identifier The Identifier being visited.
      */
     virtual void visit(const Identifier *identifier) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a Parameter AST node.
-     *
-     * @param parameter The Parameter being visited.
-     */
-    virtual void visit(const Parameter *parameter) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a ParameterList AST node.
-     *
-     * @param parameterList The ParameterList being visited.
-     */
-    virtual void visit(const ParameterList *parameterList) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a SourceFile AST node.
-     *
-     * @param sourceFile The SourceFile being visited.
-     */
-    virtual void visit(const SourceFile *sourceFile) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a Stmt AST node.
-     *
-     * @param stmt The Stmt being visited.
-     */
-    virtual void visit(const Stmt *stmt) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a Block AST node.
-     *
-     * @param block The Block being visited.
-     */
-    virtual void visit(const Block *block) = 0;
-
-    /**
-     * @brief Pure virtual method. Must be overriden in derived classes.
-     *        Used to visit a ReturnStmt AST node.
-     *
-     * @param returnStmt The ReturnStmt being visited.
-     */
-    virtual void visit(const ReturnStmt *returnStmt) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.

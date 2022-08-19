@@ -10,17 +10,17 @@
 
 namespace sodium {
 
-// Statement = ReturnStatement | Block ;
+// Statement = Block | ReturnStatement ;
 std::unique_ptr<Stmt> Parser::parseStmt() {
     std::unique_ptr<Stmt> stmt(nullptr);
 
-    if (token_->kind() == TokenKind::KEYWORD && token_->value() == "return") {
-        stmt = parseReturnStmt();
-    } else if (token_->kind() == TokenKind::LEFT_BRACE) {
+    if (token_->kind() == TokenKind::LEFT_BRACE) {
         stmt = parseBlock();
+    } else if (token_->kind() == TokenKind::KEYWORD && token_->value() == "return") {
+        stmt = parseReturnStmt();
     }
 
-    // error, expected a return statement, but did not receive one
+    // expected statement
 
     return stmt;
 }
@@ -28,7 +28,7 @@ std::unique_ptr<Stmt> Parser::parseStmt() {
 // Block = { Statement* } ;
 std::unique_ptr<Block> Parser::parseBlock() {
     if (token_->kind() != TokenKind::LEFT_BRACE) {
-        // error, expected a block, but did not receive one
+        // expected {
     }
 
     skipExcessEOLTokens(); // skip excess EOL tokens after { token
@@ -58,7 +58,7 @@ std::unique_ptr<ReturnStmt> Parser::parseReturnStmt() {
     std::unique_ptr<Expr> expr(parseExpr());
 
     if (!isStmtTerminated()) {
-        // error, expected a statement terminator, but not present
+        // expected statement terminator
     }
 
     return std::make_unique<ReturnStmt>(std::move(expr));

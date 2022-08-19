@@ -41,23 +41,21 @@ std::unique_ptr<SourceFile> Parser::parseSourceFile() {
     return std::make_unique<SourceFile>(std::move(decls));
 }
 
-// Identifier = IDENTIFIER ;
-// IDENTIFIER = IDENTIFIER_HEAD IDENTIFIER_CHARACTER* ;
-// IDENTIFIER_HEAD = "_" | LETTER ;
-// IDENTIFIER_CHARACTER = IDENTIFIER_HEAD | DIGIT ;
+// Identifier = IdentifierHead IdentifierCharacter* ;
+// IdentifierHead = "_" | LETTER ;
+// IdentifierCharacter = IdentifierHead | DIGIT ;
 std::unique_ptr<Identifier> Parser::parseIdentifier() {
     if (token_->kind() != TokenKind::IDENTIFIER) {
-        // error, expecting an identifier, but did not receive one
+        // expected an identifier
     }
 
     return std::make_unique<Identifier>(token_->value());
 }
 
-// Type = TYPE ;
-// TYPE = IDENTIFIER ;
+// Type = int ;
 std::unique_ptr<Type> Parser::parseType() {
     if (token_->kind() != TokenKind::TYPE) {
-        // error, expecting a type name, but did not receive one
+        // expected a type
     }
 
     return std::make_unique<Type>(token_->value());
@@ -73,7 +71,7 @@ void Parser::advance() noexcept {
     token_ = token_->next();
 }
 
-Token *Parser::nextToken() noexcept {
+Token *Parser::nextToken() const noexcept {
     return token_->next();
 }
 
