@@ -3,4 +3,5 @@ target_sources(libnac
         error.cpp
         error_manager.cpp
         lexer_error.cpp
+        parser_error.cpp
 )

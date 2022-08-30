@@ -2,31 +2,38 @@
 
 #include <charconv>
 #include <memory>
+#include <unordered_set>
 
 #include "sodium/nac/ast/expr.h"
+#include "sodium/nac/errors/error_manager.h"
+#include "sodium/nac/errors/parser_error.h"
 #include "sodium/nac/lexer/token.h"
 
 namespace sodium {
 
-// Expression = LiteralExpression ;
+static const std::unordered_set<TokenKind> EXPR_SYNCHRONIZING_TOKENS = {TokenKind::RIGHT_BRACE, TokenKind::SEMICOLON};
+
 std::unique_ptr<Expr> Parser::parseExpr() {
+    // std::unique_ptr<LiteralExpr> literalExpr(parseLiteralExpr());
+    // if (literalExpr == nullptr) {
+    //     // expected expression
+    //     ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected expression");
+    //     synchronize(EXPR_SYNCHRONIZING_TOKENS);
+    // }
+    // return literalExpr;
     return parseLiteralExpr();
 }
 
-// LiteralExpression = NumericLiteralExpression ;
 std::unique_ptr<LiteralExpr> Parser::parseLiteralExpr() {
-    std::unique_ptr<LiteralExpr> literalExpr(nullptr);
-
-    if (token_->kind() == TokenKind::NUMERIC_LITERAL) {
-        literalExpr = parseNumericLiteralExpr();
+    switch (token_->kind()) {
+        case TokenKind::NUMERIC_LITERAL: return parseNumericLiteralExpr();
+        default:
+            // expected numeric literal
+            ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected numeric literal");
+            return nullptr;
     }
-
-    // expected numeric literal
-
-    return literalExpr;
 }
 
-// NumericLiteralExpression = NumericLiteral ;
 std::unique_ptr<NumericLiteralExpr> Parser::parseNumericLiteralExpr() {
     // extract the integer value from the digit characters
     int value;

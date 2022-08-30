@@ -25,6 +25,11 @@ void compileFile(const File &file) {
     Parser parser(token.get());
     std::unique_ptr<AST> ast(parser.parse());
 
+    // if errors have been encountered during tokenizing, throw an exception
+    if (ErrorManager::hasErrors()) {
+        throw Exception(ExceptionKind::ERRORS_GENERATED);
+    }
+
     // temporary for debugging
     ASTPrinter(2).printAST(ast.get());
 

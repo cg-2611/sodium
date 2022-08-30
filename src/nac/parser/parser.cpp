@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <utility>
+#include <unordered_set>
 #include <vector>
 
 #include "sodium/nac/ast/ast.h"
@@ -9,6 +10,8 @@
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/type.h"
+#include "sodium/nac/errors/error_manager.h"
+#include "sodium/nac/errors/parser_error.h"
 #include "sodium/nac/lexer/token.h"
 
 namespace sodium {
@@ -21,7 +24,6 @@ std::unique_ptr<AST> Parser::parse() {
     return std::make_unique<AST>(std::move(root));
 }
 
-// SourceFile = Declaration* EOF ;
 std::unique_ptr<SourceFile> Parser::parseSourceFile() {
     std::vector<std::unique_ptr<Decl>> decls{};
 
@@ -33,38 +35,28 @@ std::unique_ptr<SourceFile> Parser::parseSourceFile() {
             break;
         }
 
-        skipExcessEOLTokens(); // skip excess EOL tokens after declaration
-
         advance();
     }
 
     return std::make_unique<SourceFile>(std::move(decls));
 }
 
-// Identifier = IdentifierHead IdentifierCharacter* ;
-// IdentifierHead = "_" | LETTER ;
-// IdentifierCharacter = IdentifierHead | DIGIT ;
 std::unique_ptr<Identifier> Parser::parseIdentifier() {
     if (token_->kind() != TokenKind::IDENTIFIER) {
-        // expected an identifier
+        // expected identifier
+        return nullptr;
     }
 
     return std::make_unique<Identifier>(token_->value());
 }
 
-// Type = int ;
 std::unique_ptr<Type> Parser::parseType() {
     if (token_->kind() != TokenKind::TYPE) {
-        // expected a type
+        // expected type
+        return nullptr;
     }
 
     return std::make_unique<Type>(token_->value());
-}
-
-void Parser::skipExcessEOLTokens() {
-    while (nextToken()->kind() == TokenKind::EOL_TOKEN) {
-        advance();
-    }
 }
 
 void Parser::advance() noexcept {
@@ -73,6 +65,16 @@ void Parser::advance() noexcept {
 
 Token *Parser::nextToken() const noexcept {
     return token_->next();
+}
+
+void Parser::synchronize(std::unordered_set<TokenKind> synchronizingTokens) {
+    while (token_->kind() != TokenKind::EOF_TOKEN) {
+        advance();
+
+        if (synchronizingTokens.contains(token_->kind())) {
+            return;
+        }
+    }
 }
 
 } // namespace sodium

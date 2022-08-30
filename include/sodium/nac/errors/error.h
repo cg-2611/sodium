@@ -9,6 +9,7 @@ namespace sodium {
  * An enum of the different kinds of errors that can be generated.
  */
 enum class ErrorKind {
+    SYNTAX_ERROR,
     UNRECOGNISED_TOKEN
 };
 
