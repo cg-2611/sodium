@@ -33,10 +33,10 @@ A token consists of an reserved words, punctuation, identifier or literal.
 ```
 ReservedWord = Keyword | Type ;
 
-Keyword = func | return ;
-Type = int ;
+Keyword = "func" | "return" ;
+Type = "int" ;
 
-Punctuation = -> | { | } | ( | ) ;
+Punctuation = "->" | "{" | "}" | "(" | ")" ;
 
 Identifier = IdentifierHead IdentifierCharacter* ;
 IdentifierHead = "_" | LETTER ;
@@ -47,8 +47,6 @@ NumericLiteral = DIGIT* ;
 LETTER = [a-zA-Z] ;
 
 DIGIT = [0-9] ;
-
-EOL = \n ;
 ```
 
 #### Syntactic Structure
@@ -59,21 +57,19 @@ SourceFile = Declaration* EOF ;
 ```
 Declaration = FunctionDeclaration ;
 
-FunctionDeclaration = func FunctionSignature Block ;
+FunctionDeclaration = "func" FunctionSignature Block ;
 FunctionSignature = Identifier ParameterList ReturnType ;
 
-ParameterList = () ;
+ParameterList = "(" ")" ;
 
-ReturnType = -> Type ;
+ReturnType = "->" Type ;
 ```
 ```
 Statement = Block | ReturnStatement ;
 
-Block = { Statement* } ;
+Block = "{" Statement* "}" ;
 
-ReturnStatement = return Expression StatementTerminator ;
-
-StatementTerminator = EOL | } ;
+ReturnStatement = "return" Expression ";" ;
 ```
 ```
 Expression = LiteralExpression ;

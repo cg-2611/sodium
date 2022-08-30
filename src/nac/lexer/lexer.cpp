@@ -61,7 +61,6 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
         advance();
         ++line_;
         column_ = 1;
-        return makeToken(TokenKind::EOL_TOKEN);
     }
 
     advance();
@@ -90,6 +89,7 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
         case '}': return makeToken(TokenKind::RIGHT_BRACE);
         case '(': return makeToken(TokenKind::LEFT_PAREN);
         case ')': return makeToken(TokenKind::RIGHT_PAREN);
+        case ';': return makeToken(TokenKind::SEMICOLON);
         case '-':
             // if the current token starts with a '-' and the next character is a '>'
             if (*current_ == '>') {
@@ -161,7 +161,7 @@ static constexpr bool isDigit(char c) noexcept {
 }
 
 static constexpr bool isSpace(char c) noexcept {
-    return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
+    return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == '\n' || c == ' ';
 }
 
 } // namespace sodium
