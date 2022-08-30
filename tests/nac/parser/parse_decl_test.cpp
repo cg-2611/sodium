@@ -48,7 +48,7 @@ TEST(ParseDeclTest, ParserCorrectlyDispatchesToParseAFunctionDeclaration) {
 
 /*
     tests function declaration:
-        func name() -> int { return 0 }
+        func name() -> int { return 0; }
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionDeclaration) {
     std::string_view funcKeywordString("func");
@@ -71,9 +71,11 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionDeclaration) {
                                                          returnKeywordString.size(), 0, 0);
     auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
                                                        returnValueString.size(), 0, 0);
+    auto semicolon = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
     auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
 
-    returnValue->next(std::move(rightBrace));
+    semicolon->next(std::move(rightBrace));
+    returnValue->next(std::move(semicolon));
     returnKeyword->next(std::move(returnValue));
     leftBrace->next(std::move(returnKeyword));
     returnType->next(std::move(leftBrace));

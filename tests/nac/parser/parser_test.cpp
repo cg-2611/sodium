@@ -90,7 +90,6 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarationsOnDiffe
                                                        returnTypeString1.size(), 0, 0);
     auto leftBrace1 = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
     auto rightBrace1 = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-    auto eol = std::make_unique<sodium::Token>(sodium::TokenKind::EOL_TOKEN, "\n", 1, 0, 0);
     auto funcKeyword2 = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, funcKeywordString2.data(),
                                                         funcKeywordString2.size(), 0, 0);
     auto functionName2 = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, functionNameString2.data(),
@@ -112,8 +111,7 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarationsOnDiffe
     leftParen2->next(std::move(rightParen2));
     functionName2->next(std::move(leftParen2));
     funcKeyword2->next(std::move(functionName2));
-    eol->next(std::move(funcKeyword2));
-    rightBrace1->next(std::move(eol));
+    rightBrace1->next(std::move(funcKeyword2));
     leftBrace1->next(std::move(rightBrace1));
     returnType1->next(std::move(leftBrace1));
     arrow1->next(std::move(returnType1));
@@ -223,8 +221,7 @@ TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
 TEST(ParserTest, ParserCorrectlyParsesAType) {
     std::string_view typeString("int");
 
-    auto type =
-        std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, typeString.data(), typeString.size(), 0, 0);
+    auto type = std::make_unique<sodium::Token>(sodium::TokenKind::TYPE, typeString.data(), typeString.size(), 0, 0);
 
     sodium::Parser parser(type.get());
     auto typeNode = parser.parseType();
