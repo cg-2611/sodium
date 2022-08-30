@@ -57,12 +57,6 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
         return makeToken(TokenKind::EOF_TOKEN);
     }
 
-    if (atEndOfLine()) {
-        advance();
-        ++line_;
-        column_ = 1;
-    }
-
     advance();
 
     if (isIdentifierCharacter(*start_)) {
@@ -128,6 +122,10 @@ void Lexer::advance() noexcept {
 
 void Lexer::skipWhitespace() noexcept {
     while (isSpace(*current_)) {
+        if (atEndOfLine()) {
+            ++line_;
+            column_ = 0;
+        }
         advance();
     }
 }
@@ -137,7 +135,7 @@ inline bool Lexer::atEndOfString() const noexcept {
 }
 
 inline bool Lexer::atEndOfLine() const noexcept {
-    return *start_ == '\n';
+    return *current_ == '\n';
 }
 
 static inline bool isKeyword(const char *start, size_t length) {
