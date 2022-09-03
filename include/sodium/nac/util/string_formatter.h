@@ -1,12 +1,12 @@
 #ifndef SODIUM_NAC_UTIL_STRING_FORMATTER_H
 #define SODIUM_NAC_UTIL_STRING_FORMATTER_H
 
+#include <array>
 #include <cstdio>
 #include <string>
 #include <utility>
 
-namespace sodium {
-namespace StringFormatter {
+namespace sodium::StringFormatter {
 
 /**
  * @brief Performs string formatting similar to std::sprintf().
@@ -19,15 +19,14 @@ namespace StringFormatter {
 template<typename... Args>
 static std::string formatString(const std::string &format, Args &&...args) {
     // get the size of the formatted string, +1 for '\0'
-    const int size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+    const int SIZE = snprintf(nullptr, 0, format.c_str(), args...) + 1;
 
-    std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
-    std::snprintf(buffer.get(), size, format.c_str(), args...);
+    std::unique_ptr<char[]> buffer = std::make_unique<char[]>(SIZE);
+    snprintf(buffer.get(), SIZE, format.c_str(), args...);
 
-    return std::string(buffer.get(), size - 1); // -1 to remove '\0'
+    return std::string(buffer.get(), SIZE - 1); // -1 to remove '\0'
 }
 
-} // namespace StringFormatter
-} // namespace sodium
+} // namespace sodium::StringFormatter
 
 #endif // SODIUM_NAC_UTIL_STRING_FORMATTER_H
