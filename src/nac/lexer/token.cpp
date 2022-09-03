@@ -6,7 +6,7 @@
 
 namespace sodium {
 
-Token::Token(TokenKind kind, const char *position, size_t length, size_t line, size_t column)
+Token::Token(TokenKind kind, const char *position, int length, size_t line, size_t column)
         : kind_(kind),
           line_(line),
           column_(column - length),
@@ -19,11 +19,11 @@ TokenKind Token::kind() const noexcept {
     return kind_;
 }
 
-size_t Token::line() const noexcept{
+size_t Token::line() const noexcept {
     return line_;
 }
 
-size_t Token::column() const noexcept{
+size_t Token::column() const noexcept {
     return column_;
 }
 

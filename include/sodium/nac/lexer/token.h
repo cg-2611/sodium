@@ -49,7 +49,10 @@ public:
      * @param line The line the token is on.
      * @param column The column the token is at.
      */
-    Token(TokenKind kind, const char *position, size_t length, size_t line, size_t column);
+    Token(TokenKind kind, const char *position, int length, size_t line, size_t column);
+
+    // deleted copy constructor so that a token cannot be copied as unique_ptr is non-copyable
+    Token(const Token &other) = delete;
 
     /**
      * @brief Construct a new Token object. Default move constructor.
@@ -63,6 +66,9 @@ public:
      *
      */
     ~Token() = default;
+
+    // deleted private copy assignment operator so that a token cannot be copied as unique_ptr is non-copyable
+    Token &operator=(const Token &other) = delete;
 
     /**
      * @brief Default move assignment operator.
@@ -139,12 +145,6 @@ private:
     std::string_view value_;
 
     std::unique_ptr<Token> next_;
-
-    // deleted, private copy constructor so that a token cannot be copied as unique_ptr is non-copyable
-    Token(const Token &other) = delete;
-
-    // deleted, private copy assignment operator so that a token cannot be copied as unique_ptr is non-copyable
-    Token &operator=(const Token &other) = delete;
 };
 
 } // namespace sodium

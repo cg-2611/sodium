@@ -4,8 +4,8 @@
 #include <string_view>
 #include <utility>
 
-#include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/error.h"
+#include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/lexer_error.h"
 #include "sodium/nac/lexer/token.h"
 
@@ -72,7 +72,9 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
         }
 
         return makeToken(TokenKind::IDENTIFIER);
-    } else if (isDigit(*start_)) {
+    }
+
+    if (isDigit(*start_)) {
         // read a numeric literal if the current token starts with a digit
         readNumericLiteral();
         return makeToken(TokenKind::NUMERIC_LITERAL);

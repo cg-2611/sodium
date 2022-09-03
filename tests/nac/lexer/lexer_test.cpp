@@ -139,7 +139,7 @@ TEST(LexerTest, LexerReadsArrow) {
 }
 
 TEST(LexerTest, LexerReadsEmptyString) {
-    std::string emptyString("");
+    std::string emptyString;
     sodium::Lexer lexer(emptyString);
     std::unique_ptr<sodium::Token> token = lexer.tokenize();
 

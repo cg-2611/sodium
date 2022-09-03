@@ -2,8 +2,8 @@
 #define SODIUM_NAC_LEXER_LEXER_H
 
 #include <memory>
-#include <unordered_set>
 #include <string_view>
+#include <unordered_set>
 
 #include "sodium/nac/lexer/token.h"
 
@@ -27,12 +27,6 @@ public:
      * @param src The std::string_view to be tokenized.
      */
     Lexer(std::string_view src);
-
-    /**
-     * @brief Destroy the Lexer object.
-     *
-     */
-    ~Lexer() = default;
 
     /**
      * @brief Extracts the Sodium programming language tokens from the string.
