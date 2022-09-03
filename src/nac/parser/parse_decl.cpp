@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <utility>
-#include <unordered_set>
 #include <vector>
 
 #include "sodium/nac/ast/decl.h"
@@ -13,47 +12,27 @@
 
 namespace sodium {
 
-static const std::unordered_set<TokenKind> DECL_SYNCHRONIZING_TOKENS = {TokenKind::RIGHT_BRACE};
-
 std::unique_ptr<Decl> Parser::parseDecl() {
     switch (token_->kind()) {
         case TokenKind::KEYWORD:
             if (token_->value() == "func") {
-                std::unique_ptr<FuncDecl> funcDecl(parseFuncDecl());
-                if (funcDecl == nullptr) {
-                    // expected function declaration
-                    ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_,
-                                                        "expected function declaration");
-                    synchronize(DECL_SYNCHRONIZING_TOKENS);
-                    // return nullptr;
-                }
-                return funcDecl;
+                return parseFuncDecl();
             }
             [[fallthrough]];
-        default:
-            // expected declaration
-            ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected declaration");
-            synchronize(DECL_SYNCHRONIZING_TOKENS);
-            return nullptr;
+        default: errorExpected("declaration"); return nullptr;
     }
 }
 
 std::unique_ptr<FuncDecl> Parser::parseFuncDecl() {
     std::unique_ptr<FunctionSignature> functionSignature(parseFunctionSignature());
-
-    if (functionSignature == nullptr) {
-        // expected function signature
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected function signature");
+    if (!functionSignature) {
         return nullptr;
     }
 
-    advance(); // advance to expected block
+    advance(); // advance to expected { to begin block
 
     std::unique_ptr<Block> functionBody(parseBlock());
-
-    if (functionBody == nullptr) {
-        // expected function body
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected function body");
+    if (!functionBody) {
         return nullptr;
     }
 
@@ -62,49 +41,38 @@ std::unique_ptr<FuncDecl> Parser::parseFuncDecl() {
 
 std::unique_ptr<FunctionSignature> Parser::parseFunctionSignature() {
     advance(); // advance to expected identifier
-    std::unique_ptr<Identifier> functionName(parseIdentifier());
 
-    if (functionName == nullptr) {
-        // expected function name
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected function name");
+    std::unique_ptr<Identifier> name(parseIdentifier());
+    if (!name) {
+        errorExpected("function name");
         return nullptr;
     }
 
-    advance(); // advance to expected parameter list
-    std::unique_ptr<ParameterList> functionParameters(parseParameterList());
+    advance(); // advance to expected ( to begin parameter list
 
-    if (functionParameters == nullptr) {
-        // expected function parameter list
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected function parameter list");
+    std::unique_ptr<ParameterList> parameters(parseParameterList());
+    if (!parameters) {
         return nullptr;
     }
 
-    advance(); // advance to expected return type
-    std::unique_ptr<Type> functionReturnType(parseReturnType());
+    advance(); // advance to expected ->
 
-    if (functionReturnType == nullptr) {
-        // expected function return type
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected function return type");
+    std::unique_ptr<Type> returnType(parseReturnType());
+    if (!returnType) {
         return nullptr;
     }
 
-    return std::make_unique<FunctionSignature>(std::move(functionName), std::move(functionParameters),
-                                               std::move(functionReturnType));
+    return std::make_unique<FunctionSignature>(std::move(name), std::move(parameters), std::move(returnType));
 }
 
 std::unique_ptr<ParameterList> Parser::parseParameterList() {
-    if (token_->kind() != TokenKind::LEFT_PAREN) {
-        // expected (
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected ( to begin parameter list");
+    if (!expect(TokenKind::LEFT_PAREN, "expected ( to begin parameter list")) {
         return nullptr;
     }
 
-    advance(); // advance to the ) token
+    advance(); // advance to expected )
 
-    if (token_->kind() != TokenKind::RIGHT_PAREN) {
-        // expected ), bracket pair never closed
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_,
-                                            "expected ) to end parameter list, pair never closed");
+    if (!expect(TokenKind::RIGHT_PAREN, "expected ) to end parameter list, pair never closed")) {
         return nullptr;
     }
 
@@ -112,19 +80,16 @@ std::unique_ptr<ParameterList> Parser::parseParameterList() {
 }
 
 std::unique_ptr<Type> Parser::parseReturnType() {
-    if (token_->kind() != TokenKind::ARROW) {
-        // expected ->
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected ->");
+    if (!expect(TokenKind::ARROW, "->")) {
         return nullptr;
     }
 
     advance(); // advance to expected type
 
     std::unique_ptr<Type> returnType(parseType());
-
-    if (returnType == nullptr) {
-        // expected type after ->
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected type after ->");
+    if (!returnType) {
+        errorExpected("type after ->");
+        return nullptr;
     }
 
     return returnType;

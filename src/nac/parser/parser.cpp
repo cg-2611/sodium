@@ -1,8 +1,10 @@
 #include "sodium/nac/parser/parser.h"
 
 #include <memory>
-#include <utility>
+#include <string>
+#include <string_view>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "sodium/nac/ast/ast.h"
@@ -15,6 +17,10 @@
 #include "sodium/nac/lexer/token.h"
 
 namespace sodium {
+
+const std::unordered_set<TokenKind> Parser::DECL_SYNCHRONIZING_TOKENS{TokenKind::RIGHT_BRACE};
+const std::unordered_set<TokenKind> Parser::STMT_SYNCHRONIZING_TOKENS{TokenKind::LEFT_BRACE, TokenKind::RIGHT_BRACE,
+                                                                      TokenKind::SEMICOLON};
 
 Parser::Parser(Token *token) : token_(token) {}
 
@@ -29,21 +35,19 @@ std::unique_ptr<SourceFile> Parser::parseSourceFile() {
 
     // parse declarations until we reach an EOF token
     while (token_->kind() != TokenKind::EOF_TOKEN) {
-        decls.push_back(parseDecl());
-
-        if (token_->kind() == TokenKind::EOF_TOKEN) {
-            break;
+        std::unique_ptr<Decl> decl(parseDecl());
+        if (!decl) {
+            synchronize(DECL_SYNCHRONIZING_TOKENS);
         }
 
-        advance();
+        decls.push_back(std::move(decl));
     }
 
     return std::make_unique<SourceFile>(std::move(decls));
 }
 
 std::unique_ptr<Identifier> Parser::parseIdentifier() {
-    if (token_->kind() != TokenKind::IDENTIFIER) {
-        // expected identifier
+    if (!match(TokenKind::IDENTIFIER)) {
         return nullptr;
     }
 
@@ -51,8 +55,7 @@ std::unique_ptr<Identifier> Parser::parseIdentifier() {
 }
 
 std::unique_ptr<Type> Parser::parseType() {
-    if (token_->kind() != TokenKind::TYPE) {
-        // expected type
+    if (!match(TokenKind::TYPE)) {
         return nullptr;
     }
 
@@ -60,20 +63,38 @@ std::unique_ptr<Type> Parser::parseType() {
 }
 
 void Parser::advance() noexcept {
-    token_ = token_->next();
+    if (token_->kind() != TokenKind::EOF_TOKEN) {
+        token_ = token_->next();
+    }
 }
 
-Token *Parser::nextToken() const noexcept {
-    return token_->next();
+bool Parser::match(TokenKind expectedTokenKind) const {
+    return token_->kind() == expectedTokenKind;
+}
+
+bool Parser::expect(TokenKind expectedTokenKind, std::string_view message) const {
+    bool tokenMatch = match(expectedTokenKind);
+
+    if (!tokenMatch) {
+        errorExpected(message);
+    }
+
+    return tokenMatch;
+}
+
+void Parser::errorExpected(std::string_view message) const {
+    std::string errorMessage("expected ");
+    errorMessage += message;
+    ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, errorMessage);
 }
 
 void Parser::synchronize(std::unordered_set<TokenKind> synchronizingTokens) {
     while (token_->kind() != TokenKind::EOF_TOKEN) {
-        advance();
-
         if (synchronizingTokens.contains(token_->kind())) {
-            return;
+            break;
         }
+
+        advance();
     }
 }
 

@@ -13,53 +13,46 @@
 
 namespace sodium {
 
-static const std::unordered_set<TokenKind> STMT_SYNCHRONIZING_TOKENS = {TokenKind::RIGHT_BRACE, TokenKind::SEMICOLON};
-
 std::unique_ptr<Stmt> Parser::parseStmt() {
     switch (token_->kind()) {
         case TokenKind::LEFT_BRACE: return parseBlock();
         case TokenKind::KEYWORD:
             if (token_->value() == "return") {
-                std::unique_ptr<ReturnStmt> returnStmt(parseReturnStmt());
-                if (returnStmt == nullptr) {
-                    // expected return statement
-                    ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected return statement");
-                    synchronize(STMT_SYNCHRONIZING_TOKENS);
-                    return nullptr;
-                }
-                return returnStmt;
+                return parseReturnStmt();
             }
             [[fallthrough]];
-        default:
-            // expected statement
-            ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected statement");
-            synchronize(STMT_SYNCHRONIZING_TOKENS);
-            return nullptr;
+        default: errorExpected("statement"); return nullptr;
     }
 }
 
 std::unique_ptr<Block> Parser::parseBlock() {
-    if (token_->kind() != TokenKind::LEFT_BRACE) {
-        // expected {
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected { to start block");
+    if (!expect(TokenKind::LEFT_BRACE, "{ to start block")) {
+        return nullptr;
     }
+
+    advance(); // advance to statements
 
     std::vector<std::unique_ptr<Stmt>> stmts{};
 
     // parse statements until we reach the end of the block
-    while (nextToken()->kind() != TokenKind::RIGHT_BRACE && nextToken()->kind() != TokenKind::EOF_TOKEN) {
-        advance(); // advance to expected statement
-        stmts.push_back(parseStmt());
+    while (token_->kind() != TokenKind::RIGHT_BRACE && token_->kind() != TokenKind::EOF_TOKEN) {
+        std::unique_ptr<Stmt> stmt(parseStmt());
+        if (!stmt) {
+            synchronize(STMT_SYNCHRONIZING_TOKENS);
+        }
+
+        stmts.push_back(std::move(stmt));
+
+        if (token_->kind() == TokenKind::SEMICOLON) {
+            advance(); // advance to next statement
+        }
     }
 
-    advance(); // advance to the } token
-
-    if (token_->kind() != TokenKind::RIGHT_BRACE) {
-        // expected }, brace pair never closed
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_,
-                                            "expected } to end block, pair never closed");
+    if (!expect(TokenKind::RIGHT_BRACE, "} to end block, pair never closed")) {
         return nullptr;
     }
+
+    advance(); // advance to token after block to continue parsing
 
     return std::make_unique<Block>(std::move(stmts));
 }
@@ -69,17 +62,14 @@ std::unique_ptr<ReturnStmt> Parser::parseReturnStmt() {
 
     // parse the expression being returned
     std::unique_ptr<Expr> expr(parseExpr());
-
-    if (expr == nullptr) {
-        // expected expression to return
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected expression to return");
+    if (!expr) {
+        errorExpected("expression to return");
         return nullptr;
     }
 
-    advance(); // advance to expected semicolon
+    advance(); // advance to expected ;
 
-    if (token_->kind() != TokenKind::SEMICOLON) {
-        ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, "expected ; at end of return statement");
+    if (!expect(TokenKind::SEMICOLON, "; after return statement")) {
         return nullptr;
     }
 
