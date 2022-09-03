@@ -88,7 +88,7 @@ void Parser::errorExpected(std::string_view message) const {
     ErrorManager::addError<ParserError>(ErrorKind::SYNTAX_ERROR, token_, errorMessage);
 }
 
-void Parser::synchronize(std::unordered_set<TokenKind> synchronizingTokens) {
+void Parser::synchronize(const std::unordered_set<TokenKind> &synchronizingTokens) {
     while (token_->kind() != TokenKind::EOF_TOKEN) {
         if (synchronizingTokens.contains(token_->kind())) {
             break;

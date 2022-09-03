@@ -182,7 +182,7 @@ private:
     void errorExpected(std::string_view message) const;
 
     // used for error recovery, skips tokens until one of the synchronizing tokens is encountered
-    void synchronize(std::unordered_set<TokenKind> synchronizingTokens);
+    void synchronize(const std::unordered_set<TokenKind> &synchronizingTokens);
 };
 
 } // namespace sodium

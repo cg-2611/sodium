@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/identifier.h"
+#include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/type.h"
 #include "sodium/nac/lexer/token.h"
 

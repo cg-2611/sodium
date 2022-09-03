@@ -88,7 +88,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAnEmptyNestedBlock) {
 
     ASSERT_EQ(1, block->stmts().size());
 
-    auto nestedBlock = static_cast<sodium::Block *>(block->stmts()[0].get());
+    auto *nestedBlock = dynamic_cast<sodium::Block *>(block->stmts()[0].get());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
     EXPECT_EQ(sodium::StmtKind::BLOCK, block->stmtKind());
@@ -124,8 +124,8 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleEmptyNestedBlocks) {
 
     ASSERT_EQ(2, block->stmts().size());
 
-    auto nestedBlock1 = static_cast<sodium::Block *>(block->stmts()[0].get());
-    auto nestedBlock2 = static_cast<sodium::Block *>(block->stmts()[1].get());
+    auto *nestedBlock1 = dynamic_cast<sodium::Block *>(block->stmts()[0].get());
+    auto *nestedBlock2 = dynamic_cast<sodium::Block *>(block->stmts()[1].get());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
     EXPECT_EQ(sodium::StmtKind::BLOCK, block->stmtKind());
@@ -253,8 +253,8 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAStatementAndANestedBlockWith
 
     ASSERT_EQ(2, block->stmts().size());
 
-    auto stmt = block->stmts()[0].get();
-    auto nestedBlock = static_cast<sodium::Block *>(block->stmts()[1].get());
+    auto *stmt = block->stmts()[0].get();
+    auto *nestedBlock = dynamic_cast<sodium::Block *>(block->stmts()[1].get());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
     EXPECT_EQ(sodium::StmtKind::BLOCK, block->stmtKind());
@@ -265,7 +265,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAStatementAndANestedBlockWith
     EXPECT_EQ(sodium::StmtKind::BLOCK, nestedBlock->stmtKind());
 
     ASSERT_EQ(1, nestedBlock->stmts().size());
-    auto nestedStmt = nestedBlock->stmts()[0].get();
+    auto *nestedStmt = nestedBlock->stmts()[0].get();
     EXPECT_EQ(sodium::StmtKind::RETURN, nestedStmt->stmtKind());
 }
 
@@ -325,8 +325,8 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithAMultiLineNe
 
     ASSERT_EQ(2, block->stmts().size());
 
-    auto stmt = block->stmts()[0].get();
-    auto nestedBlock = static_cast<sodium::Block *>(block->stmts()[1].get());
+    auto *stmt = block->stmts()[0].get();
+    auto *nestedBlock = dynamic_cast<sodium::Block *>(block->stmts()[1].get());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
     EXPECT_EQ(sodium::StmtKind::BLOCK, block->stmtKind());
@@ -337,8 +337,8 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithAMultiLineNe
     EXPECT_EQ(sodium::StmtKind::BLOCK, nestedBlock->stmtKind());
 
     ASSERT_EQ(2, nestedBlock->stmts().size());
-    auto nestedStmt1 = nestedBlock->stmts()[0].get();
-    auto nestedStmt2 = nestedBlock->stmts()[1].get();
+    auto *nestedStmt1 = nestedBlock->stmts()[0].get();
+    auto *nestedStmt2 = nestedBlock->stmts()[1].get();
 
     EXPECT_EQ(sodium::StmtKind::RETURN, nestedStmt1->stmtKind());
     EXPECT_EQ(sodium::StmtKind::RETURN, nestedStmt2->stmtKind());
@@ -367,7 +367,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithSingleDigit) {
     EXPECT_EQ(sodium::ASTNodeKind::STMT, returnStmt->nodeKind());
     EXPECT_EQ(sodium::StmtKind::RETURN, returnStmt->stmtKind());
 
-    sodium::NumericLiteralExpr *returnExpr = static_cast<sodium::NumericLiteralExpr *>(returnStmt->expr());
+    auto *returnExpr = dynamic_cast<sodium::NumericLiteralExpr *>(returnStmt->expr());
 
     EXPECT_EQ(2, returnExpr->value());
 }
@@ -395,7 +395,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithMultipleDigit) {
     EXPECT_EQ(sodium::ASTNodeKind::STMT, returnStmt->nodeKind());
     EXPECT_EQ(sodium::StmtKind::RETURN, returnStmt->stmtKind());
 
-    sodium::NumericLiteralExpr *returnExpr = static_cast<sodium::NumericLiteralExpr *>(returnStmt->expr());
+    auto *returnExpr = dynamic_cast<sodium::NumericLiteralExpr *>(returnStmt->expr());
 
     EXPECT_EQ(567, returnExpr->value());
 }
