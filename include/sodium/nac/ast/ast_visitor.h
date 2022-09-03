@@ -105,9 +105,9 @@ public:
      * @brief Pure virtual method. Must be overriden in derived classes.
      *        Used to visit a LiteralExpr AST node.
      *
-     * @param LiteralExpr The LiteralExpr being visited.
+     * @param literalExpr The LiteralExpr being visited.
      */
-    virtual void visit(const LiteralExpr *LiteralExpr) = 0;
+    virtual void visit(const LiteralExpr *literalExpr) = 0;
 
     /**
      * @brief Pure virtual method. Must be overriden in derived classes.
@@ -139,6 +139,35 @@ protected:
      *
      */
     ASTVisitor() = default;
+
+    /**
+     * @brief Construct a new ASTVisitor object by copying another ASTVisitor.
+     *
+     * @param other The other ASTVisitor being copied to construct this one.
+     */
+    ASTVisitor(const ASTVisitor &other) = default;
+
+    /**
+     * @brief Construct a new ASTVisitor object by moving another ASTVisitor.
+     *
+     * @param other The other ASTVisitor being moved to construct this one,
+     */
+    ASTVisitor(ASTVisitor &&other) noexcept = default;
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param other The other ASTVisitor being copied.
+     * @return ASTVisitor& that is \c this ASTVisitor after the assignment
+     */
+    ASTVisitor &operator=(const ASTVisitor &other) = default;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param other The other ASTVisitor being moved.
+     * @return ASTVisitor& that is \c this ASTVisitor after the assignment.
+     */
+    ASTVisitor &operator=(ASTVisitor &&other) noexcept = default;
 };
 
 } // namespace sodium

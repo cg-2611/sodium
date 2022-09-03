@@ -29,10 +29,40 @@ public:
     Expr(ExprKind kind);
 
     /**
+     * @brief Construct a new Expr object by copying another Expr.
+     *
+     * @param other The other Expr being copied to construct this one.
+     */
+    Expr(const Expr &other) = default;
+
+    /**
+     * @brief Construct a new Expr object by moving another Expr.
+     *
+     * @param other The other Expr being moved to construct this one,
+     */
+    Expr(Expr &&other) noexcept = default;
+
+    /**
      * @brief Destroy the Expr object.
      *
      */
-    virtual ~Expr() = default;
+    ~Expr() override = default;
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param other The other Expr being copied.
+     * @return Expr& that is \c this Expr after the assignment
+     */
+    Expr &operator=(const Expr &other) = default;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param other The other Expr being moved.
+     * @return Expr& that is \c this Expr after the assignment.
+     */
+    Expr &operator=(Expr &&other) noexcept = default;
 
     /**
      * @brief Used to accept, for an expression, an ASTVisitor derived class for use with the visitor pattern.
@@ -40,7 +70,7 @@ public:
      *
      * @param visitor The visitor object being accepted by this expression.
      */
-    virtual void accept(ASTVisitor *visitor) const override;
+    void accept(ASTVisitor *visitor) const override;
 
     /**
      * @brief Accessor for the kind of this expression.
@@ -49,7 +79,7 @@ public:
      */
     ExprKind exprKind() const noexcept;
 
-protected:
+private:
     ExprKind kind_;
 };
 
@@ -75,10 +105,40 @@ public:
     LiteralExpr(LiteralKind kind);
 
     /**
+     * @brief Construct a new LiteralExpr object by copying another LiteralExpr.
+     *
+     * @param other The other LiteralExpr being copied to construct this one.
+     */
+    LiteralExpr(const LiteralExpr &other) = default;
+
+    /**
+     * @brief Construct a new LiteralExpr object by moving another LiteralExpr.
+     *
+     * @param other The other LiteralExpr being moved to construct this one,
+     */
+    LiteralExpr(LiteralExpr &&other) noexcept = default;
+
+    /**
      * @brief Destroy the LiteralExpr object.
      *
      */
-    virtual ~LiteralExpr() = default;
+    ~LiteralExpr() override = default;
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param other The other LiteralExpr being copied.
+     * @return LiteralExpr& that is \c this LiteralExpr after the assignment
+     */
+    LiteralExpr &operator=(const LiteralExpr &other) = default;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param other The other LiteralExpr being moved.
+     * @return LiteralExpr& that is \c this LiteralExpr after the assignment.
+     */
+    LiteralExpr &operator=(LiteralExpr &&other) noexcept = default;
 
     /**
      * @brief Used to accept, for a literal expression, an ASTVisitor derived class for use with the visitor pattern.
@@ -86,7 +146,7 @@ public:
      *
      * @param visitor The visitor object being accepted by this literal expression.
      */
-    virtual void accept(ASTVisitor *visitor) const override;
+    void accept(ASTVisitor *visitor) const override;
 
     /**
      * @brief Accessor for the kind of this literal expression.
@@ -95,7 +155,7 @@ public:
      */
     LiteralKind literalKind() const noexcept;
 
-protected:
+private:
     LiteralKind kind_;
 };
 
@@ -111,12 +171,6 @@ public:
      * @param value The integer value of the numeric literal.
      */
     NumericLiteralExpr(int value);
-
-    /**
-     * @brief Destroy the NumericLiteralExpr object.
-     *
-     */
-    ~NumericLiteralExpr() = default;
 
     /**
      * @brief Used to accept, for a numeric literal expression, an ASTVisitor derived class for use with the visitor

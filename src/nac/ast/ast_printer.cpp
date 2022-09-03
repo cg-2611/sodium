@@ -18,12 +18,12 @@ ASTPrinter::ASTPrinter(int spaces) : indentationSpaces_(spaces), indentationLeve
 void ASTPrinter::printAST(const AST *ast) {
     ASTNode *root = ast->root();
     switch (root->nodeKind()) {
-        case ASTNodeKind::SOURCE_FILE: visit(static_cast<const SourceFile *>(root)); break;
-        case ASTNodeKind::DECL: visit(static_cast<const Decl *>(root)); break;
-        case ASTNodeKind::EXPR: visit(static_cast<const Expr *>(root)); break;
-        case ASTNodeKind::STMT: visit(static_cast<const Stmt *>(root)); break;
-        case ASTNodeKind::IDENTIFIER: visit(static_cast<const Identifier *>(root)); break;
-        case ASTNodeKind::TYPE: visit(static_cast<const Type *>(root)); break;
+        case ASTNodeKind::SOURCE_FILE: visit(dynamic_cast<const SourceFile *>(root)); break;
+        case ASTNodeKind::DECL: visit(dynamic_cast<const Decl *>(root)); break;
+        case ASTNodeKind::EXPR: visit(dynamic_cast<const Expr *>(root)); break;
+        case ASTNodeKind::STMT: visit(dynamic_cast<const Stmt *>(root)); break;
+        case ASTNodeKind::IDENTIFIER: visit(dynamic_cast<const Identifier *>(root)); break;
+        case ASTNodeKind::TYPE: visit(dynamic_cast<const Type *>(root)); break;
         default: std::cout << "unknown ast node kind\n"; break;
     }
 }
@@ -43,7 +43,7 @@ void ASTPrinter::visit(const SourceFile *sourceFile) {
 
 void ASTPrinter::visit(const Decl *decl) {
     switch (decl->declKind()) {
-        case DeclKind::FUNCTION: visit(static_cast<const FuncDecl *>(decl)); break;
+        case DeclKind::FUNCTION: visit(dynamic_cast<const FuncDecl *>(decl)); break;
         default: std::cout << "unknown declaration kind\n"; break;
     }
 }
@@ -73,15 +73,15 @@ void ASTPrinter::visit(const FunctionSignature *functionSignature) {
     dedent();
 }
 
-void ASTPrinter::visit(const ParameterList *parameterList) {
+void ASTPrinter::visit(const ParameterList * /*parameterList*/) {
     printIndentation();
     std::cout << "parameters:\n";
 }
 
 void ASTPrinter::visit(const Stmt *stmt) {
     switch (stmt->stmtKind()) {
-        case StmtKind::BLOCK: visit(static_cast<const Block *>(stmt)); break;
-        case StmtKind::RETURN: visit(static_cast<const ReturnStmt *>(stmt)); break;
+        case StmtKind::BLOCK: visit(dynamic_cast<const Block *>(stmt)); break;
+        case StmtKind::RETURN: visit(dynamic_cast<const ReturnStmt *>(stmt)); break;
         default: std::cout << "unknown statement kind\n"; break;
     }
 }
@@ -113,13 +113,13 @@ void ASTPrinter::visit(const ReturnStmt *returnStmt) {
 
 void ASTPrinter::visit(const Expr *expr) {
     switch (expr->exprKind()) {
-        case ExprKind::LITERAL: visit(static_cast<const LiteralExpr *>(expr)); break;
+        case ExprKind::LITERAL: visit(dynamic_cast<const LiteralExpr *>(expr)); break;
         default: std::cout << "unknown expression kind\n"; break;
     }
 }
 void ASTPrinter::visit(const LiteralExpr *literalExpr) {
     switch (literalExpr->literalKind()) {
-        case LiteralKind::NUMERIC_LITERAL: visit(static_cast<const NumericLiteralExpr *>(literalExpr)); break;
+        case LiteralKind::NUMERIC_LITERAL: visit(dynamic_cast<const NumericLiteralExpr *>(literalExpr)); break;
         default: std::cout << "unknown literal expression kind\n"; break;
     }
 }
@@ -139,7 +139,7 @@ void ASTPrinter::visit(const Type *type) {
     std::cout << "return type: " << type->name() << '\n';
 }
 
-void ASTPrinter::printIndentation() {
+void ASTPrinter::printIndentation() const {
     int spaces = indentationSpaces_ * indentationLevel_;
     for (int i = 0; i < spaces; ++i) {
         std::cout << " ";

@@ -17,12 +17,6 @@ public:
     ASTPrinter(int spaces);
 
     /**
-     * @brief Destroy the ASTPrinter object.
-     *
-     */
-    ~ASTPrinter() = default;
-
-    /**
      * @brief Print an AST.
      *
      * @param ast The AST to print.
@@ -97,9 +91,9 @@ public:
      * @brief Visit a LiteralExpr node in the AST. Dispatches the specific visit method for the derived class of
      *        LiteralExpr.
      *
-     * @param LiteralExpr The LiteralExpr node being visited.
+     * @param literalExpr The LiteralExpr node being visited.
      */
-    void visit(const LiteralExpr *LiteralExpr) override;
+    void visit(const LiteralExpr *literalExpr) override;
 
     /**
      * @brief Prints a numeric literal.
@@ -126,9 +120,9 @@ private:
     int indentationSpaces_;
     int indentationLevel_;
 
-    void printIndentation(); // print the correct number of spaces of indentation
-    void indent();           // increases the indentation level by 1
-    void dedent();           // decreases the indentation level by 1
+    void printIndentation() const; // print the correct number of spaces of indentation
+    void indent();                 // increases the indentation level by 1
+    void dedent();                 // decreases the indentation level by 1
 };
 
 } // namespace sodium

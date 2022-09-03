@@ -32,10 +32,40 @@ public:
     ASTNode(ASTNodeKind kind);
 
     /**
+     * @brief Construct a new ASTNode object by copying another ASTNode.
+     *
+     * @param other The other ASTNode being copied to construct this one.
+     */
+    ASTNode(const ASTNode &other) = default;
+
+    /**
+     * @brief Construct a new ASTNode object by moving another ASTNode.
+     *
+     * @param other The other ASTNode being moved to construct this one,
+     */
+    ASTNode(ASTNode &&other) noexcept = default;
+
+    /**
      * @brief Destroy the ASTNode object.
      *
      */
     virtual ~ASTNode() = default;
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param other The other ASTNode being copied.
+     * @return ASTNode& that is \c this ASTNode after the assignment
+     */
+    ASTNode &operator=(const ASTNode &other) = default;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param other The other ASTNode being moved.
+     * @return ASTNode& that is \c this ASTNode after the assignment.
+     */
+    ASTNode &operator=(ASTNode &&other) noexcept = default;
 
     /**
      * @brief Pure virtual method. Must be overridden in derived classes.

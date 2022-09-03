@@ -34,10 +34,40 @@ public:
     Stmt(StmtKind kind);
 
     /**
+     * @brief Construct a new Stmt object by copying another Stmt.
+     *
+     * @param other The other Stmt being copied to construct this one.
+     */
+    Stmt(const Stmt &other) = default;
+
+    /**
+     * @brief Construct a new Stmt object by moving another Stmt.
+     *
+     * @param other The other Stmt being moved to construct this one,
+     */
+    Stmt(Stmt &&other) noexcept = default;
+
+    /**
      * @brief Destroy the Stmt object.
      *
      */
-    virtual ~Stmt() = default;
+    ~Stmt() override = default;
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param other The other Stmt being copied.
+     * @return Stmt& that is \c this Stmt after the assignment
+     */
+    Stmt &operator=(const Stmt &other) = default;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param other The other Stmt being moved.
+     * @return Stmt& that is \c this Stmt after the assignment.
+     */
+    Stmt &operator=(Stmt &&other) noexcept = default;
 
     /**
      * @brief Used to accept, for a statement, an ASTVisitor derived class for use with the visitor pattern.
@@ -45,7 +75,7 @@ public:
      *
      * @param visitor The visitor object being accepted by this expression.
      */
-    virtual void accept(ASTVisitor *visitor) const override;
+    void accept(ASTVisitor *visitor) const override;
 
     /**
      * @brief Accessor for the kind of this statement.
@@ -54,7 +84,7 @@ public:
      */
     StmtKind stmtKind() const noexcept;
 
-protected:
+private:
     StmtKind kind_;
 };
 
@@ -70,12 +100,6 @@ public:
      * @param stmts An std::vector<std::unique_ptr<Stmt> that are the statements in the block.
      */
     Block(std::vector<std::unique_ptr<Stmt>> stmts);
-
-    /**
-     * @brief Destroy the Block object.
-     *
-     */
-    ~Block() = default;
 
     /**
      * @brief Used to accept, for a block, an ASTVisitor derived class for use with the visitor pattern.
@@ -108,12 +132,6 @@ public:
      * @param expr An std::unique_ptr<Expr> that is the expression being returned by the statement.
      */
     ReturnStmt(std::unique_ptr<Expr> expr);
-
-    /**
-     * @brief Destroy the ReturnStmt object.
-     *
-     */
-    ~ReturnStmt() = default;
 
     /**
      * @brief Used to accept, for a return statement, an ASTVisitor derived class for use with the visitor pattern.

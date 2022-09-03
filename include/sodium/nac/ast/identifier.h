@@ -23,12 +23,6 @@ public:
     Identifier(std::string_view value);
 
     /**
-     * @brief Destroy the Identifier object.
-     *
-     */
-    ~Identifier() = default;
-
-    /**
      * @brief Used to accept, for an identifier, an ASTVisitor derived class for use with the visitor pattern.
      *
      * @param visitor The visitor object being accepted by this identifier.

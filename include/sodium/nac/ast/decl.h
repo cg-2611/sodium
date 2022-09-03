@@ -38,10 +38,40 @@ public:
     Decl(DeclKind kind);
 
     /**
+     * @brief Construct a new Decl object by copying another Decl.
+     *
+     * @param other The other Decl being copied to construct this one.
+     */
+    Decl(const Decl &other) = default;
+
+    /**
+     * @brief Construct a new Decl object by moving another Decl.
+     *
+     * @param other The other Decl being moved to construct this one,
+     */
+    Decl(Decl &&other) noexcept = default;
+
+    /**
      * @brief Destroy the Decl object.
      *
      */
-    virtual ~Decl() = default;
+    ~Decl() override = default;
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param other The other Decl being copied.
+     * @return Decl& that is \c this Decl after the assignment
+     */
+    Decl &operator=(const Decl &other) = default;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * @param other The other Decl being moved.
+     * @return Decl& that is \c this Decl after the assignment.
+     */
+    Decl &operator=(Decl &&other) noexcept = default;
 
     /**
      * @brief Used to accept, for a declaration, an ASTVisitor derived class for use with the visitor pattern.
@@ -49,7 +79,7 @@ public:
      *
      * @param visitor The visitor object being accepted by this declaration.
      */
-    virtual void accept(ASTVisitor *visitor) const override;
+    void accept(ASTVisitor *visitor) const override;
 
     /**
      * @brief Accessor for the kind of this declaration.
@@ -58,7 +88,7 @@ public:
      */
     DeclKind declKind() const noexcept;
 
-protected:
+private:
     DeclKind kind_;
 };
 
@@ -75,12 +105,6 @@ public:
      * @param body An std::unique_ptr<Block> that is the function body.
      */
     FuncDecl(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Block> body);
-
-    /**
-     * @brief Destroy the FuncDecl object.
-     *
-     */
-    ~FuncDecl() = default;
 
     /**
      * @brief Used to accept, for a function declaration, an ASTVisitor derived class for use with the visitor
@@ -124,12 +148,6 @@ public:
      */
     FunctionSignature(std::unique_ptr<Identifier> name, std::unique_ptr<ParameterList> parameterList,
                       std::unique_ptr<Type> returnType);
-
-    /**
-     * @brief Destroy the FunctionSignature object.
-     *
-     */
-    ~FunctionSignature() = default;
 
     /**
      * @brief Used to accept, for a function signature, an ASTVisitor derived class for use with the visitor
@@ -177,12 +195,6 @@ public:
      *
      */
     ParameterList();
-
-    /**
-     * @brief Destroy the ParameterList object.
-     *
-     */
-    ~ParameterList() = default;
 
     /**
      * @brief Used to accept, for a parameter list, an ASTVisitor derived class for use with the visitor pattern.

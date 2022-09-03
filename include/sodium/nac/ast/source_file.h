@@ -25,12 +25,6 @@ public:
     SourceFile(std::vector<std::unique_ptr<Decl>> decls);
 
     /**
-     * @brief Destroy the SourceFile object.
-     *
-     */
-    ~SourceFile() = default;
-
-    /**
      * @brief Used to accept, for a source file node, aASTVisitor derived class for use with the visitor pattern.
      *        It calls the accept method of each declaration in the vector of declarations.
      *

@@ -21,12 +21,6 @@ public:
     AST(std::unique_ptr<ASTNode> root);
 
     /**
-     * @brief Destroy the AST object.
-     *
-     */
-    ~AST() = default;
-
-    /**
      * @brief Access the root of the AST.
      *
      * @return ASTNode* to the root node of the AST.
