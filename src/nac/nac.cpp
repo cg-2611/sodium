@@ -7,6 +7,7 @@
 #include "sodium/nac/ast/ast_printer.h"
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/exceptions/exception.h"
+#include "sodium/nac/io/file.h"
 #include "sodium/nac/lexer/lexer.h"
 #include "sodium/nac/lexer/token.h"
 #include "sodium/nac/parser/parser.h"

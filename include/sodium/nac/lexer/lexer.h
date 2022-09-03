@@ -5,9 +5,10 @@
 #include <string_view>
 #include <unordered_set>
 
-#include "sodium/nac/lexer/token.h"
-
 namespace sodium {
+
+class Token;
+enum class TokenKind;
 
 /// @brief std::unordered_set of the keywords currently used in Sodium.
 const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
