@@ -4,8 +4,7 @@
 #include <string>
 #include <tuple>
 
-namespace sodium {
-namespace IO {
+namespace sodium::IO {
 
 /**
  * @brief Function used to read the contents of a file.
@@ -17,7 +16,6 @@ namespace IO {
  */
 [[nodiscard]] std::tuple<size_t, std::string> readFile(const std::string &filePath);
 
-} // namespace IO
-} // namespace sodium
+} // namespace sodium::IO
 
 #endif // SODIUM_NAC_IO_FILE_IO_H

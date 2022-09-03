@@ -20,12 +20,6 @@ public:
     File(std::string path);
 
     /**
-     * @brief Destroy the File object.
-     *
-     */
-    ~File() = default;
-
-    /**
      * @brief Get the path of this file.
      *
      * @return const std::string& that is the path of this file.
