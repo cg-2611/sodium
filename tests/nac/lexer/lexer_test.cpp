@@ -36,7 +36,6 @@ TEST(LexerTest, LexerReadsValidIdentifier) {
     EXPECT_EQ(identifierString, token->value());
 }
 
-
 TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
     std::string identifierString("_identifier");
     sodium::Lexer lexer(identifierString);
@@ -45,7 +44,6 @@ TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
     EXPECT_EQ(sodium::TokenKind::IDENTIFIER, token->kind());
     EXPECT_EQ(identifierString, token->value());
 }
-
 
 TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
     sodium::Lexer lexer("$identifier");
@@ -122,6 +120,15 @@ TEST(LexerTest, LexerReadsRightParen) {
     EXPECT_EQ(rightParenString, token->value());
 }
 
+TEST(LexerTest, LexerReadsSemicolon) {
+    std::string semicolonString(";");
+    sodium::Lexer lexer(semicolonString);
+    std::unique_ptr<sodium::Token> token = lexer.tokenize();
+
+    EXPECT_EQ(sodium::TokenKind::SEMICOLON, token->kind());
+    EXPECT_EQ(semicolonString, token->value());
+}
+
 TEST(LexerTest, LexerReadsArrow) {
     std::string arrowString("->");
     sodium::Lexer lexer(arrowString);
@@ -138,15 +145,6 @@ TEST(LexerTest, LexerReadsEmptyString) {
 
     EXPECT_EQ(sodium::TokenKind::EOF_TOKEN, token->kind());
     EXPECT_EQ(emptyString, token->value());
-}
-
-TEST(LexerTest, LexerReadsEndOfLine) {
-    std::string endOfLineString("\n");
-    sodium::Lexer lexer(endOfLineString);
-    std::unique_ptr<sodium::Token> token = lexer.tokenize();
-
-    EXPECT_EQ(sodium::TokenKind::EOL_TOKEN, token->kind());
-    EXPECT_EQ(endOfLineString, token->value());
 }
 
 TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
@@ -176,7 +174,7 @@ TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {
-    sodium::Lexer lexer("    \t \r\f \v   ");
+    sodium::Lexer lexer("  \n  \t \r\f \v   ");
     std::unique_ptr<sodium::Token> token = lexer.tokenize();
 
     EXPECT_EQ(sodium::TokenKind::EOF_TOKEN, token->kind());
@@ -184,7 +182,7 @@ TEST(LexerTest, LexerSkipsWhitespace1) {
 }
 
 TEST(LexerTest, LexerSkipsWhitespace2) {
-    sodium::Lexer lexer("    \t \ridentifier\f \v   ");
+    sodium::Lexer lexer("   \n\n \t \ridentifier\f \v   ");
     std::unique_ptr<sodium::Token> token = lexer.tokenize();
 
     EXPECT_EQ(sodium::TokenKind::IDENTIFIER, token->kind());

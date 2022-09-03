@@ -57,13 +57,6 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
         return makeToken(TokenKind::EOF_TOKEN);
     }
 
-    if (atEndOfLine()) {
-        advance();
-        ++line_;
-        column_ = 1;
-        return makeToken(TokenKind::EOL_TOKEN);
-    }
-
     advance();
 
     if (isIdentifierCharacter(*start_)) {
@@ -90,6 +83,7 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
         case '}': return makeToken(TokenKind::RIGHT_BRACE);
         case '(': return makeToken(TokenKind::LEFT_PAREN);
         case ')': return makeToken(TokenKind::RIGHT_PAREN);
+        case ';': return makeToken(TokenKind::SEMICOLON);
         case '-':
             // if the current token starts with a '-' and the next character is a '>'
             if (*current_ == '>') {
@@ -128,6 +122,10 @@ void Lexer::advance() noexcept {
 
 void Lexer::skipWhitespace() noexcept {
     while (isSpace(*current_)) {
+        if (atEndOfLine()) {
+            ++line_;
+            column_ = 0;
+        }
         advance();
     }
 }
@@ -137,7 +135,7 @@ inline bool Lexer::atEndOfString() const noexcept {
 }
 
 inline bool Lexer::atEndOfLine() const noexcept {
-    return *start_ == '\n';
+    return *current_ == '\n';
 }
 
 static inline bool isKeyword(const char *start, size_t length) {
@@ -161,7 +159,7 @@ static constexpr bool isDigit(char c) noexcept {
 }
 
 static constexpr bool isSpace(char c) noexcept {
-    return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
+    return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == '\n' || c == ' ';
 }
 
 } // namespace sodium

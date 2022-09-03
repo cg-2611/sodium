@@ -11,7 +11,7 @@ namespace sodium {
  *
  * @param file path to sodium file to be compiled.
  */
-void compileFile(File &file);
+void compileFile(const File &file);
 
 } // namespace sodium
 

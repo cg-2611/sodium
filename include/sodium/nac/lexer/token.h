@@ -24,13 +24,13 @@ enum class TokenKind {
     RIGHT_BRACE,
     LEFT_PAREN,
     RIGHT_PAREN,
+    SEMICOLON,
 
     // two character tokens
     ARROW,
 
     // miscellaneous tokens
     EOF_TOKEN,
-    EOL_TOKEN,
     ERROR_TOKEN
 };
 

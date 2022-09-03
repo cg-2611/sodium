@@ -20,6 +20,7 @@ const std::string &Error::message() const {
 
 static std::string_view getErrorMessage(ErrorKind kind) {
     switch (kind) {
+        case ErrorKind::SYNTAX_ERROR: return "syntax error";
         case ErrorKind::UNRECOGNISED_TOKEN: return "unrecognised token";
         default: return "unkown error";
     }

@@ -10,6 +10,7 @@ namespace sodium {
  *
  */
 enum class ErrorKind {
+    SYNTAX_ERROR,
     UNRECOGNISED_TOKEN
 };
 
