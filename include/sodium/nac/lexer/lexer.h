@@ -54,8 +54,8 @@ private:
     const char *start_;   // the start of the current token being lexed
     const char *current_; // the current character being lexed
     const char *end_;     // the end of the string
-    size_t line_;         // the current line of the string
-    size_t column_;       // the current column of the current line
+    int line_;            // the current line of the string
+    int column_;          // the current column of the current line
 
     // returns the next token in the string
     Token nextToken();

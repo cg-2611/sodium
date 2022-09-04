@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "sodium/nac/basic/source_location.h"
+
 namespace sodium {
 
 /**
@@ -24,10 +26,9 @@ public:
      * @brief Construct a new Error object.
      *
      * @param kind The kind of the error, must be one of ErrorKind.
-     * @param line The line at which the error has occurred.
-     * @param column The column at which the error has occurred.
+     * @param location The location in the source at which the error has occurred.
      */
-    Error(ErrorKind kind, size_t line, size_t column);
+    Error(ErrorKind kind, SourceLocation location);
 
     /**
      * @brief Destroy the Error object.

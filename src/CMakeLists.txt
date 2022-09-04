@@ -9,6 +9,7 @@ target_sources(libnac
 )
 
 add_subdirectory(nac/ast)
+add_subdirectory(nac/basic)
 add_subdirectory(nac/errors)
 add_subdirectory(nac/exceptions)
 add_subdirectory(nac/io)

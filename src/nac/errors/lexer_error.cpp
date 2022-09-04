@@ -6,7 +6,7 @@
 
 namespace sodium {
 
-LexerError::LexerError(ErrorKind errorKind, const Token &token) : Error(errorKind, token.line(), token.column()) {
+LexerError::LexerError(ErrorKind errorKind, const Token &token) : Error(errorKind, token.location()) {
     message_ += StringFormatter::formatString(" \'%.*s\'", token.length(), token.value().data());
 }
 

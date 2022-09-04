@@ -2,33 +2,25 @@
 
 #include <string_view>
 
+#include "sodium/nac/basic/source_location.h"
+
 namespace sodium {
 
-Token::Token(TokenKind kind, const char *position, int length, size_t line, size_t column)
+Token::Token(TokenKind kind, SourceLocation location, size_t length)
         : kind_(kind),
-          line_(line),
-          column_(column - length),
-          position_(position),
+          location_(location),
           length_(length),
-          value_(position_, length_) {}
+          value_(location_.position(), length_) {}
 
 TokenKind Token::kind() const noexcept {
     return kind_;
 }
 
-size_t Token::line() const noexcept {
-    return line_;
+SourceLocation Token::location() const noexcept {
+    return location_;
 }
 
-size_t Token::column() const noexcept {
-    return column_;
-}
-
-const char *Token::position() const noexcept {
-    return position_;
-}
-
-int Token::length() const noexcept {
+size_t Token::length() const noexcept {
     return length_;
 }
 

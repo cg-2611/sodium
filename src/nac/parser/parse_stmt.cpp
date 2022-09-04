@@ -1,7 +1,6 @@
 #include "sodium/nac/parser/parser.h"
 
 #include <memory>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 

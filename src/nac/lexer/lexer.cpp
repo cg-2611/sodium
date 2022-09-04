@@ -3,6 +3,7 @@
 #include <string_view>
 #include <vector>
 
+#include "sodium/nac/basic/source_location.h"
 #include "sodium/nac/errors/error.h"
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/lexer_error.h"
@@ -95,7 +96,8 @@ Token Lexer::nextToken() {
 }
 
 Token Lexer::makeToken(TokenKind kind) {
-    return Token(kind, start_, current_ - start_, line_, column_);
+    SourceLocation location(line_, column_, start_);
+    return Token(kind, location, current_ - start_);
 }
 
 size_t Lexer::readIdentifier() {

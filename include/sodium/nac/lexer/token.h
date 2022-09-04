@@ -3,6 +3,8 @@
 
 #include <string_view>
 
+#include "sodium/nac/basic/source_location.h"
+
 namespace sodium {
 
 /**
@@ -41,15 +43,13 @@ enum class TokenKind {
 class Token {
 public:
     /**
-     * @brief Construct a new Token object
+     * @brief Construct a new Token object.
      *
      * @param kind The kind of token being constructed, must be one of TokenKind.
-     * @param position A pointer to the first character of the token.
+     * @param location The SourceLocation of the token.
      * @param length The length of the token.
-     * @param line The line the token is on.
-     * @param column The column the token is at.
      */
-    Token(TokenKind kind, const char *position, int length, size_t line, size_t column);
+    Token(TokenKind kind, SourceLocation location, size_t length);
 
     /**
      * @brief Get the kind of this token.
@@ -59,32 +59,18 @@ public:
     TokenKind kind() const noexcept;
 
     /**
-     * @brief Get the line that this token is on.
+     * @brief Get the SourceLocation of this token.
      *
-     * @return size_t that is the line number that this token is on.
+     * @return SourceLocation that is the location of this token.
      */
-    size_t line() const noexcept;
-
-    /**
-     * @brief Get the column that this token is at.
-     *
-     * @return size_t that is the column number that this token is at.
-     */
-    size_t column() const noexcept;
-
-    /**
-     * @brief Get the position of this token.
-     *
-     * @return const char* to the first character of this token.
-     */
-    const char *position() const noexcept;
+    SourceLocation location() const noexcept;
 
     /**
      * @brief Get the length of this token.
      *
      * @return int that is the length of this token.
      */
-    int length() const noexcept;
+    size_t length() const noexcept;
 
     /**
      * @brief Get the value of this token.
@@ -95,12 +81,9 @@ public:
 
 private:
     TokenKind kind_;
+    SourceLocation location_;
 
-    size_t line_;
-    size_t column_;
-
-    const char *position_; // pointer to start of token
-    int length_;
+    size_t length_;
     std::string_view value_;
 };
 

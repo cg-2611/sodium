@@ -9,7 +9,7 @@
 namespace sodium {
 
 ParserError::ParserError(ErrorKind errorKind, const Token &token, std::string_view message)
-        : Error(errorKind, token.line(), token.column()) {
+        : Error(errorKind, token.location()) {
     message_ += StringFormatter::formatString(": %.*s", message.size(), message.data());
     message_ += StringFormatter::formatString(", found \'%.*s\'", token.length(), token.value().data());
 }

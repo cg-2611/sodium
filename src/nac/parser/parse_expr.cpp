@@ -2,7 +2,6 @@
 
 #include <charconv>
 #include <memory>
-#include <unordered_set>
 
 #include "sodium/nac/ast/expr.h"
 #include "sodium/nac/errors/error_manager.h"
@@ -30,7 +29,7 @@ std::unique_ptr<NumericLiteralExpr> Parser::parseNumericLiteralExpr() {
     }
 
     // extract the integer value from the digit characters
-    std::from_chars(token_.value().data(), token_.position() + token_.length(), value);
+    std::from_chars(token_.value().data(), token_.location().position() + token_.length(), value);
 
     // TODO: check bounds of int size
 

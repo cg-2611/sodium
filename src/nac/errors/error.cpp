@@ -2,6 +2,7 @@
 
 #include <string_view>
 
+#include "sodium/nac/basic/source_location.h"
 #include "sodium/nac/util/string_formatter.h"
 
 namespace sodium {
@@ -9,9 +10,10 @@ namespace sodium {
 // returns the corresponding string describing the kind of error passed
 static std::string_view getErrorMessage(ErrorKind kind);
 
-Error::Error(ErrorKind kind, size_t line, size_t column) : message_("error") {
+Error::Error(ErrorKind kind, SourceLocation location) : message_("error") {
     std::string errorMessage(getErrorMessage(kind));
-    message_ += StringFormatter::formatString(" @ %lu:%lu: %s", line, column, errorMessage.c_str());
+    message_ +=
+        StringFormatter::formatString(" @ %lu:%lu: %s", location.line(), location.column(), errorMessage.c_str());
 }
 
 const std::string &Error::message() const {

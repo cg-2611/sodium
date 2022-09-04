@@ -17,13 +17,8 @@
 namespace sodium {
 
 class AST;
-class Lexer;
-class Token;
-
-enum class TokenKind;
 
 /**
- * @class Parser
  * @brief Used to parse a string of Sodium programming language tokens into an AST.
  *
  */
