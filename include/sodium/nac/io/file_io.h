@@ -14,7 +14,7 @@ namespace sodium::IO {
  *         the contents of the file as an std::string.
  * @throws An IOException when the file fails to be opened, or when the file is failed to be read.
  */
-[[nodiscard]] std::tuple<size_t, std::string> readFile(const std::string &filePath);
+std::tuple<size_t, std::string> readFile(const std::string &filePath);
 
 } // namespace sodium::IO
 
