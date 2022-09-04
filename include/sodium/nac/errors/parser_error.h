@@ -22,7 +22,7 @@ public:
      * @param token The token that has caused the error.
      * @param message The message that is displayed with the token.
      */
-    ParserError(ErrorKind kind, Token *token, std::string_view message);
+    ParserError(ErrorKind kind, const Token &token, std::string_view message);
 };
 
 } // namespace sodium

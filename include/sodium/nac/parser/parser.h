@@ -11,17 +11,20 @@
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/ast/type.h"
+#include "sodium/nac/lexer/lexer.h"
+#include "sodium/nac/lexer/token.h"
 
 namespace sodium {
 
 class AST;
+class Lexer;
 class Token;
 
 enum class TokenKind;
 
 /**
  * @class Parser
- * @brief Used to parse a list of Sodium programming language tokens into an AST.
+ * @brief Used to parse a string of Sodium programming language tokens into an AST.
  *
  */
 class Parser {
@@ -29,14 +32,14 @@ public:
     /**
      * @brief Construct a new Parser object.
      *
-     * @param token A Token* that is the first token in the list of tokens to be parsed.
+     * @param src An std::string_view that is the string to be parsed.
      */
-    Parser(Token *token);
+    Parser(std::string_view src);
 
     /**
-     * @brief Parses the list of Sodium programming language tokens.
+     * @brief Parses the string of Sodium programming language tokens.
      *
-     * @return std::unique_ptr<AST> that represents the AST formed of the tokens in the list.
+     * @return std::unique_ptr<AST> that represents the AST formed of the tokens in the string.
      */
     std::unique_ptr<AST> parse();
 
@@ -166,9 +169,10 @@ private:
     static const std::unordered_set<TokenKind> DECL_SYNCHRONIZING_TOKENS;
     static const std::unordered_set<TokenKind> STMT_SYNCHRONIZING_TOKENS;
 
-    Token *token_;
+    Lexer lexer_;
+    Token token_;
 
-    // advance the parser to the next token, token_ is changed
+    // advance the parser to the next token, token_ is set to the returned object of Lexer::getNextToken
     void advance() noexcept;
 
     // returns true if the kind of token_ matches the expected argument token kind

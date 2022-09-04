@@ -11,27 +11,15 @@
 #include "sodium/nac/lexer/token.h"
 
 /*
-    tests return statement:
+    tests statement:
         return 2;
 */
 TEST(ParseStmtTest, ParserCorrectlyDispatchesToAReturnStatement) {
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("2");
+    sodium::Parser parser("return 2;");
+    auto stmt(parser.parseStmt());
 
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-
-    returnValue->next(std::move(semicolon));
-    returnKeyword->next(std::move(returnValue));
-
-    sodium::Parser parser(returnKeyword.get());
-    auto returnStmt(parser.parseStmt());
-
-    EXPECT_EQ(sodium::ASTNodeKind::STMT, returnStmt->nodeKind());
-    EXPECT_EQ(sodium::StmtKind::RETURN, returnStmt->stmtKind());
+    EXPECT_EQ(sodium::ASTNodeKind::STMT, stmt->nodeKind());
+    EXPECT_EQ(sodium::StmtKind::RETURN, stmt->stmtKind());
 }
 
 /*
@@ -39,12 +27,7 @@ TEST(ParseStmtTest, ParserCorrectlyDispatchesToAReturnStatement) {
         {}
 */
 TEST(ParseStmtTest, ParserCorrectlyDispatchesToABlockStatement) {
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    leftBrace->next(std::move(rightBrace));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser("{}");
     auto block(parser.parseStmt());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
@@ -56,12 +39,7 @@ TEST(ParseStmtTest, ParserCorrectlyDispatchesToABlockStatement) {
         {}
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesAnEmptyBlock) {
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    leftBrace->next(std::move(rightBrace));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser("{}");
     auto block(parser.parseBlock());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
@@ -71,19 +49,16 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAnEmptyBlock) {
 
 /*
     tests block:
-        {{}}
+        {
+            {}
+        }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAnEmptyNestedBlock) {
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedLeftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedRightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
+    std::string_view src("{\n"
+                         "   {}\n"
+                         "}");
 
-    nestedRightBrace->next(std::move(rightBrace));
-    nestedLeftBrace->next(std::move(nestedRightBrace));
-    leftBrace->next(std::move(nestedLeftBrace));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser(src);
     auto block(parser.parseBlock());
 
     ASSERT_EQ(1, block->stmts().size());
@@ -106,20 +81,12 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAnEmptyNestedBlock) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleEmptyNestedBlocks) {
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedLeftBrace1 = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedRightBrace1 = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-    auto nestedLeftBrace2 = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedRightBrace2 = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
+    std::string_view src("{\n"
+                         "   {}\n"
+                         "   {}\n"
+                         "}");
 
-    nestedRightBrace2->next(std::move(rightBrace));
-    nestedLeftBrace2->next(std::move(nestedRightBrace2));
-    nestedRightBrace1->next(std::move(nestedLeftBrace2));
-    nestedLeftBrace1->next(std::move(nestedRightBrace1));
-    leftBrace->next(std::move(nestedLeftBrace1));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser(src);
     auto block(parser.parseBlock());
 
     ASSERT_EQ(2, block->stmts().size());
@@ -144,23 +111,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleEmptyNestedBlocks) {
         { return 0; }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithASingleStatement) {
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("0");
-
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    semicolon->next(std::move(rightBrace));
-    returnValue->next(std::move(semicolon));
-    returnKeyword->next(std::move(returnValue));
-    leftBrace->next(std::move(returnKeyword));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser("{ return 0; }");
     auto block(parser.parseBlock());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
@@ -176,33 +127,12 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithASingleStatement) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleStatements) {
-    std::string_view returnKeywordString1("return");
-    std::string_view returnValueString1("1");
-    std::string_view returnKeywordString2("return");
-    std::string_view returnValueString2("2");
+    std::string_view src("{\n"
+                         "   return 1;\n"
+                         "   return 2;\n"
+                         "}");
 
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto returnKeyword1 = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString1.data(),
-                                                          returnKeywordString1.size(), 0, 0);
-    auto returnValue1 = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString1.data(),
-                                                        returnValueString1.size(), 0, 0);
-    auto semicolon1 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto returnKeyword2 = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString2.data(),
-                                                          returnKeywordString2.size(), 0, 0);
-    auto returnValue2 = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString2.data(),
-                                                        returnValueString2.size(), 0, 0);
-    auto semicolon2 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    semicolon2->next(std::move(rightBrace));
-    returnValue2->next(std::move(semicolon2));
-    returnKeyword2->next(std::move(returnValue2));
-    semicolon1->next(std::move(returnKeyword2));
-    returnValue1->next(std::move(semicolon1));
-    returnKeyword1->next(std::move(returnValue1));
-    leftBrace->next(std::move(returnKeyword1));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser(src);
     auto block(parser.parseBlock());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->nodeKind());
@@ -218,37 +148,12 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleStatements) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAStatementAndANestedBlockWithAStatement) {
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("1");
-    std::string_view nestedReturnKeywordString("return");
-    std::string_view nestedReturnValueString("2");
+    std::string_view src("{\n"
+                         "   return 1;\n"
+                         "   { return 2; }\n"
+                         "}");
 
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon1 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto nestedLeftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedReturnKeyword = std::make_unique<sodium::Token>(
-        sodium::TokenKind::KEYWORD, nestedReturnKeywordString.data(), nestedReturnKeywordString.size(), 0, 0);
-    auto nestedReturnValue = std::make_unique<sodium::Token>(
-        sodium::TokenKind::NUMERIC_LITERAL, nestedReturnValueString.data(), nestedReturnValueString.size(), 0, 0);
-    auto semicolon2 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto nestedRightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    nestedRightBrace->next(std::move(rightBrace));
-    semicolon2->next(std::move(nestedRightBrace));
-    nestedReturnValue->next(std::move(semicolon2));
-    nestedReturnKeyword->next(std::move(nestedReturnValue));
-    nestedLeftBrace->next(std::move(nestedReturnKeyword));
-    semicolon1->next(std::move(nestedLeftBrace));
-    returnValue->next(std::move(semicolon1));
-    returnKeyword->next(std::move(returnValue));
-    leftBrace->next(std::move(returnKeyword));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser(src);
     auto block(parser.parseBlock());
 
     ASSERT_EQ(2, block->stmts().size());
@@ -280,47 +185,15 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAStatementAndANestedBlockWith
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithAMultiLineNestedBlockWithMultipleStatements) {
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("1");
-    std::string_view nestedReturnKeywordString1("return");
-    std::string_view nestedReturnValueString1("2");
-    std::string_view nestedReturnKeywordString2("return");
-    std::string_view nestedReturnValueString2("3");
+    std::string_view src("{\n"
+                         "   return 1;\n"
+                         "   {\n"
+                         "       return 2;\n"
+                         "       return 3;\n"
+                         "   }\n"
+                         "}");
 
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon1 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto nestedLeftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto nestedReturnKeyword1 = std::make_unique<sodium::Token>(
-        sodium::TokenKind::KEYWORD, nestedReturnKeywordString1.data(), nestedReturnKeywordString1.size(), 0, 0);
-    auto nestedReturnValue1 = std::make_unique<sodium::Token>(
-        sodium::TokenKind::NUMERIC_LITERAL, nestedReturnValueString1.data(), nestedReturnValueString1.size(), 0, 0);
-    auto semicolon2 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto nestedReturnKeyword2 = std::make_unique<sodium::Token>(
-        sodium::TokenKind::KEYWORD, nestedReturnKeywordString1.data(), nestedReturnKeywordString1.size(), 0, 0);
-    auto nestedReturnValue2 = std::make_unique<sodium::Token>(
-        sodium::TokenKind::NUMERIC_LITERAL, nestedReturnValueString1.data(), nestedReturnValueString1.size(), 0, 0);
-    auto semicolon3 = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto nestedRightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    nestedRightBrace->next(std::move(rightBrace));
-    semicolon3->next(std::move(nestedRightBrace));
-    nestedReturnValue2->next(std::move(semicolon3));
-    nestedReturnKeyword2->next(std::move(nestedReturnValue2));
-    semicolon2->next(std::move(nestedReturnKeyword2));
-    nestedReturnValue1->next(std::move(semicolon2));
-    nestedReturnKeyword1->next(std::move(nestedReturnValue1));
-    nestedLeftBrace->next(std::move(nestedReturnKeyword1));
-    semicolon1->next(std::move(nestedLeftBrace));
-    returnValue->next(std::move(semicolon1));
-    returnKeyword->next(std::move(returnValue));
-    leftBrace->next(std::move(returnKeyword));
-
-    sodium::Parser parser(leftBrace.get());
+    sodium::Parser parser(src);
     auto block(parser.parseBlock());
 
     ASSERT_EQ(2, block->stmts().size());
@@ -349,19 +222,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithAMultiLineNe
         return 2;
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithSingleDigit) {
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("2");
-
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-
-    returnValue->next(std::move(semicolon));
-    returnKeyword->next(std::move(returnValue));
-
-    sodium::Parser parser(returnKeyword.get());
+    sodium::Parser parser("return 2;");
     auto returnStmt(parser.parseReturnStmt());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, returnStmt->nodeKind());
@@ -377,19 +238,7 @@ TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithSingleDigit) {
         return 567;
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithMultipleDigit) {
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("567");
-
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-
-    returnValue->next(std::move(semicolon));
-    returnKeyword->next(std::move(returnValue));
-
-    sodium::Parser parser(returnKeyword.get());
+    sodium::Parser parser("return 567;");
     auto returnStmt(parser.parseReturnStmt());
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, returnStmt->nodeKind());

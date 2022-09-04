@@ -1,8 +1,6 @@
 #include "sodium/nac/lexer/token.h"
 
-#include <memory>
 #include <string_view>
-#include <utility>
 
 namespace sodium {
 
@@ -12,8 +10,7 @@ Token::Token(TokenKind kind, const char *position, int length, size_t line, size
           column_(column - length),
           position_(position),
           length_(length),
-          value_(position_, length_),
-          next_(nullptr) {}
+          value_(position_, length_) {}
 
 TokenKind Token::kind() const noexcept {
     return kind_;
@@ -37,14 +34,6 @@ int Token::length() const noexcept {
 
 std::string_view Token::value() const noexcept {
     return value_;
-}
-
-Token *Token::next() const noexcept {
-    return next_.get();
-}
-
-void Token::next(std::unique_ptr<Token> next) noexcept {
-    next_ = std::move(next);
 }
 
 } // namespace sodium

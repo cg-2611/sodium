@@ -8,6 +8,7 @@
 
 #include "sodium/nac/ast/decl.h"
 #include "sodium/nac/ast/stmt.h"
+#include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/lexer/token.h"
 
 /*
@@ -15,31 +16,9 @@
         func name() -> int {}
 */
 TEST(ParseDeclTest, ParserCorrectlyDispatchesToParseAFunctionDeclaration) {
-    std::string_view funcKeywordString("func");
-    std::string_view functionNameString("name");
-    std::string_view returnTypeString("int");
+    std::string_view src("func name() -> int {}");
 
-    auto funcKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, funcKeywordString.data(),
-                                                       funcKeywordString.size(), 0, 0);
-    auto functionName = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, functionNameString.data(),
-                                                        functionNameString.size(), 0, 0);
-    auto leftParen = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_PAREN, ")", 1, 0, 0);
-    auto rightParen = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_PAREN, "(", 1, 0, 0);
-    auto arrow = std::make_unique<sodium::Token>(sodium::TokenKind::ARROW, "->", 2, 0, 0);
-    auto returnType = std::make_unique<sodium::Token>(sodium::TokenKind::TYPE, returnTypeString.data(),
-                                                      returnTypeString.size(), 0, 0);
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "}", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "{", 1, 0, 0);
-
-    leftBrace->next(std::move(rightBrace));
-    returnType->next(std::move(leftBrace));
-    arrow->next(std::move(returnType));
-    rightParen->next(std::move(arrow));
-    leftParen->next(std::move(rightParen));
-    functionName->next(std::move(leftParen));
-    funcKeyword->next(std::move(functionName));
-
-    sodium::Parser parser(funcKeyword.get());
+    sodium::Parser parser(src);
     auto decl = parser.parseDecl();
 
     EXPECT_EQ(sodium::ASTNodeKind::DECL, decl->nodeKind());
@@ -51,48 +30,16 @@ TEST(ParseDeclTest, ParserCorrectlyDispatchesToParseAFunctionDeclaration) {
         func name() -> int { return 0; }
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionDeclaration) {
-    std::string_view funcKeywordString("func");
-    std::string_view functionNameString("name");
-    std::string_view returnTypeString("int");
-    std::string_view returnKeywordString("return");
-    std::string_view returnValueString("0");
+    std::string_view src("func name() -> int { return 0; }");
 
-    auto funcKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, funcKeywordString.data(),
-                                                       funcKeywordString.size(), 0, 0);
-    auto functionName = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, functionNameString.data(),
-                                                        functionNameString.size(), 0, 0);
-    auto leftParen = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_PAREN, ")", 1, 0, 0);
-    auto rightParen = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_PAREN, "(", 1, 0, 0);
-    auto arrow = std::make_unique<sodium::Token>(sodium::TokenKind::ARROW, "->", 2, 0, 0);
-    auto returnType = std::make_unique<sodium::Token>(sodium::TokenKind::TYPE, returnTypeString.data(),
-                                                      returnTypeString.size(), 0, 0);
-    auto leftBrace = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_BRACE, "{", 1, 0, 0);
-    auto returnKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, returnKeywordString.data(),
-                                                         returnKeywordString.size(), 0, 0);
-    auto returnValue = std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, returnValueString.data(),
-                                                       returnValueString.size(), 0, 0);
-    auto semicolon = std::make_unique<sodium::Token>(sodium::TokenKind::SEMICOLON, ";", 1, 0, 0);
-    auto rightBrace = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_BRACE, "}", 1, 0, 0);
-
-    semicolon->next(std::move(rightBrace));
-    returnValue->next(std::move(semicolon));
-    returnKeyword->next(std::move(returnValue));
-    leftBrace->next(std::move(returnKeyword));
-    returnType->next(std::move(leftBrace));
-    arrow->next(std::move(returnType));
-    rightParen->next(std::move(arrow));
-    leftParen->next(std::move(rightParen));
-    functionName->next(std::move(leftParen));
-    funcKeyword->next(std::move(functionName));
-
-    sodium::Parser parser(funcKeyword.get());
+    sodium::Parser parser(src);
     auto funcDecl = parser.parseFuncDecl();
 
     EXPECT_EQ(sodium::ASTNodeKind::DECL, funcDecl->nodeKind());
     EXPECT_EQ(sodium::DeclKind::FUNCTION, funcDecl->declKind());
-    EXPECT_EQ(functionNameString, funcDecl->signature()->name()->value());
+    EXPECT_EQ("name", funcDecl->signature()->name()->value());
     EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, funcDecl->signature()->parameterList()->declKind());
-    EXPECT_EQ(returnTypeString, funcDecl->signature()->returnType()->name());
+    EXPECT_EQ("int", funcDecl->signature()->returnType()->name());
     EXPECT_EQ(sodium::ASTNodeKind::STMT, funcDecl->body()->nodeKind());
     EXPECT_EQ(sodium::StmtKind::BLOCK, funcDecl->body()->stmtKind());
 
@@ -105,33 +52,15 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionDeclaration) {
         func name() -> int
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionSignature) {
-    std::string_view funcKeywordString("func");
-    std::string_view functionNameString("name");
-    std::string_view returnTypeString("int");
+    std::string_view src("func name() -> int {}");
 
-    auto funcKeyword = std::make_unique<sodium::Token>(sodium::TokenKind::KEYWORD, funcKeywordString.data(),
-                                                       funcKeywordString.size(), 0, 0);
-    auto functionName = std::make_unique<sodium::Token>(sodium::TokenKind::IDENTIFIER, functionNameString.data(),
-                                                        functionNameString.size(), 0, 0);
-    auto leftParen = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_PAREN, ")", 1, 0, 0);
-    auto rightParen = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_PAREN, "(", 1, 0, 0);
-    auto arrow = std::make_unique<sodium::Token>(sodium::TokenKind::ARROW, "->", 2, 0, 0);
-    auto returnType = std::make_unique<sodium::Token>(sodium::TokenKind::TYPE, returnTypeString.data(),
-                                                      returnTypeString.size(), 0, 0);
-
-    arrow->next(std::move(returnType));
-    rightParen->next(std::move(arrow));
-    leftParen->next(std::move(rightParen));
-    functionName->next(std::move(leftParen));
-    funcKeyword->next(std::move(functionName));
-
-    sodium::Parser parser(funcKeyword.get());
+    sodium::Parser parser(src);
     auto signature = parser.parseFunctionSignature();
 
     EXPECT_EQ(sodium::DeclKind::FUNCTION_SIGNATURE, signature->declKind());
-    EXPECT_EQ(functionNameString, signature->name()->value());
+    EXPECT_EQ("name", signature->name()->value());
     EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, signature->parameterList()->declKind());
-    EXPECT_EQ(returnTypeString, signature->returnType()->name());
+    EXPECT_EQ("int", signature->returnType()->name());
 }
 
 /*
@@ -139,12 +68,7 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionSignature) {
         ()
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAnEmptyParameterList) {
-    auto leftParen = std::make_unique<sodium::Token>(sodium::TokenKind::LEFT_PAREN, ")", 1, 0, 0);
-    auto rightParen = std::make_unique<sodium::Token>(sodium::TokenKind::RIGHT_PAREN, "(", 1, 0, 0);
-
-    leftParen->next(std::move(rightParen));
-
-    sodium::Parser parser(leftParen.get());
+    sodium::Parser parser("()");
     auto parameterList = parser.parseParameterList();
 
     EXPECT_EQ(sodium::ASTNodeKind::DECL, parameterList->nodeKind());
@@ -156,17 +80,9 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAnEmptyParameterList) {
         -> int
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionReturnType) {
-    std::string_view returnTypeString("int");
-
-    auto arrow = std::make_unique<sodium::Token>(sodium::TokenKind::ARROW, "->", 2, 0, 0);
-    auto returnType = std::make_unique<sodium::Token>(sodium::TokenKind::TYPE, returnTypeString.data(),
-                                                      returnTypeString.size(), 0, 0);
-
-    arrow->next(std::move(returnType));
-
-    sodium::Parser parser(arrow.get());
+    sodium::Parser parser("-> int");
     auto returnTypeNode = parser.parseReturnType();
 
     EXPECT_EQ(sodium::ASTNodeKind::TYPE, returnTypeNode->nodeKind());
-    EXPECT_EQ(returnTypeString, returnTypeNode->name());
+    EXPECT_EQ("int", returnTypeNode->name());
 }

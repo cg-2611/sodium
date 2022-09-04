@@ -1,8 +1,7 @@
 #include "sodium/nac/lexer/lexer.h"
 
-#include <memory>
 #include <string_view>
-#include <utility>
+#include <vector>
 
 #include "sodium/nac/errors/error.h"
 #include "sodium/nac/errors/error_manager.h"
@@ -12,43 +11,43 @@
 namespace sodium {
 
 // helper functions
-static constexpr bool isSpace(char c) noexcept;
-static constexpr bool isDigit(char c) noexcept;
-static constexpr bool isAlpha(char c) noexcept;
-static constexpr bool isIdentifierCharacter(char c) noexcept;
+static inline bool isSpace(char c) noexcept;
+static inline bool isDigit(char c) noexcept;
+static inline bool isAlpha(char c) noexcept;
+static inline bool isIdentifierCharacter(char c) noexcept;
 static inline bool isKeyword(const char *start, size_t length); // returns true if identifier is a keyword
 static inline bool isType(const char *start, size_t length);    // returns true if identifier is a type
 
 Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(src.end()), line_(1), column_(1) {}
 
-[[nodiscard]] std::unique_ptr<Token> Lexer::tokenize() {
-    std::unique_ptr<Token> token(getNextToken());
-
-    // skip all tokens until the first valid token is encountered
-    while (token->kind() == TokenKind::ERROR_TOKEN) {
-        // for each error token encountered add it to the vector of errors
-        ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, token.get());
-        token = getNextToken();
-    }
-
-    Token *currentToken = token.get();
-
+std::vector<Token> Lexer::tokenize() {
+    std::vector<Token> tokens{};
     while (!atEndOfString()) {
-        currentToken->next(getNextToken());
+        Token currentToken(getNextToken());
 
         // if the token is an error, add it to the vector of errors and read the next token
-        if (currentToken->next()->kind() == TokenKind::ERROR_TOKEN) {
-            ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, currentToken->next());
+        if (currentToken.kind() == TokenKind::ERROR_TOKEN) {
             continue;
         }
 
-        currentToken = currentToken->next();
+        tokens.push_back(currentToken);
+    }
+
+    return tokens;
+}
+
+Token Lexer::getNextToken() {
+    Token token(nextToken());
+
+    // skip error tokens to return next legal token
+    while (token.kind() == TokenKind::ERROR_TOKEN) {
+        token = nextToken();
     }
 
     return token;
 }
 
-[[nodiscard]] std::unique_ptr<Token> Lexer::getNextToken() {
+Token Lexer::nextToken() {
     // skip leading whitespace before the token
     skipWhitespace();
     start_ = current_;
@@ -93,12 +92,15 @@ Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(
                 return makeToken(TokenKind::ARROW);
             }
             [[fallthrough]]; // temporary until '-' is a valid token
-        default: return makeToken(TokenKind::ERROR_TOKEN);
+        default:
+            Token errorToken = makeToken(TokenKind::ERROR_TOKEN);
+            ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, errorToken);
+            return errorToken;
     }
 }
 
-[[nodiscard]] std::unique_ptr<Token> Lexer::makeToken(TokenKind kind) {
-    return std::make_unique<Token>(kind, start_, current_ - start_, line_, column_);
+Token Lexer::makeToken(TokenKind kind) {
+    return Token(kind, start_, current_ - start_, line_, column_);
 }
 
 size_t Lexer::readIdentifier() {
@@ -148,19 +150,19 @@ static inline bool isType(const char *start, size_t length) {
     return TYPES.contains(std::string_view(start, length));
 }
 
-static constexpr bool isIdentifierCharacter(char c) noexcept {
+static inline bool isIdentifierCharacter(char c) noexcept {
     return isAlpha(c) || c == '_';
 }
 
-static constexpr bool isAlpha(char c) noexcept {
+static inline bool isAlpha(char c) noexcept {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-static constexpr bool isDigit(char c) noexcept {
+static inline bool isDigit(char c) noexcept {
     return c >= '0' && c <= '9';
 }
 
-static constexpr bool isSpace(char c) noexcept {
+static inline bool isSpace(char c) noexcept {
     return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == '\n' || c == ' ';
 }
 

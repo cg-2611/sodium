@@ -1,7 +1,6 @@
 #ifndef SODIUM_NAC_LEXER_TOKEN_H
 #define SODIUM_NAC_LEXER_TOKEN_H
 
-#include <memory>
 #include <string_view>
 
 namespace sodium {
@@ -51,33 +50,6 @@ public:
      */
     Token(TokenKind kind, const char *position, int length, size_t line, size_t column);
 
-    // deleted copy constructor so that a token cannot be copied as unique_ptr is non-copyable
-    Token(const Token &other) = delete;
-
-    /**
-     * @brief Construct a new Token object. Default move constructor.
-     *
-     * @param other The token of which to move the resources from into this token.
-     */
-    Token(Token &&other) noexcept = default;
-
-    /**
-     * @brief Destroy the Token object.
-     *
-     */
-    ~Token() = default;
-
-    // deleted private copy assignment operator so that a token cannot be copied as unique_ptr is non-copyable
-    Token &operator=(const Token &other) = delete;
-
-    /**
-     * @brief Default move assignment operator.
-     *
-     * @param other The token which is being move assigned to this token.
-     * @return Token& that is this token after assignment.
-     */
-    Token &operator=(Token &&other) noexcept = default;
-
     /**
      * @brief Get the kind of this token.
      *
@@ -120,20 +92,6 @@ public:
      */
     std::string_view value() const noexcept;
 
-    /**
-     * @brief Get the token that comes after this token.
-     *
-     * @return Token* to the token that comes after this token or nullptr if it is the last token.
-     */
-    Token *next() const noexcept;
-
-    /**
-     * @brief Set the token that comes after this token.
-     *
-     * @param next An std::unique_ptr<Token> which this token will point to as the token that comes after it.
-     */
-    void next(std::unique_ptr<Token> next) noexcept;
-
 private:
     TokenKind kind_;
 
@@ -143,8 +101,6 @@ private:
     const char *position_; // pointer to start of token
     int length_;
     std::string_view value_;
-
-    std::unique_ptr<Token> next_;
 };
 
 } // namespace sodium

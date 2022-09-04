@@ -1,9 +1,9 @@
 #ifndef SODIUM_NAC_LEXER_LEXER_H
 #define SODIUM_NAC_LEXER_LEXER_H
 
-#include <memory>
 #include <string_view>
 #include <unordered_set>
+#include <vector>
 
 namespace sodium {
 
@@ -32,9 +32,16 @@ public:
     /**
      * @brief Extracts the Sodium programming language tokens from the string.
      *
-     * @return std::unique_ptr<Token> to the first token in the string.
+     * @return const std::vector<Token>& of the tokens in the stirng.
      */
-    [[nodiscard]] std::unique_ptr<Token> tokenize();
+    std::vector<Token> tokenize();
+
+    /**
+     * @brief Get the next token in the string. This will not return any tokens of kind TokenKind::ERROR_TOKEN.
+     *
+     * @return Token that is the next token in the string.
+     */
+    Token getNextToken();
 
 private:
     const char *start_;   // the start of the current token being lexed
@@ -43,11 +50,11 @@ private:
     size_t line_;         // the current line of the string
     size_t column_;       // the current column of the current line
 
-    // returns a unique pointer to the next token in the string
-    [[nodiscard]] std::unique_ptr<Token> getNextToken();
+    // returns the next token in the string
+    Token nextToken();
 
     // constructs and returns a token of the specified kind
-    [[nodiscard]] std::unique_ptr<Token> makeToken(TokenKind kind);
+    Token makeToken(TokenKind kind);
 
     // advances the lexer to the character after the end of an identifier
     size_t readIdentifier();

@@ -13,9 +13,9 @@
 namespace sodium {
 
 std::unique_ptr<Decl> Parser::parseDecl() {
-    switch (token_->kind()) {
+    switch (token_.kind()) {
         case TokenKind::KEYWORD:
-            if (token_->value() == "func") {
+            if (token_.value() == "func") {
                 return parseFuncDecl();
             }
             [[fallthrough]];

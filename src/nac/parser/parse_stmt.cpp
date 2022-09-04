@@ -14,10 +14,10 @@
 namespace sodium {
 
 std::unique_ptr<Stmt> Parser::parseStmt() {
-    switch (token_->kind()) {
+    switch (token_.kind()) {
         case TokenKind::LEFT_BRACE: return parseBlock();
         case TokenKind::KEYWORD:
-            if (token_->value() == "return") {
+            if (token_.value() == "return") {
                 return parseReturnStmt();
             }
             [[fallthrough]];
@@ -35,7 +35,7 @@ std::unique_ptr<Block> Parser::parseBlock() {
     std::vector<std::unique_ptr<Stmt>> stmts{};
 
     // parse statements until we reach the end of the block
-    while (token_->kind() != TokenKind::RIGHT_BRACE && token_->kind() != TokenKind::EOF_TOKEN) {
+    while (token_.kind() != TokenKind::RIGHT_BRACE && token_.kind() != TokenKind::EOF_TOKEN) {
         std::unique_ptr<Stmt> stmt(parseStmt());
         if (!stmt) {
             synchronize(STMT_SYNCHRONIZING_TOKENS);
@@ -43,7 +43,7 @@ std::unique_ptr<Block> Parser::parseBlock() {
 
         stmts.push_back(std::move(stmt));
 
-        if (token_->kind() == TokenKind::SEMICOLON) {
+        if (token_.kind() == TokenKind::SEMICOLON) {
             advance(); // advance to next statement
         }
     }

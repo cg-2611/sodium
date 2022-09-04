@@ -8,10 +8,10 @@
 
 namespace sodium {
 
-ParserError::ParserError(ErrorKind errorKind, Token *token, std::string_view message)
-        : Error(errorKind, token->line(), token->column()) {
+ParserError::ParserError(ErrorKind errorKind, const Token &token, std::string_view message)
+        : Error(errorKind, token.line(), token.column()) {
     message_ += StringFormatter::formatString(": %.*s", message.size(), message.data());
-    message_ += StringFormatter::formatString(", found \'%.*s\'", token->length(), token->value().data());
+    message_ += StringFormatter::formatString(", found \'%.*s\'", token.length(), token.value().data());
 }
 
 } // namespace sodium

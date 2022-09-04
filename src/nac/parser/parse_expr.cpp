@@ -16,7 +16,7 @@ std::unique_ptr<Expr> Parser::parseExpr() {
 }
 
 std::unique_ptr<LiteralExpr> Parser::parseLiteralExpr() {
-    switch (token_->kind()) {
+    switch (token_.kind()) {
         case TokenKind::NUMERIC_LITERAL: return parseNumericLiteralExpr();
         default: return nullptr;
     }
@@ -30,7 +30,7 @@ std::unique_ptr<NumericLiteralExpr> Parser::parseNumericLiteralExpr() {
     }
 
     // extract the integer value from the digit characters
-    std::from_chars(token_->value().data(), token_->position() + token_->length(), value);
+    std::from_chars(token_.value().data(), token_.position() + token_.length(), value);
 
     // TODO: check bounds of int size
 

@@ -14,16 +14,13 @@
         2
 */
 TEST(ParseExprTest, ParserCorrectlyDispatchesToParseALiteralExpression) {
-    std::string_view literalExpressionString("2");
+    std::string_view expressionString("2");
 
-    auto literalExpression = std::make_unique<sodium::Token>(
-        sodium::TokenKind::NUMERIC_LITERAL, literalExpressionString.data(), literalExpressionString.size(), 0, 0);
+    sodium::Parser parser(expressionString);
+    auto expr(parser.parseExpr());
 
-    sodium::Parser parser(literalExpression.get());
-    auto literalExpr(parser.parseExpr());
-
-    EXPECT_EQ(sodium::ASTNodeKind::EXPR, literalExpr->nodeKind());
-    EXPECT_EQ(sodium::ExprKind::LITERAL, literalExpr->exprKind());
+    EXPECT_EQ(sodium::ASTNodeKind::EXPR, expr->nodeKind());
+    EXPECT_EQ(sodium::ExprKind::LITERAL, expr->exprKind());
 }
 
 /*
@@ -31,18 +28,14 @@ TEST(ParseExprTest, ParserCorrectlyDispatchesToParseALiteralExpression) {
         2
 */
 TEST(ParseExprTest, ParserCorrectlyDispatchesToParseANumericLiteralExpression) {
-    std::string_view numericLiteralExpressionString("2");
+    std::string_view literalExpressionString("2");
 
-    auto numericLiteralExpression =
-        std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, numericLiteralExpressionString.data(),
-                                        numericLiteralExpressionString.size(), 0, 0);
+    sodium::Parser parser(literalExpressionString);
+    auto literalExpr(parser.parseLiteralExpr());
 
-    sodium::Parser parser(numericLiteralExpression.get());
-    auto numericLiteralExpr(parser.parseLiteralExpr());
-
-    EXPECT_EQ(sodium::ASTNodeKind::EXPR, numericLiteralExpr->nodeKind());
-    EXPECT_EQ(sodium::ExprKind::LITERAL, numericLiteralExpr->exprKind());
-    EXPECT_EQ(sodium::LiteralKind::NUMERIC_LITERAL, numericLiteralExpr->literalKind());
+    EXPECT_EQ(sodium::ASTNodeKind::EXPR, literalExpr->nodeKind());
+    EXPECT_EQ(sodium::ExprKind::LITERAL, literalExpr->exprKind());
+    EXPECT_EQ(sodium::LiteralKind::NUMERIC_LITERAL, literalExpr->literalKind());
 }
 
 /*
@@ -52,11 +45,7 @@ TEST(ParseExprTest, ParserCorrectlyDispatchesToParseANumericLiteralExpression) {
 TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitNumericLiteral) {
     std::string_view numericLiteralExpressionString("2");
 
-    auto numericLiteralExpression =
-        std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, numericLiteralExpressionString.data(),
-                                        numericLiteralExpressionString.size(), 0, 0);
-
-    sodium::Parser parser(numericLiteralExpression.get());
+    sodium::Parser parser(numericLiteralExpressionString);
     auto numericLiteralExpr(parser.parseNumericLiteralExpr());
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, numericLiteralExpr->nodeKind());
@@ -73,11 +62,7 @@ TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitNumericLiteral) {
 TEST(ParseExprTest, ParserCorrectlyParsesAMultiDigitNumericLiteral) {
     std::string_view numericLiteralExpressionString("567");
 
-    auto numericLiteralExpression =
-        std::make_unique<sodium::Token>(sodium::TokenKind::NUMERIC_LITERAL, numericLiteralExpressionString.data(),
-                                        numericLiteralExpressionString.size(), 0, 0);
-
-    sodium::Parser parser(numericLiteralExpression.get());
+    sodium::Parser parser(numericLiteralExpressionString);
     auto numericLiteralExpr(parser.parseNumericLiteralExpr());
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, numericLiteralExpr->nodeKind());

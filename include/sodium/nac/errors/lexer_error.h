@@ -18,13 +18,7 @@ public:
      * @param kind The kind of the error, must be one of ErrorKind.
      * @param token The token that has caused the error.
      */
-    LexerError(ErrorKind kind, Token *token);
-
-    /**
-     * @brief Destroy the Lexer Error object.
-     *
-     */
-    ~LexerError() = default;
+    LexerError(ErrorKind kind, const Token &token);
 };
 
 } // namespace sodium
