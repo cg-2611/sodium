@@ -15,8 +15,7 @@ static inline bool isSpace(char c) noexcept;
 static inline bool isDigit(char c) noexcept;
 static inline bool isAlpha(char c) noexcept;
 static inline bool isIdentifierCharacter(char c) noexcept;
-static inline bool isKeyword(const char *start, size_t length); // returns true if identifier is a keyword
-static inline bool isType(const char *start, size_t length);    // returns true if identifier is a type
+static inline bool isReserved(const char *start, size_t length);
 
 Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(src.end()), line_(1), column_(1) {}
 
@@ -62,12 +61,8 @@ Token Lexer::nextToken() {
         // read an identifier if the current token starts with a valid identifier character
         size_t length = readIdentifier();
 
-        if (isKeyword(start_, length)) {
-            return makeToken(KEYWORDS.at(std::string_view(start_, length)));
-        }
-
-        if (isType(start_, length)) {
-            return makeToken(TokenKind::TYPE);
+        if (isReserved(start_, length)) {
+            return makeToken(RESERVED_WORDS.at(std::string_view(start_, length)));
         }
 
         return makeToken(TokenKind::IDENTIFIER);
@@ -142,12 +137,8 @@ inline bool Lexer::atEndOfLine() const noexcept {
     return *current_ == '\n';
 }
 
-static inline bool isKeyword(const char *start, size_t length) {
-    return KEYWORDS.contains(std::string_view(start, length));
-}
-
-static inline bool isType(const char *start, size_t length) {
-    return TYPES.contains(std::string_view(start, length));
+static inline bool isReserved(const char *start, size_t length) {
+    return RESERVED_WORDS.contains(std::string_view(start, length));
 }
 
 static inline bool isIdentifierCharacter(char c) noexcept {

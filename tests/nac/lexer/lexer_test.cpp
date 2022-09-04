@@ -1,5 +1,6 @@
 #include "sodium/nac/lexer/lexer.h"
 
+#include <string_view>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -7,28 +8,35 @@
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/lexer/token.h"
 
-TEST(LexerTest, LexerReadsAllKeywords) {
-    for (auto &&keyword : sodium::KEYWORDS) {
-        sodium::Lexer lexer(keyword);
-        sodium::Token token = lexer.getNextToken();
+TEST(LexerTest, LexerReadsFuncKeyword) {
+    std::string_view funcKeywordString("func");
+    sodium::Lexer lexer(funcKeywordString);
+    sodium::Token token = lexer.getNextToken();
 
-        EXPECT_EQ(sodium::TokenKind::KEYWORD, token.kind());
-        EXPECT_EQ(keyword, token.value());
-    }
+    EXPECT_EQ(sodium::TokenKind::KEYWORD_FUNC, token.kind());
+    EXPECT_EQ(funcKeywordString, token.value());
 }
 
-TEST(LexerTest, LexerReadsAllTypes) {
-    for (auto &&type : sodium::TYPES) {
-        sodium::Lexer lexer(type);
-        sodium::Token token = lexer.getNextToken();
+TEST(LexerTest, LexerReadsReturnKeyword) {
+    std::string_view returnKeywordString("return");
+    sodium::Lexer lexer(returnKeywordString);
+    sodium::Token token = lexer.getNextToken();
 
-        EXPECT_EQ(sodium::TokenKind::TYPE, token.kind());
-        EXPECT_EQ(type, token.value());
-    }
+    EXPECT_EQ(sodium::TokenKind::KEYWORD_RETURN, token.kind());
+    EXPECT_EQ(returnKeywordString, token.value());
+}
+
+TEST(LexerTest, LexerReadsIntType) {
+    std::string_view intTypeString("int");
+    sodium::Lexer lexer(intTypeString);
+    sodium::Token token = lexer.getNextToken();
+
+    EXPECT_EQ(sodium::TokenKind::TYPE, token.kind());
+    EXPECT_EQ(intTypeString, token.value());
 }
 
 TEST(LexerTest, LexerReadsValidIdentifier) {
-    std::string identifierString("identifier");
+    std::string_view identifierString("identifier");
     sodium::Lexer lexer(identifierString);
     sodium::Token token = lexer.getNextToken();
 
@@ -37,7 +45,7 @@ TEST(LexerTest, LexerReadsValidIdentifier) {
 }
 
 TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
-    std::string identifierString("_identifier");
+    std::string_view identifierString("_identifier");
     sodium::Lexer lexer(identifierString);
     sodium::Token token = lexer.getNextToken();
 
@@ -46,7 +54,7 @@ TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
 }
 
 TEST(LexerTest, LexerReadsNumericLiteral) {
-    std::string numericLiteralString("2");
+    std::string_view numericLiteralString("2");
     sodium::Lexer lexer(numericLiteralString);
     sodium::Token token = lexer.getNextToken();
 
@@ -55,7 +63,7 @@ TEST(LexerTest, LexerReadsNumericLiteral) {
 }
 
 TEST(LexerTest, LexerReadsNumericLiteralWithMultipleDigits) {
-    std::string numericLiteralString("123456789");
+    std::string_view numericLiteralString("123456789");
     sodium::Lexer lexer(numericLiteralString);
     sodium::Token token = lexer.getNextToken();
 
@@ -64,7 +72,7 @@ TEST(LexerTest, LexerReadsNumericLiteralWithMultipleDigits) {
 }
 
 TEST(LexerTest, LexerReadsLeftBrace) {
-    std::string leftBraceString("{");
+    std::string_view leftBraceString("{");
     sodium::Lexer lexer(leftBraceString);
     sodium::Token token = lexer.getNextToken();
 
@@ -73,7 +81,7 @@ TEST(LexerTest, LexerReadsLeftBrace) {
 }
 
 TEST(LexerTest, LexerReadsRightBrace) {
-    std::string rightBraceString("}");
+    std::string_view rightBraceString("}");
     sodium::Lexer lexer(rightBraceString);
     sodium::Token token = lexer.getNextToken();
 
@@ -82,7 +90,7 @@ TEST(LexerTest, LexerReadsRightBrace) {
 }
 
 TEST(LexerTest, LexerReadsLeftParen) {
-    std::string leftParenString("(");
+    std::string_view leftParenString("(");
     sodium::Lexer lexer(leftParenString);
     sodium::Token token = lexer.getNextToken();
 
@@ -91,7 +99,7 @@ TEST(LexerTest, LexerReadsLeftParen) {
 }
 
 TEST(LexerTest, LexerReadsRightParen) {
-    std::string rightParenString(")");
+    std::string_view rightParenString(")");
     sodium::Lexer lexer(rightParenString);
     sodium::Token token = lexer.getNextToken();
 
@@ -100,7 +108,7 @@ TEST(LexerTest, LexerReadsRightParen) {
 }
 
 TEST(LexerTest, LexerReadsSemicolon) {
-    std::string semicolonString(";");
+    std::string_view semicolonString(";");
     sodium::Lexer lexer(semicolonString);
     sodium::Token token = lexer.getNextToken();
 
@@ -109,7 +117,7 @@ TEST(LexerTest, LexerReadsSemicolon) {
 }
 
 TEST(LexerTest, LexerReadsArrow) {
-    std::string arrowString("->");
+    std::string_view arrowString("->");
     sodium::Lexer lexer(arrowString);
     sodium::Token token = lexer.getNextToken();
 
@@ -118,7 +126,7 @@ TEST(LexerTest, LexerReadsArrow) {
 }
 
 TEST(LexerTest, LexerReadsEmptyString) {
-    std::string emptyString;
+    std::string_view emptyString("");
     sodium::Lexer lexer(emptyString);
     sodium::Token token = lexer.getNextToken();
 

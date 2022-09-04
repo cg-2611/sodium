@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string_view>
 
 #include "sodium/nac/ast/ast.h"
 #include "sodium/nac/ast/ast_printer.h"
@@ -9,8 +10,6 @@
 #include "sodium/nac/exceptions/exception.h"
 #include "sodium/nac/io/file.h"
 #include "sodium/nac/parser/parser.h"
-
-#include "sodium/nac/lexer/lexer.h"
 
 namespace sodium {
 

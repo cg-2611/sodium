@@ -3,7 +3,6 @@
 
 #include <string_view>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 #include "sodium/nac/lexer/token.h"
@@ -11,17 +10,18 @@
 namespace sodium {
 
 /**
- * @brief An std::unordered_map of the keywords currently used in Sodium. The key is a string_view of the keyword and
- *        the value is the corresponding TokenKind.
+ * @brief An std::unordered_map of the reserved words currently used by Sodium. The key is a string_view of the reserved
+ *        word and the value is the corresponding TokenKind.
  *
  */
-const std::unordered_map<std::string_view, TokenKind> KEYWORDS{
+const std::unordered_map<std::string_view, TokenKind> RESERVED_WORDS{
+  // keywords
     {  "func",   TokenKind::KEYWORD_FUNC},
-    {"return", TokenKind::KEYWORD_RETURN}
-};
+    {"return", TokenKind::KEYWORD_RETURN},
 
-/// @brief An std::unordered_set of the types currently used in Sodium.
-const std::unordered_set<std::string_view> TYPES{"int"};
+ // types
+    {   "int",           TokenKind::TYPE}
+};
 
 /**
  * @brief Used to extract, from a string, any tokens used in the Sodium programming language.
