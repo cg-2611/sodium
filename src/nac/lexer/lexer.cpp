@@ -63,7 +63,7 @@ Token Lexer::nextToken() {
         size_t length = readIdentifier();
 
         if (isKeyword(start_, length)) {
-            return makeToken(TokenKind::KEYWORD);
+            return makeToken(KEYWORDS.at(std::string_view(start_, length)));
         }
 
         if (isType(start_, length)) {

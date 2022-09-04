@@ -11,7 +11,8 @@ namespace sodium {
  */
 enum class TokenKind {
     // reserved tokens
-    KEYWORD,
+    KEYWORD_FUNC,
+    KEYWORD_RETURN,
     TYPE,
 
     // literal tokens

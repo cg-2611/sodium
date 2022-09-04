@@ -16,11 +16,7 @@ namespace sodium {
 std::unique_ptr<Stmt> Parser::parseStmt() {
     switch (token_.kind()) {
         case TokenKind::LEFT_BRACE: return parseBlock();
-        case TokenKind::KEYWORD:
-            if (token_.value() == "return") {
-                return parseReturnStmt();
-            }
-            [[fallthrough]];
+        case TokenKind::KEYWORD_RETURN: return parseReturnStmt();
         default: errorExpected("statement"); return nullptr;
     }
 }

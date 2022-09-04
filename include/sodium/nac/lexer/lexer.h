@@ -2,16 +2,23 @@
 #define SODIUM_NAC_LEXER_LEXER_H
 
 #include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
+#include "sodium/nac/lexer/token.h"
+
 namespace sodium {
 
-class Token;
-enum class TokenKind;
-
-/// @brief std::unordered_set of the keywords currently used in Sodium.
-const std::unordered_set<std::string_view> KEYWORDS{"func", "return"};
+/**
+ * @brief An std::unordered_map of the keywords currently used in Sodium. The key is a string_view of the keyword and
+ *        the value is the corresponding TokenKind.
+ *
+ */
+const std::unordered_map<std::string_view, TokenKind> KEYWORDS{
+    {  "func",   TokenKind::KEYWORD_FUNC},
+    {"return", TokenKind::KEYWORD_RETURN}
+};
 
 /// @brief An std::unordered_set of the types currently used in Sodium.
 const std::unordered_set<std::string_view> TYPES{"int"};

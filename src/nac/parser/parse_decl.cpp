@@ -14,11 +14,7 @@ namespace sodium {
 
 std::unique_ptr<Decl> Parser::parseDecl() {
     switch (token_.kind()) {
-        case TokenKind::KEYWORD:
-            if (token_.value() == "func") {
-                return parseFuncDecl();
-            }
-            [[fallthrough]];
+        case TokenKind::KEYWORD_FUNC: return parseFuncDecl();
         default: errorExpected("declaration"); return nullptr;
     }
 }
