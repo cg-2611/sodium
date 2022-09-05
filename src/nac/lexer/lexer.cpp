@@ -1,7 +1,6 @@
 #include "sodium/nac/lexer/lexer.h"
 
 #include <string_view>
-#include <vector>
 
 #include "sodium/nac/basic/source_location.h"
 #include "sodium/nac/errors/error.h"
@@ -19,22 +18,6 @@ static inline bool isIdentifierCharacter(char c) noexcept;
 static inline bool isReserved(const char *start, size_t length);
 
 Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(src.end()), line_(1), column_(1) {}
-
-std::vector<Token> Lexer::tokenize() {
-    std::vector<Token> tokens{};
-    while (!atEndOfString()) {
-        Token currentToken(getNextToken());
-
-        // if the token is an error, add it to the vector of errors and read the next token
-        if (currentToken.kind() == TokenKind::ERROR_TOKEN) {
-            continue;
-        }
-
-        tokens.push_back(currentToken);
-    }
-
-    return tokens;
-}
 
 Token Lexer::getNextToken() {
     Token token(nextToken());

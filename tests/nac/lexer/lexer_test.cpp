@@ -1,7 +1,6 @@
 #include "sodium/nac/lexer/lexer.h"
 
 #include <string_view>
-#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -132,30 +131,6 @@ TEST(LexerTest, LexerReadsEmptyString) {
 
     EXPECT_EQ(sodium::TokenKind::EOF_TOKEN, token.kind());
     EXPECT_EQ(emptyString, token.value());
-}
-
-TEST(LexerTest, LexerReadsMultipleTokensFromAString) {
-    sodium::Lexer lexer("identifier 2 { -> )");
-    std::vector<sodium::Token> tokens = lexer.tokenize();
-
-    ASSERT_EQ(6, tokens.size());
-
-    EXPECT_EQ(sodium::TokenKind::IDENTIFIER, tokens[0].kind());
-    EXPECT_EQ("identifier", tokens[0].value());
-
-    EXPECT_EQ(sodium::TokenKind::NUMERIC_LITERAL, tokens[1].kind());
-    EXPECT_EQ("2", tokens[1].value());
-
-    EXPECT_EQ(sodium::TokenKind::LEFT_BRACE, tokens[2].kind());
-    EXPECT_EQ("{", tokens[2].value());
-
-    EXPECT_EQ(sodium::TokenKind::ARROW, tokens[3].kind());
-    EXPECT_EQ("->", tokens[3].value());
-
-    EXPECT_EQ(sodium::TokenKind::RIGHT_PAREN, tokens[4].kind());
-    EXPECT_EQ(")", tokens[4].value());
-
-    EXPECT_EQ(sodium::TokenKind::EOF_TOKEN, tokens[5].kind());
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {

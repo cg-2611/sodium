@@ -3,7 +3,6 @@
 
 #include <string_view>
 #include <unordered_map>
-#include <vector>
 
 #include "sodium/nac/lexer/token.h"
 
@@ -35,13 +34,6 @@ public:
      * @param src The std::string_view to be tokenized.
      */
     Lexer(std::string_view src);
-
-    /**
-     * @brief Extracts the Sodium programming language tokens from the string.
-     *
-     * @return const std::vector<Token>& of the tokens in the stirng.
-     */
-    std::vector<Token> tokenize();
 
     /**
      * @brief Get the next token in the string. This will not return any tokens of kind TokenKind::ERROR_TOKEN.
