@@ -4,13 +4,14 @@
   - implement file io for `nac`
   - implement a lexer for `nac`
   - implement a parser for `nac`
+  - implement type checking for `nac`
   - interface `nac` front-end with llvm back-end
   - compile examples/main.na
 
 - v0.2.0:
   - implement variables
   - implement primitive integral data types
-  - implement type checking
+  - add comments to sodium
 
 - v0.3.0:
   - implement control flow structures:
@@ -57,8 +58,8 @@ SourceFile = Declaration* EOF ;
 ```
 Declaration = FunctionDeclaration ;
 
-FunctionDeclaration = "func" FunctionSignature Block ;
-FunctionSignature = Identifier ParameterList ReturnType ;
+FunctionDeclaration = FunctionSignature Block ;
+FunctionSignature = "func" Identifier ParameterList ReturnType ;
 
 ParameterList = "(" ")" ;
 
