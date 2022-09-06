@@ -5,39 +5,24 @@
 
 namespace sodium {
 
-/**
- * @brief Used to store information about a file, such as its path, size and contents.
- *
- */
+/// @brief Used to store information about a file, such as its path, size and contents.
 class File {
 public:
-    /**
-     * @brief Construct a new File object. The contents of the file are read and stored along with the size of the file
-     * when this is called.
-     *
-     * @param path The path to the file as an std::string.
-     */
+    /// @brief Construct a new File object.
+    /// The contents of the file are read and stored along with the size of the file on construction.
+    /// @param path The path to the file as an std::string.
     File(std::string path);
 
-    /**
-     * @brief Get the path of this file.
-     *
-     * @return const std::string& that is the path of this file.
-     */
+    /// @brief Accessor for the path of this file.
+    /// @return const std::string& that is the path of this file.
     const std::string &path() const noexcept;
 
-    /**
-     * @brief Get the contents of this file.
-     *
-     * @return const std::string& that is the contents of this file.
-     */
+    /// @brief Accessor for the contents of this file.
+    /// @return const std::string& that is the contents of this file.
     const std::string &contents() const noexcept;
 
-    /**
-     * @brief Get the size of this file.
-     *
-     * @return size_t that is the size of this file in bytes.
-     */
+    /// @brief Accessor for the size of this file.
+    /// @return size_t that is the size of this file in bytes.
     size_t size() const noexcept;
 
 private:

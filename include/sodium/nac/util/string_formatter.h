@@ -1,21 +1,17 @@
 #ifndef SODIUM_NAC_UTIL_STRING_FORMATTER_H
 #define SODIUM_NAC_UTIL_STRING_FORMATTER_H
 
-#include <array>
 #include <cstdio>
+#include <memory>
 #include <string>
-#include <utility>
 
 namespace sodium::StringFormatter {
 
-/**
- * @brief Performs string formatting similar to std::sprintf().
- *
- * @tparam Args Variadic template arguments that are used to populate the formatted string.
- * @param format The format for the returned string.
- * @param args The arguments to populate the formatted string with.
- * @return std::string that is the formatted string using format and args.
- */
+/// @brief Performs string formatting similar to std::sprintf().
+/// @tparam Args Variadic template arguments that are used to populate the formatted string.
+/// @param format The format for the returned string.
+/// @param args The arguments to populate the formatted string with.
+/// @return std::string that is the formatted string using format and args.
 template<typename... Args>
 static std::string formatString(const std::string &format, Args &&...args) {
     // get the size of the formatted string, +1 for '\0'
