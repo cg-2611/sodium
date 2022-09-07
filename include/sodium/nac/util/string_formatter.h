@@ -13,7 +13,7 @@ namespace sodium::StringFormatter {
 /// @param args The arguments to populate the formatted string with.
 /// @return std::string that is the formatted string using format and args.
 template<typename... Args>
-static std::string formatString(const std::string &format, Args &&...args) {
+static std::string format_string(const std::string &format, Args &&...args) {
     // get the size of the formatted string, +1 for '\0'
     const int SIZE = snprintf(nullptr, 0, format.c_str(), args...) + 1;
 
