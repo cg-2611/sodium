@@ -33,14 +33,14 @@ public:
      * @brief Destroy the Exception object.
      *
      */
-    virtual ~Exception() = default;
+    ~Exception() override = default;
 
     /**
      * @brief Inherited from std::exception. Overriden in derived classes.
      *
      * @return const char* that is the exception message.
      */
-    virtual const char *what() const noexcept;
+    const char *what() const noexcept override;
 
 protected:
     std::string message_; // the string to be output when what() is called

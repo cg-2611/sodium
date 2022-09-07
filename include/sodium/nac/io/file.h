@@ -8,7 +8,7 @@ namespace sodium {
 /// @brief Used to store information about a file, such as its path, size and contents.
 class File {
 public:
-    /// @brief Construct a new File object.
+    /// @brief Constructor for File.
     /// The contents of the file are read and stored along with the size of the file on construction.
     /// @param path The path to the file as an std::string.
     File(std::string path);

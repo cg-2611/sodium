@@ -2,7 +2,7 @@
 #define SODIUM_NAC_ERROR_LEXER_ERROR_H
 
 #include "sodium/nac/errors/error.h"
-#include "sodium/nac/lexer/token.h"
+#include "sodium/nac/token/token.h"
 
 namespace sodium {
 

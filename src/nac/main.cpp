@@ -11,7 +11,7 @@ int main(int argc, const char *argv[]) {
 
     try {
         sodium::File file(argv[1]);
-        sodium::compileFile(file);
+        sodium::compile_file(file);
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;

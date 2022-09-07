@@ -13,19 +13,19 @@
 
 namespace sodium {
 
-void compileFile(const File &file) {
+void compile_file(const File &file) {
     Parser parser(file.contents());
     std::unique_ptr<AST> ast(parser.parse());
 
     // if errors have been encountered during parsing, throw an exception
-    if (ErrorManager::hasErrors()) {
+    if (ErrorManager::has_errors()) {
         throw Exception(ExceptionKind::ERRORS_GENERATED);
     }
 
     // temporary for debugging
-    ASTPrinter(2).printAST(ast.get());
+    ASTPrinter(4).print_ast(ast.get());
 
-    std::cout << "[nac]: compilation complete\n";
+    std::cout << "[nac]: compilation complete\n"; // temporary
 }
 
 } // namespace sodium

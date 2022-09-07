@@ -10,24 +10,24 @@
 namespace sodium {
 
 std::vector<Error> ErrorManager::errors_{};
-std::string ErrorManager::errorMessages_{};
+std::string ErrorManager::error_messages_{};
 
-bool ErrorManager::hasErrors() noexcept {
+bool ErrorManager::has_errors() noexcept {
     return !errors_.empty();
 }
 
-size_t ErrorManager::errorCount() noexcept {
+size_t ErrorManager::error_count() noexcept {
     return errors_.size();
 }
 
-std::string_view ErrorManager::errorMessages() {
+std::string_view ErrorManager::error_messages() {
     for (const Error &error : errors_) {
-        errorMessages_ += error.message() + "\n[nac]: ";
+        error_messages_ += error.message() + "\n[nac]: ";
     }
 
-    errorMessages_ += StringFormatter::formatString("generated %lu errors", errorCount());
+    error_messages_ += StringFormatter::format_string("generated %lu errors", error_count());
 
-    return std::string_view(errorMessages_);
+    return std::string_view(error_messages_);
 }
 
 } // namespace sodium

@@ -20,13 +20,13 @@ public:
      * @param kind The kind of the exception, must be one of ExceptionKind.
      * @param filePath The path of the file that has caused the exception to be thrown.
      */
-    IOException(ExceptionKind kind, const std::string &filePath);
+    IOException(ExceptionKind kind, const std::string &file_path);
 
     /**
      * @brief Destroy the IOException object.
      *
      */
-    ~IOException() = default;
+    ~IOException() override = default;
 
     /**
      * @brief Get the generated message for this exception.
