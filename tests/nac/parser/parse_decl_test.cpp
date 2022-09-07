@@ -1,3 +1,4 @@
+#include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/parser/parser.h"
 
 #include <memory>
@@ -9,7 +10,7 @@
 #include "sodium/nac/ast/decl.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/errors/error_manager.h"
-#include "sodium/nac/lexer/token.h"
+#include "sodium/nac/token/token.h"
 
 /*
     tests declaration:
@@ -19,10 +20,10 @@ TEST(ParseDeclTest, ParserCorrectlyDispatchesToParseAFunctionDeclaration) {
     std::string_view src("func name() -> int {}");
 
     sodium::Parser parser(src);
-    auto decl = parser.parseDecl();
+    auto decl = parser.parse_decl();
 
-    EXPECT_EQ(sodium::ASTNodeKind::DECL, decl->nodeKind());
-    EXPECT_EQ(sodium::DeclKind::FUNCTION, decl->declKind());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, decl->node_kind());
+    EXPECT_EQ(sodium::DeclKind::FUNCTION, decl->decl_kind());
 }
 
 /*
@@ -33,34 +34,34 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionDeclaration) {
     std::string_view src("func name() -> int { return 0; }");
 
     sodium::Parser parser(src);
-    auto funcDecl = parser.parseFuncDecl();
+    auto func_decl = parser.parse_func_decl();
 
-    EXPECT_EQ(sodium::ASTNodeKind::DECL, funcDecl->nodeKind());
-    EXPECT_EQ(sodium::DeclKind::FUNCTION, funcDecl->declKind());
-    EXPECT_EQ("name", funcDecl->signature()->name()->value());
-    EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, funcDecl->signature()->parameterList()->declKind());
-    EXPECT_EQ("int", funcDecl->signature()->returnType()->name());
-    EXPECT_EQ(sodium::ASTNodeKind::STMT, funcDecl->body()->nodeKind());
-    EXPECT_EQ(sodium::StmtKind::BLOCK, funcDecl->body()->stmtKind());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, func_decl->node_kind());
+    EXPECT_EQ(sodium::DeclKind::FUNCTION, func_decl->decl_kind());
+    EXPECT_EQ("name", func_decl->signature()->name()->value());
+    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER_LIST, func_decl->signature()->parameter_list()->node_kind());
+    EXPECT_EQ("int", func_decl->signature()->return_type()->name());
+    EXPECT_EQ(sodium::ASTNodeKind::STMT, func_decl->body()->node_kind());
+    EXPECT_EQ(sodium::StmtKind::BLOCK, func_decl->body()->stmt_kind());
 
-    ASSERT_EQ(1, funcDecl->body()->stmts().size());
-    EXPECT_EQ(sodium::StmtKind::RETURN, funcDecl->body()->stmts()[0]->stmtKind());
+    ASSERT_EQ(1, func_decl->body()->stmts().size());
+    EXPECT_EQ(sodium::StmtKind::RETURN, func_decl->body()->stmts()[0]->stmt_kind());
 }
 
 /*
     tests function signature:
         func name() -> int
 */
-TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionSignature) {
+TEST(ParseDeclTest, ParserCorrectlyParsesAFuncSignature) {
     std::string_view src("func name() -> int {}");
 
     sodium::Parser parser(src);
-    auto signature = parser.parseFunctionSignature();
+    auto signature = parser.parse_func_signature();
 
-    EXPECT_EQ(sodium::DeclKind::FUNCTION_SIGNATURE, signature->declKind());
+    EXPECT_EQ(sodium::ASTNodeKind::FUNCTION_SIGNATURE, signature->node_kind());
     EXPECT_EQ("name", signature->name()->value());
-    EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, signature->parameterList()->declKind());
-    EXPECT_EQ("int", signature->returnType()->name());
+    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER_LIST, signature->parameter_list()->node_kind());
+    EXPECT_EQ("int", signature->return_type()->name());
 }
 
 /*
@@ -69,10 +70,9 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionSignature) {
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAnEmptyParameterList) {
     sodium::Parser parser("()");
-    auto parameterList = parser.parseParameterList();
+    auto parameter_list = parser.parse_parameter_list();
 
-    EXPECT_EQ(sodium::ASTNodeKind::DECL, parameterList->nodeKind());
-    EXPECT_EQ(sodium::DeclKind::PARAMETER_LIST, parameterList->declKind());
+    EXPECT_EQ(sodium::ASTNodeKind::PARAMETER_LIST, parameter_list->node_kind());
 }
 
 /*
@@ -81,8 +81,8 @@ TEST(ParseDeclTest, ParserCorrectlyParsesAnEmptyParameterList) {
 */
 TEST(ParseDeclTest, ParserCorrectlyParsesAFunctionReturnType) {
     sodium::Parser parser("-> int");
-    auto returnTypeNode = parser.parseReturnType();
+    auto return_type_node = parser.parse_return_type();
 
-    EXPECT_EQ(sodium::ASTNodeKind::TYPE, returnTypeNode->nodeKind());
-    EXPECT_EQ("int", returnTypeNode->name());
+    EXPECT_EQ(sodium::ASTNodeKind::TYPE, return_type_node->node_kind());
+    EXPECT_EQ("int", return_type_node->name());
 }

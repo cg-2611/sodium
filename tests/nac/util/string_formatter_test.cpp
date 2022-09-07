@@ -6,25 +6,25 @@
 
 TEST(StringFormatterTest, StringFormatterFormatsCorrectly) {
     std::string format("%d, %c, %s, %s, %.7s %.*s");
-    std::string testString("test std::string");
-    std::string formattedString(sodium::StringFormatter::formatString(format, 2, 'b', "test string", testString.c_str(),
-                                                                      "another test string", 4, testString.c_str()));
+    std::string test_string("test std::string");
+    std::string formatted_string(sodium::StringFormatter::format_string(
+        format, 2, 'b', "test string", test_string.c_str(), "another test string", 4, test_string.c_str()));
 
-    EXPECT_EQ("2, b, test string, test std::string, another test", formattedString);
+    EXPECT_EQ("2, b, test string, test std::string, another test", formatted_string);
 }
 
 TEST(StringFormatterTest, StringFormatterHandlesEmptyFormatString) {
-    std::string emptyFormat;
-    std::string testString("test string");
-    std::string formattedString(sodium::StringFormatter::formatString(emptyFormat, testString.c_str()));
+    std::string empty_format;
+    std::string test_string("test string");
+    std::string formatted_string(sodium::StringFormatter::format_string(empty_format, test_string.c_str()));
 
-    EXPECT_EQ("", formattedString);
+    EXPECT_EQ("", formatted_string);
 }
 
 TEST(StringFormatterTest, StringFormatterHandlesEmptyArgumentString) {
     std::string format("%s");
-    std::string emptyString;
-    std::string formattedString(sodium::StringFormatter::formatString(format, emptyString.c_str()));
+    std::string empty_string;
+    std::string formatted_string(sodium::StringFormatter::format_string(format, empty_string.c_str()));
 
-    EXPECT_EQ("", formattedString);
+    EXPECT_EQ("", formatted_string);
 }

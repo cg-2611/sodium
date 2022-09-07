@@ -7,7 +7,7 @@
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/type.h"
-#include "sodium/nac/lexer/token.h"
+#include "sodium/nac/token/token.h"
 
 /*
     tests source file:
@@ -15,10 +15,10 @@
 */
 TEST(ParserTest, ParserCorrectlyParsesAnEmptySourceFile) {
     sodium::Parser parser("");
-    auto sourceFile = parser.parseSourceFile();
+    auto source_file = parser.parse_source_file();
 
-    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, sourceFile->nodeKind());
-    EXPECT_EQ(0, sourceFile->decls().size());
+    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
+    EXPECT_EQ(0, source_file->decls().size());
 }
 
 /*
@@ -29,13 +29,13 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithASingleDeclaration) {
     std::string_view src("func name() -> int {}");
 
     sodium::Parser parser(src);
-    auto sourceFile = parser.parseSourceFile();
+    auto source_file = parser.parse_source_file();
 
-    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, sourceFile->nodeKind());
+    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
 
-    ASSERT_EQ(1, sourceFile->decls().size());
-    EXPECT_EQ(sodium::ASTNodeKind::DECL, sourceFile->decls()[0]->nodeKind());
-    EXPECT_EQ(sodium::DeclKind::FUNCTION, sourceFile->decls()[0]->declKind());
+    ASSERT_EQ(1, source_file->decls().size());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, source_file->decls()[0]->node_kind());
+    EXPECT_EQ(sodium::DeclKind::FUNCTION, source_file->decls()[0]->decl_kind());
 }
 
 /*
@@ -48,15 +48,15 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
                          "func name2() -> int {}");
 
     sodium::Parser parser(src);
-    auto sourceFile = parser.parseSourceFile();
+    auto source_file = parser.parse_source_file();
 
-    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, sourceFile->nodeKind());
+    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
 
-    ASSERT_EQ(2, sourceFile->decls().size());
-    EXPECT_EQ(sodium::ASTNodeKind::DECL, sourceFile->decls()[0]->nodeKind());
-    EXPECT_EQ(sodium::DeclKind::FUNCTION, sourceFile->decls()[0]->declKind());
-    EXPECT_EQ(sodium::ASTNodeKind::DECL, sourceFile->decls()[1]->nodeKind());
-    EXPECT_EQ(sodium::DeclKind::FUNCTION, sourceFile->decls()[1]->declKind());
+    ASSERT_EQ(2, source_file->decls().size());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, source_file->decls()[0]->node_kind());
+    EXPECT_EQ(sodium::DeclKind::FUNCTION, source_file->decls()[0]->decl_kind());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, source_file->decls()[1]->node_kind());
+    EXPECT_EQ(sodium::DeclKind::FUNCTION, source_file->decls()[1]->decl_kind());
 }
 
 /*
@@ -64,12 +64,12 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
         identifier
 */
 TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
-    std::string_view identifierString("identifier");
-    sodium::Parser parser(identifierString);
-    auto identifierNode = parser.parseIdentifier();
+    std::string_view identifier_string("identifier");
+    sodium::Parser parser(identifier_string);
+    auto identifier_node = parser.parse_identifier();
 
-    EXPECT_EQ(sodium::ASTNodeKind::IDENTIFIER, identifierNode->nodeKind());
-    EXPECT_EQ(identifierString, identifierNode->value());
+    EXPECT_EQ(sodium::ASTNodeKind::IDENTIFIER, identifier_node->node_kind());
+    EXPECT_EQ(identifier_string, identifier_node->value());
 }
 
 /*
@@ -77,11 +77,11 @@ TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
         int
 */
 TEST(ParserTest, ParserCorrectlyParsesAType) {
-    std::string_view typeString("int");
+    std::string_view type_string("int");
 
-    sodium::Parser parser(typeString);
-    auto typeNode = parser.parseType();
+    sodium::Parser parser(type_string);
+    auto type_node = parser.parse_type();
 
-    EXPECT_EQ(sodium::ASTNodeKind::TYPE, typeNode->nodeKind());
-    EXPECT_EQ(typeString, typeNode->name());
+    EXPECT_EQ(sodium::ASTNodeKind::TYPE, type_node->node_kind());
+    EXPECT_EQ(type_string, type_node->name());
 }

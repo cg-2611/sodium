@@ -18,19 +18,19 @@ protected:
     static void SetUpTestSuite() {
         std::filesystem::create_directory(TEMP_DIRECTORY_PATH);
 
-        std::unique_ptr<std::FILE, decltype(&std::fclose)> emptyFile(std::fopen(EMPTY_FILE_PATH.c_str(), "w"),
-                                                                     &std::fclose);
-        if (!emptyFile) {
+        std::unique_ptr<std::FILE, decltype(&std::fclose)> empty_file(std::fopen(EMPTY_FILE_PATH.c_str(), "w"),
+                                                                      &std::fclose);
+        if (!empty_file) {
             FAIL() << "FileReaderTest: error creating temporary file: " << EMPTY_FILE_PATH << '\n';
         }
 
-        std::unique_ptr<std::FILE, decltype(&std::fclose)> tempFile(std::fopen(TEST_FILE_PATH.c_str(), "w"),
-                                                                    &std::fclose);
-        if (!tempFile) {
+        std::unique_ptr<std::FILE, decltype(&std::fclose)> temp_file(std::fopen(TEST_FILE_PATH.c_str(), "w"),
+                                                                     &std::fclose);
+        if (!temp_file) {
             FAIL() << "FileReaderTest: error creating temporary file: " << TEST_FILE_PATH << '\n';
         }
 
-        std::fputs(TEST_FILE_TEXT.c_str(), tempFile.get());
+        std::fputs(TEST_FILE_TEXT.c_str(), temp_file.get());
     }
 
     static void TearDownTestSuite() {
@@ -44,18 +44,18 @@ protected:
 };
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
-    EXPECT_THROW(auto _ = sodium::IO::readFile("./file_that_does_not_exist.txt"), sodium::IOException);
+    EXPECT_THROW(auto _ = sodium::IO::read_file("./file_that_does_not_exist.txt"), sodium::IOException);
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {
-    auto [fileSize, fileContents] = sodium::IO::readFile(TEST_FILE_PATH);
+    auto [fileSize, fileContents] = sodium::IO::read_file(TEST_FILE_PATH);
 
     EXPECT_EQ(TEST_FILE_TEXT, fileContents);
     EXPECT_EQ(fileSize, fileContents.size());
 }
 
 TEST_F(FileReaderTest, EmptyFileCanBeRead) {
-    auto [fileSize, fileContents] = sodium::IO::readFile(EMPTY_FILE_PATH.string());
+    auto [fileSize, fileContents] = sodium::IO::read_file(EMPTY_FILE_PATH.string());
 
     EXPECT_EQ("", fileContents);
     EXPECT_EQ(fileSize, fileContents.size());
