@@ -1,5 +1,6 @@
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
 AlignEscapedNewlines: Left
 AlignOperands: Align
 AllowShortBlocksOnASingleLine: Empty
