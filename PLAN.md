@@ -43,7 +43,7 @@ Identifier = IdentifierHead IdentifierCharacter* ;
 IdentifierHead = "_" | LETTER ;
 IdentifierCharacter = IdentifierHead | DIGIT ;
 
-NumericLiteral = DIGIT* ;
+IntegerLiteral = DIGIT* ;
 
 LETTER = [a-zA-Z] ;
 
@@ -75,7 +75,7 @@ ReturnStatement = "return" Expression ";" ;
 ```
 Expression = LiteralExpression ;
 
-LiteralExpression = NumericLiteralExpression ;
+LiteralExpression = IntegerLiteralExpression ;
 
-NumericLiteralExpression = NumericLiteral ;
+IntegerLiteralExpression = IntegerLiteral ;
 ```
