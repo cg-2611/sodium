@@ -1,4 +1,4 @@
-Checks: "-*, bugprone-*, cppcoreguidelines-*, llvm-header-guard, llvm-include-order, llvm-namespace-comment, misc-*, modernize-*, performance-*, readability-*, -cppcoreguidelines-pro-bounds-pointer-arithmetic, -misc-no-recursion, -modernize-return-braced-init-list, -modernize-use-auto, -modernize-use-trailing-return-type"
+Checks: "-*, bugprone-*, cppcoreguidelines-*, llvm-header-guard, llvm-include-order, llvm-namespace-comment, misc-*, modernize-*, performance-*, readability-*, -misc-no-recursion, -modernize-return-braced-init-list, -modernize-use-trailing-return-type, -readability-identifier-length"
 
 CheckOptions:
   - key:   readability-identifier-naming.ClassCase
