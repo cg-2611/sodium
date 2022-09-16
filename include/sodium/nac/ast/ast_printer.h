@@ -1,128 +1,74 @@
 #ifndef SODIUM_NAC_AST_AST_PRINTER_H
 #define SODIUM_NAC_AST_AST_PRINTER_H
 
+#include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/ast_visitor.h"
 
 namespace sodium {
 
 class AST;
+class SourceRange;
 
+/// Used to print an AST to std::cout using the visitor pattern and ASTVisitor interface.
 class ASTPrinter : public ASTVisitor {
 public:
-    /**
-     * @brief Construct a new ASTPrinter object.
-     *
-     * @param spaces The width of indentation in spaces.
-     */
+    /// Constructor for ASTPrinter.
+    /// Constructs an ASTPrinter that uses an indentation width of 4 spaces.
+    ASTPrinter();
+
+    /// Constructor for ASTPrinter.
+    /// \param spaces The  number of spaces of indentation used in the tree.
     ASTPrinter(int spaces);
 
-    /**
-     * @brief Print an AST.
-     *
-     * @param ast The AST to print.
-     */
-    void printAST(const AST *ast);
+    /// Print an AST.
+    /// \param ast The AST to print.
+    void print_ast(const AST &ast);
 
-    /**
-     * @brief Prints a SourceFile. The visit method of each Decl is called.
-     *
-     * @param sourceFile The SourceFile node to be printed.
-     */
-    void visit(const SourceFile *sourceFile) override;
+    /// Prints a source file ast node.
+    /// \param source_file The source file node to be printed.
+    void visit(const SourceFile &source_file) override;
 
-    /**
-     * @brief Visit a Decl node in the AST. Dispatches the specific visit method for the derived class of Decl.
-     *
-     * @param decl The Decl node being visited.
-     */
-    void visit(const Decl *decl) override;
+    /// Prints an identifier.
+    /// \param identifier The identifier to be printed.
+    void visit(const Identifier &identifier) override;
 
-    /**
-     * @brief Print a function declaration. The visit method of the Signature and the Block of the function are called.
-     *
-     * @param funcDecl The function declaration to be printed.
-     */
-    void visit(const FuncDecl *funcDecl) override;
+    /// Prints a type.
+    /// \param type The type to be printed.
+    void visit(const Type &type) override;
 
-    /**
-     * @brief Print a function signature. The visit method of the Identifier, ParameterList and return Type of the
-     *        function are called.
-     *
-     * @param functionSignature The function signature to be printed.
-     */
-    void visit(const FunctionSignature *functionSignature) override;
+    /// Print a function declaration.
+    /// \param func_decl The function declaration to be printed.
+    void visit(const FuncDecl &func_decl) override;
 
-    /**
-     * @brief Prints a ParameterList. The visit method of each Parameter in the list is called.
-     *
-     * @param parameterList The ParameterList to be printed.
-     */
-    void visit(const ParameterList *parameterList) override;
+    /// Print a function signature.
+    /// \param function_signature The function signature to be printed.
+    void visit(const FuncSignature &func_signature) override;
 
-    /**
-     * @brief Visit an Stmt node in the AST. Dispatches the specific visit method for the derived class of Stmt.
-     *
-     * @param stmt The Stmt node being visited.
-     */
-    void visit(const Stmt *stmt) override;
+    /// Prints a parameter list.
+    /// \param parameter_list The parameter list to be printed.
+    void visit(const ParameterList &parameter_list) override;
 
-    /**
-     * @brief Prints a Block. The visit method of each Stmt in the block is called.
-     *
-     * @param block The Block to be printed.
-     */
-    void visit(const Block *block) override;
+    /// Prints a numeric literal.
+    /// \param integer_literal_expr The numeric literal to be printed.
+    void visit(const IntegerLiteralExpr &integer_literal_expr) override;
 
-    /**
-     * @brief Prints a ReturnStmt. The visit method of the returned expression is called.
-     *
-     * @param returnStmt The ReturnStmt to be printed.
-     */
-    void visit(const ReturnStmt *returnStmt) override;
+    /// Prints a block.
+    /// \param block The block to be printed.
+    void visit(const Block &block) override;
 
-    /**
-     * @brief Visit an Expr node in the AST. Dispatches the specific visit method for the derived class of Expr.
-     *
-     * @param expr The Expr node being visited.
-     */
-    void visit(const Expr *expr) override;
-
-    /**
-     * @brief Visit a LiteralExpr node in the AST. Dispatches the specific visit method for the derived class of
-     *        LiteralExpr.
-     *
-     * @param literalExpr The LiteralExpr node being visited.
-     */
-    void visit(const LiteralExpr *literalExpr) override;
-
-    /**
-     * @brief Prints a numeric literal.
-     *
-     * @param numericLiteralExpr The numeric literal to be printed.
-     */
-    void visit(const NumericLiteralExpr *numericLiteralExpr) override;
-
-    /**
-     * @brief Prints an identifier.
-     *
-     * @param identifier The identifier to be printed.
-     */
-    void visit(const Identifier *identifier) override;
-
-    /**
-     * @brief Prints a Type.
-     *
-     * @param type The Type to be printed.
-     */
-    void visit(const Type *type) override;
+    /// Prints a return statement.
+    /// \param return_stmt The return statement to be printed.
+    void visit(const ReturnStmt &return_stmt) override;
 
 private:
-    int indentationSpaces_;
-    int indentationLevel_;
+    int indentation_spaces_;
+    int indentation_level_;
 
-    void printIndentation() const; // print the correct number of spaces of indentation
-    void indent();                 // increases the indentation level by 1
-    void dedent();                 // decreases the indentation level by 1
+    static void print_range(SourceRange range); // print the specified range
+    void print_indentation() const;             // print the correct number of spaces of indentation
+
+    void indent(); // increases the indentation level by 1
+    void dedent(); // decreases the indentation level by 1
 };
 
 } // namespace sodium

@@ -9,201 +9,105 @@ namespace sodium {
 
 class ASTVisitor;
 class Block;
-class FunctionSignature;
+class FuncSignature;
 class Identifier;
 class ParameterList;
+class SourceRange;
 class Type;
 
-/**
- * @brief An enum of the different kinds of declarations that can be made in Sodium.
- *
- */
+/// An enum of the different kinds of declarations that can be made in Sodium.
 enum class DeclKind {
-    FUNCTION,
-    FUNCTION_SIGNATURE,
-    PARAMETER_LIST
+    FUNC
 };
 
-/**
- * @brief A derived class of ASTNode, and a base class for any declaration that can be made in Sodium.
- *
- */
+/// A base class for any declaration that can be made in Sodium.
 class Decl : public ASTNode {
 public:
-    /**
-     * @brief Construct a new Decl object.
-     *
-     * @param kind The kind of declaration, must be one of DeclKind.
-     */
-    Decl(DeclKind kind);
+    Decl(const Decl &other) = delete;
+    Decl &operator=(const Decl &other) = delete;
 
-    /**
-     * @brief Construct a new Decl object by copying another Decl.
-     *
-     * @param other The other Decl being copied to construct this one.
-     */
-    Decl(const Decl &other) = default;
+    Decl(Decl &&other) noexcept = delete;
+    Decl &operator=(Decl &&other) noexcept = delete;
 
-    /**
-     * @brief Construct a new Decl object by moving another Decl.
-     *
-     * @param other The other Decl being moved to construct this one,
-     */
-    Decl(Decl &&other) noexcept = default;
-
-    /**
-     * @brief Destroy the Decl object.
-     *
-     */
     ~Decl() override = default;
 
-    /**
-     * @brief Copy assignment operator.
-     *
-     * @param other The other Decl being copied.
-     * @return Decl& that is \c this Decl after the assignment
-     */
-    Decl &operator=(const Decl &other) = default;
+    /// \return The kind of \c this declaration.
+    [[nodiscard]] DeclKind decl_kind() const;
 
-    /**
-     * @brief Move assignment operator.
-     *
-     * @param other The other Decl being moved.
-     * @return Decl& that is \c this Decl after the assignment.
-     */
-    Decl &operator=(Decl &&other) noexcept = default;
-
-    /**
-     * @brief Used to accept, for a declaration, an ASTVisitor derived class for use with the visitor pattern.
-     *        It is also overridden in derived classes of this class.
-     *
-     * @param visitor The visitor object being accepted by this declaration.
-     */
-    void accept(ASTVisitor *visitor) const override;
-
-    /**
-     * @brief Accessor for the kind of this declaration.
-     *
-     * @return DeclKind that is the kind of this declaration.
-     */
-    DeclKind declKind() const noexcept;
+protected:
+    /// Constructor for Decl.
+    /// \param kind The kind of declaration.
+    /// \param range The range of the declaration in the source code.
+    Decl(DeclKind kind, SourceRange range);
 
 private:
     DeclKind kind_;
 };
 
-/**
- * @brief A derived class of Decl, used to represent a function declaration in Sodium.
- *
- */
+/// A derived class of Decl, used to represent a function declaration in Sodium.
 class FuncDecl : public Decl {
 public:
-    /**
-     * @brief Construct a new FuncDecl object.
-     *
-     * @param signature An std::unique_ptr<Signature> that is the function signature.
-     * @param body An std::unique_ptr<Block> that is the function body.
-     */
-    FuncDecl(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Block> body);
+    /// Constructor for FuncDecl.
+    /// \param signature The signature of the function declaration..
+    /// \param body The body of the function declaration.
+    /// \param range The range of the function declaration in the source code.
+    FuncDecl(std::unique_ptr<FuncSignature> signature, std::unique_ptr<Block> body, SourceRange range);
 
-    /**
-     * @brief Used to accept, for a function declaration, an ASTVisitor derived class for use with the visitor
-     *        pattern.
-     *
-     * @param visitor The visitor object being accepted by this function declaration.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this function declaration.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the function signature.
-     *
-     * @return Signature* that stores the function signature.
-     */
-    FunctionSignature *signature() const noexcept;
+    /// \return The signature of \c this function declaration.
+    [[nodiscard]] FuncSignature *signature() const;
 
-    /**
-     * @brief Acessors for the Block that represents the function body.
-     *
-     * @return Block* that stores the function body.
-     */
-    Block *body() const noexcept;
+    /// \return The body of \c this function declaration.
+    [[nodiscard]] Block *body() const;
 
 private:
-    std::unique_ptr<FunctionSignature> signature_;
+    std::unique_ptr<FuncSignature> signature_;
     std::unique_ptr<Block> body_;
 };
 
-/**
- * @brief Used to represent the signature of a function in Sodium.
- *
- */
-class FunctionSignature : public Decl {
+/// A derived class of ASTNode, used to represent the signature of a function in Sodium.
+class FuncSignature : public ASTNode {
 public:
-    /**
-     * @brief Construct a new FunctionSignature object.
-     *
-     * @param name An std::unique_ptr<Identifier> that is the name of the function.
-     * @param parameterList An std::unique_ptr<ParameterList> that are parameter list of the function.
-     * @param returnType An std::unique_ptr<Type> that is the return type of the function.
-     */
-    FunctionSignature(std::unique_ptr<Identifier> name, std::unique_ptr<ParameterList> parameterList,
-                      std::unique_ptr<Type> returnType);
+    /// Constructor for FuncSignature.
+    /// \param name The name of the function.
+    /// \param parameter_list The  parameter list of the function.
+    /// \param return_type The return type of the function.
+    /// \param range The range of the function signature in the source code.
+    FuncSignature(std::unique_ptr<Identifier> name, std::unique_ptr<ParameterList> parameter_list,
+                  std::unique_ptr<Type> return_type, SourceRange range);
 
-    /**
-     * @brief Used to accept, for a function signature, an ASTVisitor derived class for use with the visitor
-     *        pattern.
-     *
-     * @param visitor The visitor object being accepted by this function signature.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this function signature.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the identifier of the function.
-     *
-     * @return Identifier* that stores the name of the function.
-     */
-    Identifier *name() const noexcept;
+    /// \return The name of \c this function signature.
+    [[nodiscard]] Identifier *name() const;
 
-    /**
-     * @brief Accessor for the parameter list of the function.
-     *
-     * @return ParameterList* that stores the parameter list of the function.
-     */
-    ParameterList *parameterList() const noexcept;
+    /// \return The parameter list of \c this function signature.
+    [[nodiscard]] ParameterList *parameter_list() const;
 
-    /**
-     * @brief Accessor for the return type of the function
-     *
-     * @return Type* that stores the return type of the function.
-     */
-    Type *returnType() const noexcept;
+    /// \return The return type of \c this function signature.
+    [[nodiscard]] Type *return_type() const;
 
 private:
     std::unique_ptr<Identifier> name_;
-    std::unique_ptr<ParameterList> parameterList_;
-    std::unique_ptr<Type> returnType_;
+    std::unique_ptr<ParameterList> parameter_list_;
+    std::unique_ptr<Type> return_type_;
 };
 
-/**
- * @brief A derived class of ASTNode, used to represent a list of function parameter in Sodium.
- *
- */
-class ParameterList : public Decl {
+/// A derived class of ASTNode, used to represent a list of function parameters in Sodium.
+class ParameterList : public ASTNode {
 public:
-    /**
-     * @brief Construct a new ParameterList object.
-     *
-     */
-    ParameterList();
+    /// Constructor for ParameterList.
+    /// \param range The range of of the parameter list in the source code.
+    ParameterList(SourceRange range);
 
-    /**
-     * @brief Used to accept, for a parameter list, an ASTVisitor derived class for use with the visitor pattern.
-     *
-     * @param visitor The visitor object being accepted by this parameter list.
-     */
-    void accept(ASTVisitor *visitor) const override;
-
-private:
+    /// Accepts an ASTVisitor for \c this parameter list.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 };
 
 } // namespace sodium

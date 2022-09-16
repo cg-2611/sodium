@@ -7,42 +7,37 @@
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/ast_visitor.h"
 #include "sodium/nac/ast/expr.h"
+#include "sodium/nac/basic/source_range.h"
 
 namespace sodium {
 
-Stmt::Stmt(StmtKind kind) : ASTNode(ASTNodeKind::STMT), kind_(kind) {}
+Stmt::Stmt(StmtKind kind, SourceRange range) : ASTNode(ASTNodeKind::STMT, range), kind_(kind) {}
 
-void Stmt::accept(ASTVisitor *visitor) const {
-    visitor->visit(this);
-}
-
-StmtKind Stmt::stmtKind() const noexcept {
+StmtKind Stmt::stmt_kind() const {
     return kind_;
 }
 
-Block::Block(std::vector<std::unique_ptr<Stmt>> stmts) : Stmt(StmtKind::BLOCK), stmts_(std::move(stmts)) {}
+Block::Block(std::vector<std::unique_ptr<Stmt>> stmts, SourceRange range)
+        : Stmt(StmtKind::BLOCK, range),
+          stmts_(std::move(stmts)) {}
 
-void Block::accept(ASTVisitor *visitor) const {
-    // call the accept method of all the statements in the block
-    for (auto &&stmt : stmts_) {
-        stmt->accept(visitor);
-    }
-
-    visitor->visit(this);
+void Block::accept(ASTVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
-const std::vector<std::unique_ptr<Stmt>> &Block::stmts() const noexcept {
+const std::vector<std::unique_ptr<Stmt>> &Block::stmts() const {
     return stmts_;
 }
 
-ReturnStmt::ReturnStmt(std::unique_ptr<Expr> expr) : Stmt(StmtKind::RETURN), expr_(std::move(expr)) {}
+ReturnStmt::ReturnStmt(std::unique_ptr<Expr> expr, SourceRange range)
+        : Stmt(StmtKind::RETURN, range),
+          expr_(std::move(expr)) {}
 
-void ReturnStmt::accept(ASTVisitor *visitor) const {
-    expr_->accept(visitor);
-    visitor->visit(this);
+void ReturnStmt::accept(ASTVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
-Expr *ReturnStmt::expr() const noexcept {
+Expr *ReturnStmt::expr() const {
     return expr_.get();
 }
 

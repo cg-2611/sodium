@@ -6,69 +6,69 @@
 
 #include "sodium/nac/ast/expr.h"
 #include "sodium/nac/ast/stmt.h"
+#include "sodium/nac/basic/source_range.h"
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/parser_error.h"
-#include "sodium/nac/lexer/token.h"
+#include "sodium/nac/token/token.h"
+#include "sodium/nac/token/token_kind.h"
 
 namespace sodium {
 
-std::unique_ptr<Stmt> Parser::parseStmt() {
+std::unique_ptr<Stmt> Parser::parse_stmt() {
     switch (token_.kind()) {
-        case TokenKind::LEFT_BRACE: return parseBlock();
-        case TokenKind::KEYWORD_RETURN: return parseReturnStmt();
-        default: errorExpected("statement"); return nullptr;
+        case TokenKind::LEFT_BRACE: return parse_block();
+        case TokenKind::KEYWORD_RETURN: return parse_return_stmt();
+        default: error_expected("statement"); return nullptr;
     }
 }
 
-std::unique_ptr<Block> Parser::parseBlock() {
-    if (!expect(TokenKind::LEFT_BRACE, "{ to start block")) {
+std::unique_ptr<Block> Parser::parse_block() {
+    auto left_brace_location = token_.range().start();
+
+    if (!expect(TokenKind::LEFT_BRACE, "{ to begin block")) {
         return nullptr;
     }
 
-    advance(); // advance to statements
+    auto stmts = std::vector<std::unique_ptr<Stmt>>();
 
-    std::vector<std::unique_ptr<Stmt>> stmts{};
-
-    // parse statements until we reach the end of the block
-    while (token_.kind() != TokenKind::RIGHT_BRACE && token_.kind() != TokenKind::EOF_TOKEN) {
-        std::unique_ptr<Stmt> stmt(parseStmt());
+    while (!match(TokenKind::RIGHT_BRACE) && !match(TokenKind::EOF_TOKEN)) {
+        auto stmt = parse_stmt();
         if (!stmt) {
-            synchronize(STMT_SYNCHRONIZING_TOKENS);
+            synchronize({TokenKind::LEFT_BRACE, TokenKind::RIGHT_BRACE, TokenKind::SEMICOLON});
+            continue;
         }
 
         stmts.push_back(std::move(stmt));
-
-        if (token_.kind() == TokenKind::SEMICOLON) {
-            advance(); // advance to next statement
-        }
     }
 
-    if (!expect(TokenKind::RIGHT_BRACE, "} to end block, pair never closed")) {
+    auto right_brace_location = token_.range().end();
+
+    if (!expect(TokenKind::RIGHT_BRACE, "} to end block")) {
         return nullptr;
     }
 
-    advance(); // advance to token after block to continue parsing
-
-    return std::make_unique<Block>(std::move(stmts));
+    return std::make_unique<Block>(std::move(stmts), left_brace_location.to(right_brace_location));
 }
 
-std::unique_ptr<ReturnStmt> Parser::parseReturnStmt() {
-    advance(); // advance to expected return expression
+std::unique_ptr<ReturnStmt> Parser::parse_return_stmt() {
+    auto return_keyword_location = token_.range().start();
 
-    // parse the expression being returned
-    std::unique_ptr<Expr> expr(parseExpr());
-    if (!expr) {
-        errorExpected("expression to return");
+    if (!expect(TokenKind::KEYWORD_RETURN, "return keyword")) {
         return nullptr;
     }
 
-    advance(); // advance to expected ;
-
-    if (!expect(TokenKind::SEMICOLON, "; after return statement")) {
+    std::unique_ptr<Expr> return_expr(parse_expr());
+    if (!return_expr) {
         return nullptr;
     }
 
-    return std::make_unique<ReturnStmt>(std::move(expr));
+    auto semicolon_location = token_.range().end();
+
+    if (!expect(TokenKind::SEMICOLON, ";")) {
+        return nullptr;
+    }
+
+    return std::make_unique<ReturnStmt>(std::move(return_expr), return_keyword_location.to(semicolon_location));
 }
 
 } // namespace sodium

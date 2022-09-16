@@ -8,68 +8,60 @@
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/ast/type.h"
+#include "sodium/nac/basic/source_range.h"
 
 namespace sodium {
 
-Decl::Decl(DeclKind kind) : ASTNode(ASTNodeKind::DECL), kind_(kind) {}
+Decl::Decl(DeclKind kind, SourceRange range) : ASTNode(ASTNodeKind::DECL, range), kind_(kind) {}
 
-void Decl::accept(ASTVisitor *visitor) const {
-    visitor->visit(this);
-}
-
-DeclKind Decl::declKind() const noexcept {
+DeclKind Decl::decl_kind() const {
     return kind_;
 }
 
-FuncDecl::FuncDecl(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Block> body)
-        : Decl(DeclKind::FUNCTION),
+FuncDecl::FuncDecl(std::unique_ptr<FuncSignature> signature, std::unique_ptr<Block> body, SourceRange range)
+        : Decl(DeclKind::FUNC, SourceRange(range)),
           signature_(std::move(signature)),
           body_(std::move(body)) {}
 
-void FuncDecl::accept(ASTVisitor *visitor) const {
-    signature_->accept(visitor);
-    body_->accept(visitor);
-    visitor->visit(this);
+void FuncDecl::accept(ASTVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
-FunctionSignature *FuncDecl::signature() const noexcept {
+FuncSignature *FuncDecl::signature() const {
     return signature_.get();
 }
 
-Block *FuncDecl::body() const noexcept {
+Block *FuncDecl::body() const {
     return body_.get();
 }
 
-FunctionSignature::FunctionSignature(std::unique_ptr<Identifier> name, std::unique_ptr<ParameterList> parameterList,
-                                     std::unique_ptr<Type> returnType)
-        : Decl(DeclKind::FUNCTION_SIGNATURE),
+FuncSignature::FuncSignature(std::unique_ptr<Identifier> name, std::unique_ptr<ParameterList> parameter_list,
+                             std::unique_ptr<Type> return_type, SourceRange range)
+        : ASTNode(ASTNodeKind::FUNC_SIGNATURE, range),
           name_(std::move(name)),
-          parameterList_(std::move(parameterList)),
-          returnType_(std::move(returnType)) {}
+          parameter_list_(std::move(parameter_list)),
+          return_type_(std::move(return_type)) {}
 
-void FunctionSignature::accept(ASTVisitor *visitor) const {
-    name_->accept(visitor);
-    parameterList_->accept(visitor);
-    returnType_->accept(visitor);
-    visitor->visit(this);
+void FuncSignature::accept(ASTVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
-Identifier *FunctionSignature::name() const noexcept {
+Identifier *FuncSignature::name() const {
     return name_.get();
 }
 
-ParameterList *FunctionSignature::parameterList() const noexcept {
-    return parameterList_.get();
+ParameterList *FuncSignature::parameter_list() const {
+    return parameter_list_.get();
 }
 
-Type *FunctionSignature::returnType() const noexcept {
-    return returnType_.get();
+Type *FuncSignature::return_type() const {
+    return return_type_.get();
 }
 
-ParameterList::ParameterList() : Decl(DeclKind::PARAMETER_LIST) {}
+ParameterList::ParameterList(SourceRange range) : ASTNode(ASTNodeKind::PARAMETER_LIST, range) {}
 
-void ParameterList::accept(ASTVisitor *visitor) const {
-    visitor->visit(this);
+void ParameterList::accept(ASTVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
 } // namespace sodium

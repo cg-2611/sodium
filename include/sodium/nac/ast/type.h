@@ -1,43 +1,32 @@
 #ifndef SODIUM_NAC_AST_TYPE_H
 #define SODIUM_NAC_AST_TYPE_H
 
-#include <string_view>
+#include <string>
 
 #include "sodium/nac/ast/ast_node.h"
 
 namespace sodium {
 
 class ASTVisitor;
+class SourceRange;
 
-/**
- * @brief A derived class of ASTNode, used to represent a type in Sodium.
- *
- */
+/// A derived class of ASTNode, used to represent a type in Sodium.
 class Type : public ASTNode {
 public:
-    /**
-     * @brief Construct a new Type object.
-     *
-     * @param name An std::string_view of the name of the type.
-     */
-    Type(std::string_view name);
+    /// Constructor for Type.
+    /// \param name The name of the type.
+    /// \param range The range of the type in the source code.
+    Type(std::string name, SourceRange range);
 
-    /**
-     * @brief Used to accept, for a type, an ASTVisitor derived class for use with the visitor pattern.
-     *
-     * @param visitor The visitor object being accepted by this type.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this type.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the name of this type.
-     *
-     * @return std::string_view that is the name of this type.
-     */
-    std::string_view name() const noexcept;
+    /// \return The name of \c this type.
+    [[nodiscard]] const std::string &name() const;
 
 private:
-    std::string_view name_;
+    std::string name_;
 };
 
 } // namespace sodium

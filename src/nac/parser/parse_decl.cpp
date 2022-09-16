@@ -2,93 +2,93 @@
 
 #include <memory>
 #include <utility>
-#include <vector>
 
 #include "sodium/nac/ast/decl.h"
+#include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/type.h"
+#include "sodium/nac/basic/source_range.h"
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/parser_error.h"
-#include "sodium/nac/lexer/token.h"
+#include "sodium/nac/token/token.h"
+#include "sodium/nac/token/token_kind.h"
 
 namespace sodium {
 
-std::unique_ptr<Decl> Parser::parseDecl() {
+std::unique_ptr<Decl> Parser::parse_decl() {
     switch (token_.kind()) {
-        case TokenKind::KEYWORD_FUNC: return parseFuncDecl();
-        default: errorExpected("declaration"); return nullptr;
+        case TokenKind::KEYWORD_FUNC: return parse_func_decl();
+        default: error_expected("declaration"); return nullptr;
     }
 }
 
-std::unique_ptr<FuncDecl> Parser::parseFuncDecl() {
-    std::unique_ptr<FunctionSignature> functionSignature(parseFunctionSignature());
-    if (!functionSignature) {
+std::unique_ptr<FuncDecl> Parser::parse_func_decl() {
+    std::unique_ptr<FuncSignature> signature(parse_func_signature());
+    if (!signature) {
         return nullptr;
     }
 
-    advance(); // advance to expected { to begin block
-
-    std::unique_ptr<Block> functionBody(parseBlock());
-    if (!functionBody) {
+    std::unique_ptr<Block> body(parse_block());
+    if (!body) {
         return nullptr;
     }
 
-    return std::make_unique<FuncDecl>(std::move(functionSignature), std::move(functionBody));
+    return std::make_unique<FuncDecl>(std::move(signature), std::move(body),
+                                      signature->range().start().to(body->range().end()));
 }
 
-std::unique_ptr<FunctionSignature> Parser::parseFunctionSignature() {
-    advance(); // advance to expected identifier
+std::unique_ptr<FuncSignature> Parser::parse_func_signature() {
+    auto func_keyword_location = token_.range().start();
 
-    std::unique_ptr<Identifier> name(parseIdentifier());
+    if (!expect(TokenKind::KEYWORD_FUNC, "func keyword")) {
+        return nullptr;
+    }
+
+    std::unique_ptr<Identifier> name(parse_identifier());
     if (!name) {
-        errorExpected("function name");
         return nullptr;
     }
 
-    advance(); // advance to expected ( to begin parameter list
-
-    std::unique_ptr<ParameterList> parameters(parseParameterList());
+    std::unique_ptr<ParameterList> parameters(parse_parameter_list());
     if (!parameters) {
         return nullptr;
     }
 
-    advance(); // advance to expected ->
-
-    std::unique_ptr<Type> returnType(parseReturnType());
-    if (!returnType) {
+    std::unique_ptr<Type> return_type(parse_return_type());
+    if (!return_type) {
         return nullptr;
     }
 
-    return std::make_unique<FunctionSignature>(std::move(name), std::move(parameters), std::move(returnType));
+    return std::make_unique<FuncSignature>(std::move(name), std::move(parameters), std::move(return_type),
+                                           func_keyword_location.to(return_type->range().end()));
 }
 
-std::unique_ptr<ParameterList> Parser::parseParameterList() {
-    if (!expect(TokenKind::LEFT_PAREN, "expected ( to begin parameter list")) {
+std::unique_ptr<ParameterList> Parser::parse_parameter_list() {
+    auto left_paren_location = token_.range().start();
+
+    if (!expect(TokenKind::LEFT_PAREN, "( to begin parameter list")) {
         return nullptr;
     }
 
-    advance(); // advance to expected )
+    auto right_paren_location = token_.range().end();
 
-    if (!expect(TokenKind::RIGHT_PAREN, "expected ) to end parameter list, pair never closed")) {
+    if (!expect(TokenKind::RIGHT_PAREN, ") to end parameter list")) {
         return nullptr;
     }
 
-    return std::make_unique<ParameterList>();
+    return std::make_unique<ParameterList>(left_paren_location.to(right_paren_location));
 }
 
-std::unique_ptr<Type> Parser::parseReturnType() {
+std::unique_ptr<Type> Parser::parse_return_type() {
     if (!expect(TokenKind::ARROW, "->")) {
         return nullptr;
     }
 
-    advance(); // advance to expected type
-
-    std::unique_ptr<Type> returnType(parseType());
-    if (!returnType) {
-        errorExpected("type after ->");
+    std::unique_ptr<Type> return_type(parse_type());
+    if (!return_type) {
         return nullptr;
     }
 
-    return returnType;
+    return return_type;
 }
 
 } // namespace sodium

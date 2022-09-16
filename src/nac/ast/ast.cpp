@@ -9,7 +9,7 @@ namespace sodium {
 
 AST::AST(std::unique_ptr<ASTNode> root) : root_(std::move(root)) {}
 
-ASTNode *AST::root() const noexcept {
+ASTNode *AST::root() const {
     return root_.get();
 }
 

@@ -10,34 +10,22 @@ namespace sodium {
 
 class ASTVisitor;
 class Decl;
+class SourceRange;
 
-/**
- * @brief A derived class of ASTNode, used to represent a Sodium source file.
- *
- */
+/// A derived class of ASTNode, used to represent a Sodium source file.
 class SourceFile : public ASTNode {
 public:
-    /**
-     * @brief Construct a new SourceFile object.
-     *
-     * @param decls An std::vector<std::unique_ptr<Decl>> that are all the declarations in the source file.
-     */
-    SourceFile(std::vector<std::unique_ptr<Decl>> decls);
+    /// Constructor for SourceFile.
+    /// \param decls The declarations in the source file.
+    /// \param range The range of the contents of the source code.
+    SourceFile(std::vector<std::unique_ptr<Decl>> decls, SourceRange range);
 
-    /**
-     * @brief Used to accept, for a source file node, aASTVisitor derived class for use with the visitor pattern.
-     *        It calls the accept method of each declaration in the vector of declarations.
-     *
-     * @param visitor The visitor object being accepted by this source file node.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this source file.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the list of declarations in the source file.
-     *
-     * @return const std::vector<std::unique_ptr<Decl>>& that stores the declarations in the list.
-     */
-    const std::vector<std::unique_ptr<Decl>> &decls() const noexcept;
+    /// \return The declarations in \c this source file.
+    [[nodiscard]] const std::vector<std::unique_ptr<Decl>> &decls() const;
 
 private:
     std::vector<std::unique_ptr<Decl>> decls_;

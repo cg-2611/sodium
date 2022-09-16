@@ -10,143 +10,71 @@ namespace sodium {
 
 class ASTVisitor;
 class Expr;
+class SourceRange;
 
-/**
- * @brief An enum of the different kinds of statements in Sodium.
- *
- */
+/// An enum of the different kinds of statements in Sodium.
 enum class StmtKind {
     BLOCK,
     RETURN
 };
 
-/**
- * @brief A derived class of ASTNode, and a base class for any statement in Sodium.
- *
- */
+/// A base class for any statement in Sodium.
 class Stmt : public ASTNode {
 public:
-    /**
-     * @brief Construct a new Stmt object.
-     *
-     * @param kind The kind of statement, must be one of StmtKind.
-     */
-    Stmt(StmtKind kind);
+    Stmt(const Stmt &) = delete;
+    Stmt &operator=(const Stmt &) = delete;
 
-    /**
-     * @brief Construct a new Stmt object by copying another Stmt.
-     *
-     * @param other The other Stmt being copied to construct this one.
-     */
-    Stmt(const Stmt &other) = default;
+    Stmt &operator=(Stmt &&) noexcept = delete;
+    Stmt(Stmt &&) noexcept = delete;
 
-    /**
-     * @brief Construct a new Stmt object by moving another Stmt.
-     *
-     * @param other The other Stmt being moved to construct this one,
-     */
-    Stmt(Stmt &&other) noexcept = default;
-
-    /**
-     * @brief Destroy the Stmt object.
-     *
-     */
     ~Stmt() override = default;
 
-    /**
-     * @brief Copy assignment operator.
-     *
-     * @param other The other Stmt being copied.
-     * @return Stmt& that is \c this Stmt after the assignment
-     */
-    Stmt &operator=(const Stmt &other) = default;
+    /// \return The kind of \c this statement.
+    [[nodiscard]] StmtKind stmt_kind() const;
 
-    /**
-     * @brief Move assignment operator.
-     *
-     * @param other The other Stmt being moved.
-     * @return Stmt& that is \c this Stmt after the assignment.
-     */
-    Stmt &operator=(Stmt &&other) noexcept = default;
-
-    /**
-     * @brief Used to accept, for a statement, an ASTVisitor derived class for use with the visitor pattern.
-     *        It is also overridden in derived classes of this class.
-     *
-     * @param visitor The visitor object being accepted by this expression.
-     */
-    void accept(ASTVisitor *visitor) const override;
-
-    /**
-     * @brief Accessor for the kind of this statement.
-     *
-     * @return StmtKind that is the kind of this statement.
-     */
-    StmtKind stmtKind() const noexcept;
+protected:
+    /// Constructor for Stmt.
+    /// \param kind The kind of statement.
+    /// \param range The range of the statement in the source code.
+    Stmt(StmtKind kind, SourceRange range);
 
 private:
     StmtKind kind_;
 };
 
-/**
- * @brief A derived class of Stmt, used to represent a block of statements in Sodium.
- *
- */
+/// A derived class of Stmt, used to represent a block of statements in Sodium.
 class Block : public Stmt {
 public:
-    /**
-     * @brief Construct a new Block object.
-     *
-     * @param stmts An std::vector<std::unique_ptr<Stmt> that are the statements in the block.
-     */
-    Block(std::vector<std::unique_ptr<Stmt>> stmts);
+    /// Constructor for Block.
+    /// \param stmts The statements in the block.
+    /// \param range The range of the start of the block in the source code.
+    Block(std::vector<std::unique_ptr<Stmt>> stmts, SourceRange range);
 
-    /**
-     * @brief Used to accept, for a block, an ASTVisitor derived class for use with the visitor pattern.
-     *        It calls the accept method of each statement in the vector of statements.
-     *
-     * @param visitor The visitor object being accepted by this block.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this block.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the list of declarations in the source file.
-     *
-     * @return const std::vector<std::unique_ptr<Stmt>>& that stores the statements in the block.
-     */
-    const std::vector<std::unique_ptr<Stmt>> &stmts() const noexcept;
+    /// \return The  statements in \c this block.
+    [[nodiscard]] const std::vector<std::unique_ptr<Stmt>> &stmts() const;
 
 private:
     std::vector<std::unique_ptr<Stmt>> stmts_;
 };
 
-/**
- * @brief A derived class of Stmt, used to represent a return statement in Sodium.
- *
- */
+/// A derived class of Stmt, used to represent a return statement in Sodium.
 class ReturnStmt : public Stmt {
 public:
-    /**
-     * @brief Construct a new ReturnStmt object.
-     *
-     * @param expr An std::unique_ptr<Expr> that is the expression being returned by the statement.
-     */
-    ReturnStmt(std::unique_ptr<Expr> expr);
+    /// Constructor for ReturnStmt.
+    /// \param expr The expression being returned by the statement.
+    /// \param range The range of the end of the return statement in the source code.
+    ReturnStmt(std::unique_ptr<Expr> expr, SourceRange range);
 
-    /**
-     * @brief Used to accept, for a return statement, an ASTVisitor derived class for use with the visitor pattern.
-     *        It class the accept method of the expression too.
-     *
-     * @param visitor The visitor object being accepted by this return statement.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this return statement.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the expression being returned by this statement.
-     *
-     * @return Expr* that is the expression being returned by this statement.
-     */
-    Expr *expr() const noexcept;
+    /// \return The expression being returned by \c this statement.
+    [[nodiscard]] Expr *expr() const;
 
 private:
     std::unique_ptr<Expr> expr_;

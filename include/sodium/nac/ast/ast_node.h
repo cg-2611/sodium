@@ -1,89 +1,54 @@
 #ifndef SODIUM_NAC_AST_AST_NODE_H
 #define SODIUM_NAC_AST_AST_NODE_H
 
-namespace sodium {
+#include "sodium/nac/basic/source_range.h"
 
-/**
- * @brief An enum of the different kinds of AST nodes.
- *
- */
-enum class ASTNodeKind {
-    SOURCE_FILE,
-    DECL,
-    EXPR,
-    STMT,
-    IDENTIFIER,
-    TYPE
-};
+namespace sodium {
 
 class ASTVisitor;
 
-/**
- * @brief A base class for all nodes in the AST.
- *
- */
+/// An enum of the different kinds of AST nodes.
+enum class ASTNodeKind {
+    DECL,
+    EXPR,
+    FUNC_SIGNATURE,
+    IDENTIFIER,
+    PARAMETER_LIST,
+    STMT,
+    SOURCE_FILE,
+    TYPE
+};
+
+/// A base class for all nodes in the AST.
 class ASTNode {
 public:
-    /**
-     * @brief Construct a new ASTNode object.
-     *
-     * @param kind The kind of the node, must be one of ASTNodeKind.
-     */
-    ASTNode(ASTNodeKind kind);
+    ASTNode(const ASTNode &) = default;
+    ASTNode &operator=(const ASTNode &) = default;
 
-    /**
-     * @brief Construct a new ASTNode object by copying another ASTNode.
-     *
-     * @param other The other ASTNode being copied to construct this one.
-     */
-    ASTNode(const ASTNode &other) = default;
+    ASTNode(ASTNode &&) noexcept = default;
+    ASTNode &operator=(ASTNode &&) noexcept = default;
 
-    /**
-     * @brief Construct a new ASTNode object by moving another ASTNode.
-     *
-     * @param other The other ASTNode being moved to construct this one,
-     */
-    ASTNode(ASTNode &&other) noexcept = default;
-
-    /**
-     * @brief Destroy the ASTNode object.
-     *
-     */
     virtual ~ASTNode() = default;
 
-    /**
-     * @brief Copy assignment operator.
-     *
-     * @param other The other ASTNode being copied.
-     * @return ASTNode& that is \c this ASTNode after the assignment
-     */
-    ASTNode &operator=(const ASTNode &other) = default;
+    /// Accepts an ASTVisitor for \c a derived AST node.
+    /// \param visitor The ASTVisitor being accepted by \c the derived AST node.
+    virtual void accept(ASTVisitor &visitor) const = 0;
 
-    /**
-     * @brief Move assignment operator.
-     *
-     * @param other The other ASTNode being moved.
-     * @return ASTNode& that is \c this ASTNode after the assignment.
-     */
-    ASTNode &operator=(ASTNode &&other) noexcept = default;
+    /// \return The kind of \c this node.
+    [[nodiscard]] ASTNodeKind node_kind() const;
 
-    /**
-     * @brief Pure virtual method. Must be overridden in derived classes.
-     *        Used to accept an ASTVisitor derived class for use with the visitor pattern.
-     *
-     * @param visitor The visitor object being accepted by this node.
-     */
-    virtual void accept(ASTVisitor *visitor) const = 0;
+    /// \return The range of \c this node in the source code.
+    [[nodiscard]] SourceRange range() const;
 
-    /**
-     * @brief Access the kind of this AST node.
-     *
-     * @return ASTNodeKind that is the kind of this node.
-     */
-    ASTNodeKind nodeKind() const noexcept;
+protected:
+    /// Constructor for ASTNode.
+    /// \param kind The kind of the node, must be one of ASTNodeKind.
+    /// \param range The range of the node in the source code.
+    ASTNode(ASTNodeKind kind, SourceRange range);
 
 private:
     ASTNodeKind kind_;
+    SourceRange range_;
 };
 
 } // namespace sodium

@@ -1,43 +1,32 @@
 #ifndef SODIUM_NAC_AST_IDENTIFIER_H
 #define SODIUM_NAC_AST_IDENTIFIER_H
 
-#include <string_view>
+#include <string>
 
 #include "sodium/nac/ast/ast_node.h"
 
 namespace sodium {
 
 class ASTVisitor;
+class SourceRange;
 
-/**
- * @brief A derived class of ASTNode, used to represent an identifier in Sodium.
- *
- */
+/// A derived class of ASTNode, used to represent an identifier in Sodium.
 class Identifier : public ASTNode {
 public:
-    /**
-     * @brief Construct a new Identifier object.
-     *
-     * @param value An std::string_view of the value of the identifier.
-     */
-    Identifier(std::string_view value);
+    /// Constructor for Identifier.
+    /// \param value The value of the identifier.
+    /// \param range The range of the identifier in the source code.
+    Identifier(std::string value, SourceRange range);
 
-    /**
-     * @brief Used to accept, for an identifier, an ASTVisitor derived class for use with the visitor pattern.
-     *
-     * @param visitor The visitor object being accepted by this identifier.
-     */
-    void accept(ASTVisitor *visitor) const override;
+    /// Accepts an ASTVisitor for \c this identifier.
+    /// \param visitor The ASTVisitor being accepted by \c this.
+    void accept(ASTVisitor &visitor) const override;
 
-    /**
-     * @brief Accessor for the value of this identifier.
-     *
-     * @return std::string_view that is the value of this identifier.
-     */
-    std::string_view value() const noexcept;
+    /// \return The value of \c this identifier.
+    [[nodiscard]] const std::string &value() const;
 
 private:
-    std::string_view value_;
+    std::string value_;
 };
 
 } // namespace sodium
