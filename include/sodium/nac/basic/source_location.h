@@ -3,41 +3,34 @@
 
 namespace sodium {
 
-/**
- * @brief Used to represent a location in a source file.
- *
- */
+class SourceRange;
+
+/// Used to represent a location in a source file.
 class SourceLocation {
 public:
-    /**
-     * @brief Construct a new Source Location object.
-     *
-     * @param line The line number of the location.
-     * @param column The column number of the location.
-     * @param position Pointer to the character at the location.
-     */
+    /// Constructor for SourceLocation object.
+    /// Creates an invalid SourceLocation with line and column numbers of -1 and a position of \c nullptr;
+    SourceLocation();
+
+    /// Construct for SourceLocation.
+    /// \param line The line number of the location.
+    /// \param column The column number of the location.
+    /// \param position Pointer to the character at the location.
     SourceLocation(int line, int column, const char *position);
 
-    /**
-     * @brief Get the line number of this location.
-     *
-     * @return \c int that is the line number of this location.
-     */
-    int line() const noexcept;
+    /// \return The line number of \c this location.
+    [[nodiscard]] int line() const;
 
-    /**
-     * @brief Get the column number of this location.
-     *
-     * @return \c int that is the column number of this location.
-     */
-    int column() const noexcept;
+    /// \return  The column number of \c this location.
+    [[nodiscard]] int column() const;
 
-    /**
-     * @brief Get a pointer to the character at this location.
-     *
-     * @return \c const \c char* to the character at this location.
-     */
-    const char *position() const noexcept;
+    /// \return The position of \c this location.
+    [[nodiscard]] const char *position() const;
+
+    /// \return \c true  if \c this location is a valid location in a Sodium source file.
+    [[nodiscard]] bool is_valid() const;
+
+    [[nodiscard]] SourceRange to(SourceLocation location) const;
 
 private:
     int line_;
