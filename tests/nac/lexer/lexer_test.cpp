@@ -2,170 +2,171 @@
 
 #include <string_view>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/token/token.h"
+#include "sodium/nac/token/token_kind.h"
 
 TEST(LexerTest, LexerReadsFuncKeyword) {
-    std::string_view func_keyword_string("func");
-    sodium::Lexer lexer(func_keyword_string);
-    sodium::Token token = lexer.get_next_token();
+    auto func_keyword_string = std::string_view("func");
+    auto lexer = sodium::Lexer(func_keyword_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::KEYWORD_FUNC, token.kind());
     EXPECT_EQ(func_keyword_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsReturnKeyword) {
-    std::string_view return_keyword_string("return");
-    sodium::Lexer lexer(return_keyword_string);
-    sodium::Token token = lexer.get_next_token();
+    auto return_keyword_string = std::string_view("return");
+    auto lexer = sodium::Lexer(return_keyword_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::KEYWORD_RETURN, token.kind());
     EXPECT_EQ(return_keyword_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsIntType) {
-    std::string_view int_type_string("int");
-    sodium::Lexer lexer(int_type_string);
-    sodium::Token token = lexer.get_next_token();
+    auto int_type_string = std::string_view("int");
+    auto lexer = sodium::Lexer(int_type_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::TYPE, token.kind());
     EXPECT_EQ(int_type_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsValidIdentifier) {
-    std::string_view identifier_string("identifier");
-    sodium::Lexer lexer(identifier_string);
-    sodium::Token token = lexer.get_next_token();
+    auto identifier_string = std::string_view("identifier");
+    auto lexer = sodium::Lexer(identifier_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::IDENTIFIER, token.kind());
     EXPECT_EQ(identifier_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsValidIdentifierWithUnderscorePrefix) {
-    std::string_view identifier_string("_identifier");
-    sodium::Lexer lexer(identifier_string);
-    sodium::Token token = lexer.get_next_token();
+    auto identifier_string = std::string_view("_identifier");
+    auto lexer = sodium::Lexer(identifier_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::IDENTIFIER, token.kind());
     EXPECT_EQ(identifier_string, token.value());
 }
 
-TEST(LexerTest, LexerReadsNumericLiteral) {
-    std::string_view numeric_literal_string("2");
-    sodium::Lexer lexer(numeric_literal_string);
-    sodium::Token token = lexer.get_next_token();
+TEST(LexerTest, LexerReadsIntegerLiteral) {
+    auto integer_literal_string = std::string_view("2");
+    auto lexer = sodium::Lexer(integer_literal_string);
+    auto token = lexer.next_token();
 
-    EXPECT_EQ(sodium::TokenKind::NUMERIC_LITERAL, token.kind());
-    EXPECT_EQ(numeric_literal_string, token.value());
+    EXPECT_EQ(sodium::TokenKind::INTEGER_LITERAL, token.kind());
+    EXPECT_EQ(integer_literal_string, token.value());
 }
 
-TEST(LexerTest, LexerReadsNumericLiteralWithMultipleDigits) {
-    std::string_view numeric_literal_string("123456789");
-    sodium::Lexer lexer(numeric_literal_string);
-    sodium::Token token = lexer.get_next_token();
+TEST(LexerTest, LexerReadsIntegerLiteralWithMultipleDigits) {
+    auto integer_literal_string = std::string_view("123456789");
+    auto lexer = sodium::Lexer(integer_literal_string);
+    auto token = lexer.next_token();
 
-    EXPECT_EQ(sodium::TokenKind::NUMERIC_LITERAL, token.kind());
-    EXPECT_EQ(numeric_literal_string, token.value());
+    EXPECT_EQ(sodium::TokenKind::INTEGER_LITERAL, token.kind());
+    EXPECT_EQ(integer_literal_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsLeftBrace) {
-    std::string_view left_brace_string("{");
-    sodium::Lexer lexer(left_brace_string);
-    sodium::Token token = lexer.get_next_token();
+    auto left_brace_string = std::string_view("{");
+    auto lexer = sodium::Lexer(left_brace_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::LEFT_BRACE, token.kind());
     EXPECT_EQ(left_brace_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsRightBrace) {
-    std::string_view right_brace_string("}");
-    sodium::Lexer lexer(right_brace_string);
-    sodium::Token token = lexer.get_next_token();
+    auto right_brace_string = std::string_view("}");
+    auto lexer = sodium::Lexer(right_brace_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::RIGHT_BRACE, token.kind());
     EXPECT_EQ(right_brace_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsLeftParen) {
-    std::string_view leftParen_string("(");
-    sodium::Lexer lexer(leftParen_string);
-    sodium::Token token = lexer.get_next_token();
+    auto left_paren_string = std::string_view("(");
+    auto lexer = sodium::Lexer(left_paren_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::LEFT_PAREN, token.kind());
-    EXPECT_EQ(leftParen_string, token.value());
+    EXPECT_EQ(left_paren_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsRightParen) {
-    std::string_view rightParen_string(")");
-    sodium::Lexer lexer(rightParen_string);
-    sodium::Token token = lexer.get_next_token();
+    auto right_paren_string = std::string_view(")");
+    auto lexer = sodium::Lexer(right_paren_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::RIGHT_PAREN, token.kind());
-    EXPECT_EQ(rightParen_string, token.value());
+    EXPECT_EQ(right_paren_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsSemicolon) {
-    std::string_view semicolon_string(";");
-    sodium::Lexer lexer(semicolon_string);
-    sodium::Token token = lexer.get_next_token();
+    auto semicolon_string = std::string_view(";");
+    auto lexer = sodium::Lexer(semicolon_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::SEMICOLON, token.kind());
     EXPECT_EQ(semicolon_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsArrow) {
-    std::string_view arrow_string("->");
-    sodium::Lexer lexer(arrow_string);
-    sodium::Token token = lexer.get_next_token();
+    auto arrow_string = std::string_view("->");
+    auto lexer = sodium::Lexer(arrow_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::ARROW, token.kind());
     EXPECT_EQ(arrow_string, token.value());
 }
 
 TEST(LexerTest, LexerReadsEmpty_string) {
-    std::string_view empty_string("");
-    sodium::Lexer lexer(empty_string);
-    sodium::Token token = lexer.get_next_token();
+    auto empty_string = std::string_view("");
+    auto lexer = sodium::Lexer(empty_string);
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::EOF_TOKEN, token.kind());
     EXPECT_EQ(empty_string, token.value());
 }
 
 TEST(LexerTest, LexerSkipsWhitespace1) {
-    sodium::Lexer lexer("  \n  \t \r\f \v   ");
-    sodium::Token token = lexer.get_next_token();
+    auto lexer = sodium::Lexer("  \n  \t \r\f \v   ");
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::EOF_TOKEN, token.kind());
     EXPECT_EQ("", token.value());
 }
 
 TEST(LexerTest, LexerSkipsWhitespace2) {
-    sodium::Lexer lexer("   \n\n \t \ridentifier\f \v   ");
-    sodium::Token token = lexer.get_next_token();
+    auto lexer = sodium::Lexer("   \n\n \t \ridentifier\f \v   ");
+    auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::IDENTIFIER, token.kind());
     EXPECT_EQ("identifier", token.value());
 }
 
+TEST(LexerTest, LexerRejectsInvalidToken) {
+    auto lexer = sodium::Lexer("$");
+    auto token = lexer.next_token();
+
+    EXPECT_TRUE(sodium::ErrorManager::has_errors());
+}
+
 TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
-    sodium::Lexer lexer("$identifier");
-    sodium::Token token = lexer.get_next_token();
+    auto lexer = sodium::Lexer("$identifier");
+    auto token = lexer.next_token();
 
     EXPECT_TRUE(sodium::ErrorManager::has_errors());
 }
 
 TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
-    sodium::Lexer lexer("ident$ifier");
-    sodium::Token token = lexer.get_next_token();
-
-    EXPECT_TRUE(sodium::ErrorManager::has_errors());
-}
-
-TEST(LexerTest, LexerRejectsInvalidToken) {
-    sodium::Lexer lexer("$");
-    sodium::Token token = lexer.get_next_token();
+    auto lexer = sodium::Lexer("ident$ifier");
+    auto token = lexer.next_token();
 
     EXPECT_TRUE(sodium::ErrorManager::has_errors());
 }
