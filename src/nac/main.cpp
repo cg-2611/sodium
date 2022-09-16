@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "sodium/nac/io/file.h"
+#include "sodium/nac/basic/file.h"
 #include "sodium/nac/nac.h"
 
 int main(int argc, const char *argv[]) {
@@ -16,6 +16,8 @@ int main(int argc, const char *argv[]) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
+
+    std::cout << "[nac]: compilation complete\n"; // temporary
 
     return EXIT_SUCCESS;
 }

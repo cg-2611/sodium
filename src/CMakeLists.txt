@@ -12,9 +12,10 @@ add_subdirectory(nac/ast)
 add_subdirectory(nac/basic)
 add_subdirectory(nac/errors)
 add_subdirectory(nac/exceptions)
-add_subdirectory(nac/io)
 add_subdirectory(nac/lexer)
 add_subdirectory(nac/parser)
+add_subdirectory(nac/token)
+add_subdirectory(nac/util)
 
 # for nac target
 target_compile_features(nac PRIVATE cxx_std_20)

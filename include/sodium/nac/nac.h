@@ -7,8 +7,8 @@ class File;
 
 /// --- UNFINISHED ---
 /// Compiles a given sodium file.
-/// @param file path to sodium file to be compiled.
-void compileFile(const File &file);
+/// \param file  The file to be compiled.
+void compile_file(const File &file);
 
 } // namespace sodium
 
