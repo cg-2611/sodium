@@ -28,7 +28,7 @@ public:
     [[nodiscard]] int length() const;
 
     /// \return The value of \c this token.
-    [[nodiscard]] const std::string &value() const;
+    [[nodiscard]] std::string value() const;
 
     static Token dummy();
 
@@ -36,7 +36,6 @@ private:
     TokenKind kind_;
     SourceRange range_;
     int length_;
-    std::string value_;
 };
 
 } // namespace sodium

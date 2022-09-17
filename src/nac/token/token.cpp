@@ -7,11 +7,7 @@
 
 namespace sodium {
 
-Token::Token(TokenKind kind, SourceRange range, int length)
-        : kind_(kind),
-          range_(range),
-          length_(length),
-          value_(range.start().position(), length) {}
+Token::Token(TokenKind kind, SourceRange range, int length) : kind_(kind), range_(range), length_(length) {}
 
 TokenKind Token::kind() const {
     return kind_;
@@ -25,8 +21,8 @@ int Token::length() const {
     return length_;
 }
 
-const std::string &Token::value() const {
-    return value_;
+std::string Token::value() const {
+    return std::string(range_.start().position(), length_);
 }
 
 Token Token::dummy() {
