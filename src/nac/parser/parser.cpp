@@ -1,6 +1,5 @@
 #include "sodium/nac/parser/parser.h"
 
-#include <initializer_list>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -39,7 +38,7 @@ std::unique_ptr<SourceFile> Parser::parse_source_file() {
     while (!match(TokenKind::EOF_TOKEN)) {
         auto decl = parse_decl();
         if (!decl) {
-            synchronize({TokenKind::KEYWORD_FUNC});
+            synchronize_decl();
             continue;
         }
 
@@ -95,12 +94,25 @@ void Parser::error_expected(std::string_view message) const {
     ErrorManager::add_error<ParserError>(ErrorKind::SYNTAX_ERROR, token_, error_message);
 }
 
-void Parser::synchronize(std::initializer_list<TokenKind> synchronizing_tokens) {
+void Parser::synchronize_decl() {
     while (!match(TokenKind::EOF_TOKEN)) {
-        for (auto &&synchronizing_token : synchronizing_tokens) {
-            if (match(synchronizing_token)) {
-                return;
-            }
+        if (match(TokenKind::KEYWORD_FUNC)) {
+            break;
+        }
+
+        advance();
+    }
+}
+
+void Parser::synchronize_stmt() {
+    while (!match(TokenKind::EOF_TOKEN)) {
+        if (match(TokenKind::LEFT_BRACE) || match(TokenKind::RIGHT_BRACE)) {
+            break;
+        }
+
+        if (match(TokenKind::SEMICOLON)) {
+            advance();
+            break;
         }
 
         advance();

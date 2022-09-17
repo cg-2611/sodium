@@ -34,7 +34,7 @@ std::unique_ptr<Block> Parser::parse_block() {
     while (!match(TokenKind::RIGHT_BRACE) && !match(TokenKind::EOF_TOKEN)) {
         auto stmt = parse_stmt();
         if (!stmt) {
-            synchronize({TokenKind::LEFT_BRACE, TokenKind::RIGHT_BRACE, TokenKind::SEMICOLON});
+            synchronize_stmt();
             continue;
         }
 

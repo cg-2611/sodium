@@ -1,7 +1,6 @@
 #ifndef SODIUM_NAC_PARSER_PARSER_H
 #define SODIUM_NAC_PARSER_PARSER_H
 
-#include <initializer_list>
 #include <memory>
 #include <string_view>
 
@@ -108,9 +107,13 @@ private:
     // reports the error described by message
     void error_expected(std::string_view message) const;
 
-    // used for error recovery, advances until any one of the token kinds in synchronizing_tokens is matched.
+    // used for error recovery when failing to parse a declaration
     // parsing is ready to resume after this function returns
-    void synchronize(std::initializer_list<TokenKind> synchronizing_tokens);
+    void synchronize_decl();
+
+    // used for error recovery when failing to parse a statement
+    // parsing is ready to resume after this function returns
+    void synchronize_stmt();
 };
 
 } // namespace sodium
