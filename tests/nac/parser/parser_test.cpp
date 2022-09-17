@@ -9,13 +9,17 @@
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/type.h"
+#include "sodium/nac/lexer/lexer.h"
 
 /*
     tests source file:
 
 */
 TEST(ParserTest, ParserCorrectlyParsesAnEmptySourceFile) {
-    auto parser = sodium::Parser("");
+    auto src = std::string_view("");
+    auto token_buffer = sodium::Lexer(src).tokenize();
+
+    auto parser = sodium::Parser(token_buffer);
     auto source_file = parser.parse_source_file();
 
     EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
@@ -28,8 +32,9 @@ TEST(ParserTest, ParserCorrectlyParsesAnEmptySourceFile) {
 */
 TEST(ParserTest, ParserCorrectlyParsesASourceFileWithASingleDeclaration) {
     auto src = std::string_view("func name() -> int {}");
+    auto token_buffer = sodium::Lexer(src).tokenize();
 
-    auto parser = sodium::Parser(src);
+    auto parser = sodium::Parser(token_buffer);
     auto source_file = parser.parse_source_file();
 
     EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
@@ -47,8 +52,9 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithASingleDeclaration) {
 TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
     auto src = std::string_view("func name1() -> int {}\n"
                                 "func name2() -> int {}");
+    auto token_buffer = sodium::Lexer(src).tokenize();
 
-    auto parser = sodium::Parser(src);
+    auto parser = sodium::Parser(token_buffer);
     auto source_file = parser.parse_source_file();
 
     EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
@@ -65,13 +71,14 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
         identifier
 */
 TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
-    auto identifier_string = std::string_view("identifier");
+    auto src = std::string_view("identifier");
+    auto token_buffer = sodium::Lexer(src).tokenize();
 
-    auto parser = sodium::Parser(identifier_string);
+    auto parser = sodium::Parser(token_buffer);
     auto identifier_node = parser.parse_identifier();
 
     EXPECT_EQ(sodium::ASTNodeKind::IDENTIFIER, identifier_node->node_kind());
-    EXPECT_EQ(identifier_string, identifier_node->value());
+    EXPECT_EQ(src, identifier_node->value());
 }
 
 /*
@@ -79,11 +86,12 @@ TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
         int
 */
 TEST(ParserTest, ParserCorrectlyParsesAType) {
-    auto type_string = std::string_view("int");
+    auto src = std::string_view("int");
+    auto token_buffer = sodium::Lexer(src).tokenize();
 
-    auto parser = sodium::Parser(type_string);
+    auto parser = sodium::Parser(token_buffer);
     auto type_node = parser.parse_type();
 
     EXPECT_EQ(sodium::ASTNodeKind::TYPE, type_node->node_kind());
-    EXPECT_EQ(type_string, type_node->name());
+    EXPECT_EQ(src, type_node->name());
 }

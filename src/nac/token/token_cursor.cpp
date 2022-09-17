@@ -7,9 +7,7 @@
 
 namespace sodium {
 
-TokenCursor::TokenCursor(const TokenBuffer &token_buffer)
-        : token_buffer_(std::make_unique<TokenBuffer>(token_buffer)),
-          index_(-1) {}
+TokenCursor::TokenCursor(const TokenBuffer &token_buffer) : token_buffer_(&token_buffer), index_(-1) {}
 
 std::optional<Token> TokenCursor::next() {
     return token_buffer_->get(++index_);

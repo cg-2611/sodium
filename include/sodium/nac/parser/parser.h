@@ -17,8 +17,6 @@
 namespace sodium {
 
 class AST;
-class File;
-class Lexer;
 class TokenBuffer;
 
 enum class TokenKind;
@@ -29,18 +27,6 @@ public:
     /// Constructor for Parser.
     /// \param token_buffer The tokens to be parsed.
     Parser(const TokenBuffer &token_buffer);
-
-    /// Constructor for Parser.
-    /// \param lexer The Lexer to be used to generate the tokens to be parsed.
-    Parser(Lexer &lexer);
-
-    /// Constructor for Parser.
-    /// \param file The file of which the contents are to be parsed.
-    Parser(const File &file);
-
-    /// Constructor for Parser.
-    /// \param src The string to be parsed.
-    Parser(std::string_view src);
 
     /// Parses Sodium programming language tokens into an AST.
     /// \return The AST formed of the parsed tokens.

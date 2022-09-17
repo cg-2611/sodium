@@ -11,13 +11,11 @@
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/type.h"
-#include "sodium/nac/basic/file.h"
 #include "sodium/nac/basic/source_location.h"
 #include "sodium/nac/basic/source_range.h"
 #include "sodium/nac/errors/error.h"
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/parser_error.h"
-#include "sodium/nac/lexer/lexer.h"
 #include "sodium/nac/token/token.h"
 #include "sodium/nac/token/token_buffer.h"
 #include "sodium/nac/token/token_cursor.h"
@@ -28,12 +26,6 @@ namespace sodium {
 Parser::Parser(const TokenBuffer &token_buffer) : token_cursor_(token_buffer), token_(Token::dummy()) {
     advance();
 }
-
-Parser::Parser(Lexer &lexer) : Parser(lexer.tokenize()) {}
-
-Parser::Parser(const File &file) : Parser(Lexer(file).tokenize()) {}
-
-Parser::Parser(std::string_view src) : Parser(Lexer(src).tokenize()) {}
 
 AST Parser::parse() {
     // a source file is the root of the AST

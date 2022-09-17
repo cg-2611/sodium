@@ -31,7 +31,7 @@ public:
     [[nodiscard]] size_t index() const;
 
 private:
-    std::unique_ptr<TokenBuffer> token_buffer_;
+    const TokenBuffer *token_buffer_;
     size_t index_;
 };
 

@@ -6,13 +6,17 @@
 
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/expr.h"
+#include "sodium/nac/lexer/lexer.h"
 
 /*
     tests expression:
         2
 */
 TEST(ParseExprTest, ParserCorrectlyDispatchesToParseAIntegerLiteralExpression) {
-    auto parser = sodium::Parser("2");
+    auto src = std::string_view("2");
+    auto token_buffer = sodium::Lexer(src).tokenize();
+
+    auto parser = sodium::Parser(token_buffer);
     auto expr = parser.parse_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, expr->node_kind());
@@ -24,7 +28,10 @@ TEST(ParseExprTest, ParserCorrectlyDispatchesToParseAIntegerLiteralExpression) {
         2
 */
 TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitIntegerLiteral) {
-    auto parser = sodium::Parser("2");
+    auto src = std::string_view("2");
+    auto token_buffer = sodium::Lexer(src).tokenize();
+
+    auto parser = sodium::Parser(token_buffer);
     auto integer_literal_expr = parser.parse_integer_literal_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, integer_literal_expr->node_kind());
@@ -38,7 +45,10 @@ TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitIntegerLiteral) {
         567
 */
 TEST(ParseExprTest, ParserCorrectlyParsesAMultiDigitIntegerLiteral) {
-    auto parser = sodium::Parser("567");
+    auto src = std::string_view("567");
+    auto token_buffer = sodium::Lexer(src).tokenize();
+
+    auto parser = sodium::Parser(token_buffer);
     auto integer_literal_expr = parser.parse_integer_literal_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, integer_literal_expr->node_kind());
