@@ -18,7 +18,6 @@
 #include "sodium/nac/token/token.h"
 #include "sodium/nac/token/token_buffer.h"
 #include "sodium/nac/token/token_cursor.h"
-#include "sodium/nac/token/token_kind.h"
 
 namespace sodium {
 

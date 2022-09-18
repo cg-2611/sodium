@@ -6,7 +6,6 @@
 
 #include "sodium/nac/basic/source_location.h"
 #include "sodium/nac/token/token.h"
-#include "sodium/nac/token/token_kind.h"
 
 namespace sodium {
 

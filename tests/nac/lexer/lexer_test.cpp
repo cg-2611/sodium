@@ -6,7 +6,6 @@
 
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/token/token.h"
-#include "sodium/nac/token/token_kind.h"
 
 TEST(LexerTest, LexerReadsFuncKeyword) {
     auto func_keyword_string = std::string_view("func");

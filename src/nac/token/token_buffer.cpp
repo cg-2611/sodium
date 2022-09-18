@@ -14,12 +14,8 @@ TokenBuffer::TokenBuffer(const Token &token) {
     push(token);
 }
 
-TokenBuffer::TokenBuffer(Token &&token) {
-    push(std::move(token));
-}
-
-void TokenBuffer::push(Token token) {
-    tokens_.push_back(std::move(token));
+void TokenBuffer::push(const Token &token) {
+    tokens_.push_back(token);
 }
 
 std::optional<Token> TokenBuffer::get(size_t index) const {

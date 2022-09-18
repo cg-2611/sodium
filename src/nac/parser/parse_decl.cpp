@@ -10,7 +10,6 @@
 #include "sodium/nac/errors/error_manager.h"
 #include "sodium/nac/errors/parser_error.h"
 #include "sodium/nac/token/token.h"
-#include "sodium/nac/token/token_kind.h"
 
 namespace sodium {
 

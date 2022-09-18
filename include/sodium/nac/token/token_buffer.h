@@ -22,13 +22,9 @@ public:
     /// \param token A token that is to be pushed into the TokenBuffer on construction.
     TokenBuffer(const Token &token);
 
-    /// Constructor for TokenBuffer.
-    /// \param token A token that is to be pushed into the TokenBuffer on construction.
-    TokenBuffer(Token &&token);
-
     /// Append a token to the end of \c this token buffer.
     /// \param token The token to be pushed.
-    void push(Token token);
+    void push(const Token &token);
 
     /// \return An to std::optional<Token> with a value of the token at the specified index if the access into the
     /// vector was successful, or \c nullopt otherwise
