@@ -1,3 +1,4 @@
+#include "sodium/nac/diagnostics/diagnostic.h"
 #include "sodium/nac/lexer/lexer.h"
 
 #include <optional>
@@ -6,6 +7,7 @@
 #include "gtest/gtest.h"
 
 #include "sodium/nac/diagnostics/diagnostic_engine.h"
+#include "sodium/nac/lexer/lexer_diagnostics.h"
 #include "sodium/nac/token/token.h"
 #include "sodium/nac/token/token_buffer.h"
 
@@ -284,7 +286,7 @@ TEST(LexerTest, LexerReadsMultipleTokens) {
     EXPECT_EQ(0, diagnostics.count());
 }
 
-TEST(LexerTest, LexerRejectsInvalidToken) {
+TEST(LexerTest, LexerRejectsInvalidTokenAndDiagnosesLexerError) {
     auto diagnostics = sodium::DiagnosticEngine();
 
     auto lexer = sodium::Lexer("$", diagnostics);
@@ -294,11 +296,19 @@ TEST(LexerTest, LexerRejectsInvalidToken) {
     EXPECT_EQ("$", token.value());
 
     EXPECT_TRUE(diagnostics.has_problems());
-    EXPECT_EQ(1, diagnostics.count());
     EXPECT_EQ(1, diagnostics.count_errors());
+
+    ASSERT_EQ(1, diagnostics.count());
+
+    auto *diagnostic = diagnostics.get(0);
+    ASSERT_NE(nullptr, diagnostic);
+
+    auto *lexer_error = dynamic_cast<sodium::LexerError *>(diagnostic);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, lexer_error->diagnostic_kind());
+    EXPECT_EQ(sodium::LexerErrorKind::UNRECOGNISED_TOKEN, lexer_error->kind());
 }
 
-TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
+TEST(LexerTest, LexerRejectsInvalidIdentifierAndDiagnosesLexerError1) {
     auto diagnostics = sodium::DiagnosticEngine();
 
     auto lexer = sodium::Lexer("$identifier", diagnostics);
@@ -308,11 +318,19 @@ TEST(LexerTest, LexerRejectsInvalidIdentifier1) {
     EXPECT_EQ("$", token.value());
 
     EXPECT_TRUE(diagnostics.has_problems());
-    EXPECT_EQ(1, diagnostics.count());
     EXPECT_EQ(1, diagnostics.count_errors());
+
+    ASSERT_EQ(1, diagnostics.count());
+
+    auto *diagnostic = diagnostics.get(0);
+    ASSERT_NE(nullptr, diagnostic);
+
+    auto *lexer_error = dynamic_cast<sodium::LexerError *>(diagnostic);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, lexer_error->diagnostic_kind());
+    EXPECT_EQ(sodium::LexerErrorKind::UNRECOGNISED_TOKEN, lexer_error->kind());
 }
 
-TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
+TEST(LexerTest, LexerRejectsInvalidIdentifierAndDiagnosesLexerError2) {
     auto diagnostics = sodium::DiagnosticEngine();
 
     auto lexer = sodium::Lexer("ident$ifier", diagnostics);
@@ -324,6 +342,14 @@ TEST(LexerTest, LexerRejectsInvalidIdentifier2) {
     EXPECT_EQ("$", token.value());
 
     EXPECT_TRUE(diagnostics.has_problems());
-    EXPECT_EQ(1, diagnostics.count());
     EXPECT_EQ(1, diagnostics.count_errors());
+
+    ASSERT_EQ(1, diagnostics.count());
+
+    auto *diagnostic = diagnostics.get(0);
+    ASSERT_NE(nullptr, diagnostic);
+
+    auto *lexer_error = dynamic_cast<sodium::LexerError *>(diagnostic);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, lexer_error->diagnostic_kind());
+    EXPECT_EQ(sodium::LexerErrorKind::UNRECOGNISED_TOKEN, lexer_error->kind());
 }
