@@ -49,7 +49,7 @@ public:
     virtual void visit(const ReturnStmt &return_stmt) = 0;
 
     /// Visit a IntegerLiteralExpr AST node.
-    /// \param integer_literal_expr The numericLiteralExpr being visited.
+    /// \param integer_literal_expr The integerLiteralExpr being visited.
     virtual void visit(const IntegerLiteralExpr &integer_literal_expr) = 0;
 
     /// Visit a Identifier AST node.

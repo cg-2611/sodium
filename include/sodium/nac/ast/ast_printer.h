@@ -48,8 +48,8 @@ public:
     /// \param parameter_list The parameter list to be printed.
     void visit(const ParameterList &parameter_list) override;
 
-    /// Prints a numeric literal.
-    /// \param integer_literal_expr The numeric literal to be printed.
+    /// Prints a integer literal.
+    /// \param integer_literal_expr The integer literal to be printed.
     void visit(const IntegerLiteralExpr &integer_literal_expr) override;
 
     /// Prints a block.
