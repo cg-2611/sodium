@@ -14,16 +14,19 @@
         2
 */
 TEST(ParseExprTest, ParserCorrectlyDispatchesToParseAIntegerLiteralExpression) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("2");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto expr = parser.parse_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, expr->node_kind());
     EXPECT_EQ(sodium::ExprKind::INTEGER_LITERAL, expr->expr_kind());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
 
 /*
@@ -31,18 +34,20 @@ TEST(ParseExprTest, ParserCorrectlyDispatchesToParseAIntegerLiteralExpression) {
         2
 */
 TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitIntegerLiteral) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("2");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto integer_literal_expr = parser.parse_integer_literal_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, integer_literal_expr->node_kind());
     EXPECT_EQ(sodium::ExprKind::INTEGER_LITERAL, integer_literal_expr->expr_kind());
-
     EXPECT_EQ(2, integer_literal_expr->value());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
 
 /*
@@ -50,16 +55,18 @@ TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitIntegerLiteral) {
         567
 */
 TEST(ParseExprTest, ParserCorrectlyParsesAMultiDigitIntegerLiteral) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("567");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto integer_literal_expr = parser.parse_integer_literal_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, integer_literal_expr->node_kind());
     EXPECT_EQ(sodium::ExprKind::INTEGER_LITERAL, integer_literal_expr->expr_kind());
-
     EXPECT_EQ(567, integer_literal_expr->value());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }

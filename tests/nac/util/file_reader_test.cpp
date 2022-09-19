@@ -1,6 +1,5 @@
 #include "sodium/nac/util/file_reader.h"
 
-#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <optional>

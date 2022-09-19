@@ -17,16 +17,19 @@
 
 */
 TEST(ParserTest, ParserCorrectlyParsesAnEmptySourceFile) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto source_file = parser.parse_source_file();
 
     EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
     EXPECT_EQ(0, source_file->decls().size());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
 
 /*
@@ -34,12 +37,12 @@ TEST(ParserTest, ParserCorrectlyParsesAnEmptySourceFile) {
         func name() -> int {}
 */
 TEST(ParserTest, ParserCorrectlyParsesASourceFileWithASingleDeclaration) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("func name() -> int {}");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto source_file = parser.parse_source_file();
 
     EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
@@ -47,6 +50,9 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithASingleDeclaration) {
     ASSERT_EQ(1, source_file->decls().size());
     EXPECT_EQ(sodium::ASTNodeKind::DECL, source_file->decls()[0]->node_kind());
     EXPECT_EQ(sodium::DeclKind::FUNC, source_file->decls()[0]->decl_kind());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
 
 /*
@@ -55,13 +61,13 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithASingleDeclaration) {
         func name2() -> int {}
 */
 TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("func name1() -> int {}\n"
                                 "func name2() -> int {}");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto source_file = parser.parse_source_file();
 
     EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
@@ -71,6 +77,9 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
     EXPECT_EQ(sodium::DeclKind::FUNC, source_file->decls()[0]->decl_kind());
     EXPECT_EQ(sodium::ASTNodeKind::DECL, source_file->decls()[1]->node_kind());
     EXPECT_EQ(sodium::DeclKind::FUNC, source_file->decls()[1]->decl_kind());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
 
 /*
@@ -78,16 +87,19 @@ TEST(ParserTest, ParserCorrectlyParsesASourceFileWithMultipleDeclarations) {
         identifier
 */
 TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("identifier");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto identifier_node = parser.parse_identifier();
 
     EXPECT_EQ(sodium::ASTNodeKind::IDENTIFIER, identifier_node->node_kind());
     EXPECT_EQ(src, identifier_node->value());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
 
 /*
@@ -95,14 +107,17 @@ TEST(ParserTest, ParserCorrectlyParsesAnIdentifier) {
         int
 */
 TEST(ParserTest, ParserCorrectlyParsesAType) {
-    auto _ = sodium::DiagnosticEngine();
+    auto diagnostics = sodium::DiagnosticEngine();
 
     auto src = std::string_view("int");
-    auto token_buffer = sodium::Lexer(src, _).tokenize();
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
 
-    auto parser = sodium::Parser(token_buffer, _);
+    auto parser = sodium::Parser(token_buffer, diagnostics);
     auto type_node = parser.parse_type();
 
     EXPECT_EQ(sodium::ASTNodeKind::TYPE, type_node->node_kind());
     EXPECT_EQ(src, type_node->name());
+
+    EXPECT_FALSE(diagnostics.has_problems());
+    EXPECT_EQ(0, diagnostics.count());
 }
