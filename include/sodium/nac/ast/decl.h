@@ -36,7 +36,7 @@ public:
 
 protected:
     /// Constructor for Decl.
-    /// \param kind The kind of declaration.
+    /// \param kind The kind of the declaration.
     /// \param range The range of the declaration in the source code.
     Decl(DeclKind kind, SourceRange range);
 

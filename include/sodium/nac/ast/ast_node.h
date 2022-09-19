@@ -42,7 +42,7 @@ public:
 
 protected:
     /// Constructor for ASTNode.
-    /// \param kind The kind of the node, must be one of ASTNodeKind.
+    /// \param kind The kind of the node.
     /// \param range The range of the node in the source code.
     ASTNode(ASTNodeKind kind, SourceRange range);
 

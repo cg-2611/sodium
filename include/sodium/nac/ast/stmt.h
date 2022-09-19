@@ -34,7 +34,7 @@ public:
 
 protected:
     /// Constructor for Stmt.
-    /// \param kind The kind of statement.
+    /// \param kind The kind of the statement.
     /// \param range The range of the statement in the source code.
     Stmt(StmtKind kind, SourceRange range);
 
