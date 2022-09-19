@@ -37,7 +37,7 @@ ReservedWord = Keyword | Type ;
 Keyword = "func" | "return" ;
 Type = "int" ;
 
-Punctuation = "->" | "{" | "}" | "(" | ")" ;
+Punctuation = "->" | "{" | "}" | "(" | ")" | ";" ;
 
 Identifier = IdentifierHead IdentifierCharacter* ;
 IdentifierHead = "_" | LETTER ;
