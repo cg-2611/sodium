@@ -8,7 +8,9 @@ class File;
 /// --- UNFINISHED ---
 /// Compiles a given sodium file.
 /// \param file  The file to be compiled.
-void compile_file(const File &file);
+/// \return \c true if the file was compiled successfully, or \c false if there were problems diagnosed during the
+/// compilation of the file.
+bool compile_file(const File &file);
 
 } // namespace sodium
 

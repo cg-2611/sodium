@@ -2,10 +2,11 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
+#include <optional>
+#include <string>
 
 #include "gtest/gtest.h"
-
-#include "sodium/nac/exceptions/io_exception.h"
 
 // operator / is overloaded to concatenate file path in std::filesystem
 static const std::filesystem::path TEMP_DIRECTORY_PATH = std::filesystem::temp_directory_path() / "sodium_test_files";
@@ -18,19 +19,23 @@ protected:
     static void SetUpTestSuite() {
         std::filesystem::create_directory(TEMP_DIRECTORY_PATH);
 
-        std::unique_ptr<std::FILE, decltype(&std::fclose)> empty_file(std::fopen(EMPTY_FILE_PATH.c_str(), "w"),
-                                                                      &std::fclose);
-        if (!empty_file) {
+        auto empty_file = std::ofstream(EMPTY_FILE_PATH);
+
+        if (!empty_file.is_open()) {
             FAIL() << "FileReaderTest: error creating temporary file: " << EMPTY_FILE_PATH << '\n';
         }
 
-        std::unique_ptr<std::FILE, decltype(&std::fclose)> temp_file(std::fopen(TEST_FILE_PATH.c_str(), "w"),
-                                                                     &std::fclose);
-        if (!temp_file) {
+        empty_file.close();
+
+        auto temp_file = std::ofstream(TEST_FILE_PATH);
+
+        if (!temp_file.is_open()) {
             FAIL() << "FileReaderTest: error creating temporary file: " << TEST_FILE_PATH << '\n';
         }
 
-        std::fputs(TEST_FILE_TEXT.c_str(), temp_file.get());
+        temp_file << TEST_FILE_TEXT;
+
+        temp_file.close();
     }
 
     static void TearDownTestSuite() {
@@ -44,7 +49,9 @@ protected:
 };
 
 TEST_F(FileReaderTest, AnExceptionIsThrownWhenTheFileDoesNotExist) {
-    EXPECT_THROW(auto _ = sodium::util::read_file("./file_that_does_not_exist.txt"), sodium::IOException);
+    auto file_contents = sodium::util::read_file("./file_that_does_not_exist.txt");
+
+    EXPECT_FALSE(file_contents.has_value());
 }
 
 TEST_F(FileReaderTest, FileContentsAreSuccessfullyRead) {

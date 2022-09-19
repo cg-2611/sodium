@@ -18,15 +18,13 @@ enum class TokenKind {
     IDENTIFIER,
     INTEGER_LITERAL,
 
-    // one character tokens
+    // punctuation
+    ARROW,
     LEFT_BRACE,
     RIGHT_BRACE,
     LEFT_PAREN,
     RIGHT_PAREN,
     SEMICOLON,
-
-    // two character tokens
-    ARROW,
 
     // miscellaneous tokens
     EOF_TOKEN,

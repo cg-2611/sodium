@@ -10,7 +10,6 @@ namespace sodium::util {
 /// \param file_path The path to the file of which the contents are to be read.
 /// \return An std::optional<std::string> that has the value of the contents of the file as a string if reading the file
 /// was successful, or \c nullopt otherwise.
-///  \throws An IOException when the file fails to be opened, or when the file is failed to be read.
 std::optional<std::string> read_file(const std::string &file_path);
 
 } // namespace sodium::util

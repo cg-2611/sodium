@@ -7,8 +7,7 @@
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/type.h"
 #include "sodium/nac/basic/source_range.h"
-#include "sodium/nac/errors/error_manager.h"
-#include "sodium/nac/errors/parser_error.h"
+#include "sodium/nac/parser/parser_diagnostics.h"
 #include "sodium/nac/token/token.h"
 
 namespace sodium {
@@ -16,7 +15,7 @@ namespace sodium {
 std::unique_ptr<Decl> Parser::parse_decl() {
     switch (token_.kind()) {
         case TokenKind::KEYWORD_FUNC: return parse_func_decl();
-        default: error_expected("declaration"); return nullptr;
+        default: error_expected(ParserErrorKind::EXPECTED_DECLARATION); return nullptr;
     }
 }
 
@@ -38,7 +37,7 @@ std::unique_ptr<FuncDecl> Parser::parse_func_decl() {
 std::unique_ptr<FuncSignature> Parser::parse_func_signature() {
     auto func_keyword_location = token_.range().start();
 
-    if (!expect(TokenKind::KEYWORD_FUNC, "func keyword")) {
+    if (!expect(TokenKind::KEYWORD_FUNC, ParserErrorKind::EXPECTED_KEYWORD_FUNC)) {
         return nullptr;
     }
 
@@ -64,13 +63,13 @@ std::unique_ptr<FuncSignature> Parser::parse_func_signature() {
 std::unique_ptr<ParameterList> Parser::parse_parameter_list() {
     auto left_paren_location = token_.range().start();
 
-    if (!expect(TokenKind::LEFT_PAREN, "( to begin parameter list")) {
+    if (!expect(TokenKind::LEFT_PAREN, ParserErrorKind::EXPECTED_LEFT_PAREN_PARAMETER_LIST)) {
         return nullptr;
     }
 
     auto right_paren_location = token_.range().end();
 
-    if (!expect(TokenKind::RIGHT_PAREN, ") to end parameter list")) {
+    if (!expect(TokenKind::RIGHT_PAREN, ParserErrorKind::EXPECTED_RIGHT_PAREN_PARAMETER_LIST)) {
         return nullptr;
     }
 
@@ -78,7 +77,7 @@ std::unique_ptr<ParameterList> Parser::parse_parameter_list() {
 }
 
 std::unique_ptr<Type> Parser::parse_return_type() {
-    if (!expect(TokenKind::ARROW, "->")) {
+    if (!expect(TokenKind::ARROW, ParserErrorKind::EXPECTED_ARROW)) {
         return nullptr;
     }
 

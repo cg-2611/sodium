@@ -7,6 +7,7 @@
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/expr.h"
 #include "sodium/nac/ast/stmt.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
 #include "sodium/nac/lexer/lexer.h"
 
 /*
@@ -14,10 +15,12 @@
         {}
 */
 TEST(ParseStmtTest, ParserCorrectlyDispatchesToABlockStatement) {
-    auto src = std::string_view("{}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("{}");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_stmt();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->node_kind());
@@ -29,10 +32,12 @@ TEST(ParseStmtTest, ParserCorrectlyDispatchesToABlockStatement) {
         return 2;
 */
 TEST(ParseStmtTest, ParserCorrectlyDispatchesToAReturnStatement) {
-    auto src = std::string_view("return 2;");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("return 2;");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto stmt = parser.parse_stmt();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, stmt->node_kind());
@@ -44,10 +49,12 @@ TEST(ParseStmtTest, ParserCorrectlyDispatchesToAReturnStatement) {
         {}
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesAnEmptyBlock) {
-    auto src = std::string_view("{}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("{}");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->node_kind());
@@ -62,12 +69,14 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAnEmptyBlock) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAnEmptyNestedBlock) {
+    auto _ = sodium::DiagnosticEngine();
+
     auto src = std::string_view("{\n"
                                 "   {}\n"
                                 "}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     ASSERT_EQ(1, block->stmts().size());
@@ -90,13 +99,15 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAnEmptyNestedBlock) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleEmptyNestedBlocks) {
+    auto _ = sodium::DiagnosticEngine();
+
     auto src = std::string_view("{\n"
                                 "   {}\n"
                                 "   {}\n"
                                 "}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     ASSERT_EQ(2, block->stmts().size());
@@ -121,10 +132,12 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleEmptyNestedBlocks) {
         { return 0; }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithASingleStatement) {
-    auto src = std::string_view("{ return 0; }");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("{ return 0; }");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->node_kind());
@@ -140,13 +153,15 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithASingleStatement) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleStatements) {
+    auto _ = sodium::DiagnosticEngine();
+
     auto src = std::string_view("{\n"
                                 "   return 1;\n"
                                 "   return 2;\n"
                                 "}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, block->node_kind());
@@ -162,13 +177,15 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithMultipleStatements) {
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAStatementAndANestedBlockWithAStatement) {
+    auto _ = sodium::DiagnosticEngine();
+
     auto src = std::string_view("{\n"
                                 "   return 1;\n"
                                 "   { return 2; }\n"
                                 "}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     ASSERT_EQ(2, block->stmts().size());
@@ -200,6 +217,8 @@ TEST(ParseStmtTest, ParserCorrectlyParsesABlockWithAStatementAndANestedBlockWith
         }
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithANestedBlockWithMultipleStatements) {
+    auto _ = sodium::DiagnosticEngine();
+
     auto src = std::string_view("{\n"
                                 "   return 1;\n"
                                 "   {\n"
@@ -207,9 +226,9 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithANestedBlock
                                 "       return 3;\n"
                                 "   }\n"
                                 "}");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto parser = sodium::Parser(token_buffer, _);
     auto block = parser.parse_block();
 
     ASSERT_EQ(2, block->stmts().size());
@@ -238,10 +257,12 @@ TEST(ParseStmtTest, ParserCorrectlyParsesAMultipleStatementBlockWithANestedBlock
         return 2;
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithSingleDigit) {
-    auto src = std::string_view("return 2;");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("return 2;");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto return_stmt = parser.parse_return_stmt();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, return_stmt->node_kind());
@@ -257,10 +278,12 @@ TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithSingleDigit) {
         return 567;
 */
 TEST(ParseStmtTest, ParserCorrectlyParsesReturnStmtWithMultipleDigit) {
-    auto src = std::string_view("return 567;");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("return 567;");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto return_stmt = parser.parse_return_stmt();
 
     EXPECT_EQ(sodium::ASTNodeKind::STMT, return_stmt->node_kind());

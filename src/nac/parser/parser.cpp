@@ -1,7 +1,6 @@
 #include "sodium/nac/parser/parser.h"
 
 #include <memory>
-#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -12,16 +11,18 @@
 #include "sodium/nac/ast/type.h"
 #include "sodium/nac/basic/source_location.h"
 #include "sodium/nac/basic/source_range.h"
-#include "sodium/nac/errors/error.h"
-#include "sodium/nac/errors/error_manager.h"
-#include "sodium/nac/errors/parser_error.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
+#include "sodium/nac/parser/parser_diagnostics.h"
 #include "sodium/nac/token/token.h"
 #include "sodium/nac/token/token_buffer.h"
 #include "sodium/nac/token/token_cursor.h"
 
 namespace sodium {
 
-Parser::Parser(const TokenBuffer &token_buffer) : token_cursor_(token_buffer), token_(Token::dummy()) {
+Parser::Parser(const TokenBuffer &token_buffer, DiagnosticEngine &diagnostic_engine)
+        : diagnostic_engine_(diagnostic_engine),
+          token_cursor_(token_buffer),
+          token_(Token::dummy()) {
     advance();
 }
 
@@ -51,7 +52,7 @@ std::unique_ptr<Identifier> Parser::parse_identifier() {
     auto identifier_value = token_.value();
     auto identifier_range = token_.range();
 
-    if (!expect(TokenKind::IDENTIFIER, "identifier")) {
+    if (!expect(TokenKind::IDENTIFIER, ParserErrorKind::EXPECTED_IDENTIFIER)) {
         return nullptr;
     }
 
@@ -62,7 +63,7 @@ std::unique_ptr<Type> Parser::parse_type() {
     auto type_value = token_.value();
     auto type_range = token_.range();
 
-    if (!expect(TokenKind::TYPE, "type")) {
+    if (!expect(TokenKind::TYPE, ParserErrorKind::EXPECTED_TYPE)) {
         return nullptr;
     }
 
@@ -77,9 +78,9 @@ bool Parser::match(TokenKind expected) const {
     return token_.kind() == expected;
 }
 
-bool Parser::expect(TokenKind expected, std::string_view message) {
+bool Parser::expect(TokenKind expected, ParserErrorKind kind) {
     if (!match(expected)) {
-        error_expected(message);
+        error_expected(kind);
         return false;
     }
 
@@ -87,10 +88,9 @@ bool Parser::expect(TokenKind expected, std::string_view message) {
     return true;
 }
 
-void Parser::error_expected(std::string_view message) const {
-    std::string error_message("expected ");
-    error_message += message;
-    ErrorManager::add_error<ParserError>(ErrorKind::SYNTAX_ERROR, token_, error_message);
+void Parser::error_expected(ParserErrorKind kind) const {
+    auto parser_error = std::make_unique<ParserError>(kind, token_);
+    diagnostic_engine_.diagnose(std::move(parser_error));
 }
 
 void Parser::synchronize_decl() {

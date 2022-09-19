@@ -2,7 +2,6 @@
 #define SODIUM_NAC_PARSER_PARSER_H
 
 #include <memory>
-#include <string_view>
 
 #include "sodium/nac/ast/decl.h"
 #include "sodium/nac/ast/expr.h"
@@ -16,8 +15,10 @@
 namespace sodium {
 
 class AST;
+class DiagnosticEngine;
 class TokenBuffer;
 
+enum class ParserErrorKind;
 enum class TokenKind;
 
 /// Used to parse Sodium programming language tokens into an AST.
@@ -25,7 +26,7 @@ class Parser {
 public:
     /// Constructor for Parser.
     /// \param token_buffer The tokens to be parsed.
-    Parser(const TokenBuffer &token_buffer);
+    Parser(const TokenBuffer &token_buffer, DiagnosticEngine &diagnostic_engine);
 
     /// Parses Sodium programming language tokens into an AST.
     /// \return The AST formed of the parsed tokens.
@@ -90,6 +91,8 @@ public:
     std::unique_ptr<ReturnStmt> parse_return_stmt();
 
 private:
+    DiagnosticEngine &diagnostic_engine_;
+
     TokenCursor token_cursor_;
     Token token_;
 
@@ -101,11 +104,12 @@ private:
     [[nodiscard]] bool match(TokenKind expected) const;
 
     // returns true if the kind of token_ matches the expected token kind, the parser does advance
-    // returns false on a failure to match and reports an error described by message, the parser does not advance
-    bool expect(TokenKind expected, std::string_view message);
+    // returns false on a failure to match and diagnoses the error indicated by the kind parameter, the parser does not
+    // advance
+    bool expect(TokenKind expected, ParserErrorKind kind);
 
-    // reports the error described by message
-    void error_expected(std::string_view message) const;
+    // diagnoses the error indicated by the kind parameter
+    void error_expected(ParserErrorKind kind) const;
 
     // used for error recovery when failing to parse a declaration
     // parsing is ready to resume after this function returns

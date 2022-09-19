@@ -1,30 +1,35 @@
 #include "sodium/nac/lexer/lexer.h"
 
+#include <memory>
 #include <string_view>
 
 #include "sodium/nac/basic/file.h"
 #include "sodium/nac/basic/source_location.h"
-#include "sodium/nac/errors/error.h"
-#include "sodium/nac/errors/error_manager.h"
-#include "sodium/nac/errors/lexer_error.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
+#include "sodium/nac/lexer/lexer_diagnostics.h"
 #include "sodium/nac/token/token.h"
 #include "sodium/nac/token/token_buffer.h"
 
 namespace sodium {
 
-Lexer::Lexer(const File &file) : Lexer(file.contents().data()) {}
-
-Lexer::Lexer(std::string_view src) : current_(src.begin()), end_(src.cend()), line_(1), column_(1), length_(0) {}
+Lexer::Lexer(std::string_view src, DiagnosticEngine &diagnostics)
+        : diagnostics_(diagnostics),
+          token_start_(src.begin()),
+          current_char_(src.begin()),
+          string_end_(src.cend()),
+          line_(1),
+          column_(1),
+          length_(0) {}
 
 TokenBuffer Lexer::tokenize() {
     // return an eof token if we have an empty string
-    if (at_end(current_)) {
-        return TokenBuffer(make_token(TokenKind::EOF_TOKEN, {line_, column_, current_}));
+    if (at_end()) {
+        return TokenBuffer(make_token(TokenKind::EOF_TOKEN, {line_, column_, current_char_}));
     }
 
     auto token_buffer = TokenBuffer();
 
-    while (!at_end(current_)) {
+    while (!at_end()) {
         auto token = next_token();
 
         // skip error tokens until we have a valid token
@@ -43,80 +48,86 @@ Token Lexer::next_token() {
 
     length_ = 0; // reset the length of the current token
 
-    const auto *first_char = current_;
-    auto token_start = SourceLocation(line_, column_, first_char);
+    token_start_ = current_char_;
+    auto start_location = SourceLocation(line_, column_, token_start_);
 
     advance();
 
-    if (at_end(first_char)) {
-        return make_token(TokenKind::EOF_TOKEN, token_start);
+    if (at_end()) {
+        return make_token(TokenKind::EOF_TOKEN, start_location);
     }
 
     // if we have an identifier, handle it
-    if (is_identifier_start(*first_char)) {
+    if (is_identifier_start(*token_start_)) {
         consume_identifier();
 
-        auto identifier = std::string_view(token_start.position(), length_);
+        auto identifier = std::string_view(start_location.position(), length_);
         if (is_reserved(identifier)) {
-            return make_token(RESERVED_WORDS.at(identifier), token_start);
+            return make_token(RESERVED_WORDS.at(identifier), start_location);
         }
 
-        return make_token(TokenKind::IDENTIFIER, token_start);
+        return make_token(TokenKind::IDENTIFIER, start_location);
     }
 
     // if we have an integer literal, handle it
-    if (is_digit(*first_char)) {
+    if (is_digit(*token_start_)) {
         consume_integer_literal();
-        return make_token(TokenKind::INTEGER_LITERAL, token_start);
+        return make_token(TokenKind::INTEGER_LITERAL, start_location);
     }
 
-    switch (*first_char) {
-        case '{': return make_token(TokenKind::LEFT_BRACE, token_start);
-        case '}': return make_token(TokenKind::RIGHT_BRACE, token_start);
-        case '(': return make_token(TokenKind::LEFT_PAREN, token_start);
-        case ')': return make_token(TokenKind::RIGHT_PAREN, token_start);
-        case ';': return make_token(TokenKind::SEMICOLON, token_start);
+    switch (*token_start_) {
+        case '{': return make_token(TokenKind::LEFT_BRACE, start_location);
+        case '}': return make_token(TokenKind::RIGHT_BRACE, start_location);
+        case '(': return make_token(TokenKind::LEFT_PAREN, start_location);
+        case ')': return make_token(TokenKind::RIGHT_PAREN, start_location);
+        case ';': return make_token(TokenKind::SEMICOLON, start_location);
         case '-':
             // if the current token starts with a '-' and the next character is a '>'
-            if (*current_ == '>') {
+            if (*current_char_ == '>') {
                 advance();
-                return make_token(TokenKind::ARROW, token_start);
+                return make_token(TokenKind::ARROW, start_location);
             }
             [[fallthrough]]; // temporary until '-' is a valid token
-        default:
-            auto error_token = make_token(TokenKind::ERROR_TOKEN, token_start);
-            ErrorManager::add_error<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, error_token);
-            return error_token;
+        default: return make_lexer_error(LexerErrorKind::UNRECOGNISED_TOKEN, start_location);
     }
 }
 
 Token Lexer::make_token(TokenKind kind, SourceLocation start) const {
-    return Token(kind, start.to({line_, column_, current_}), length_);
+    return Token(kind, start.to({line_, column_, current_char_}), length_);
+}
+
+Token Lexer::make_lexer_error(LexerErrorKind kind, SourceLocation location) const {
+    auto error_token = make_token(TokenKind::ERROR_TOKEN, location);
+    auto lexer_error = std::make_unique<LexerError>(kind, error_token);
+
+    diagnostics_.diagnose(std::move(lexer_error));
+
+    return error_token;
 }
 
 void Lexer::consume_identifier() {
-    while (is_identifier_start(*current_) || is_digit(*current_)) {
+    while (is_identifier_start(*current_char_) || is_digit(*current_char_)) {
         advance();
     }
 }
 
 void Lexer::consume_integer_literal() {
-    while (is_digit(*current_)) {
+    while (is_digit(*current_char_)) {
         advance();
     }
 }
 
 void Lexer::advance() {
-    if (!at_end(current_)) {
-        ++current_;
+    if (!at_end()) {
+        ++current_char_;
         ++column_;
         ++length_;
     }
 }
 
 void Lexer::skip_whitespace() {
-    while (is_space(*current_)) {
-        if (*current_ == '\n') {
+    while (is_space(*current_char_)) {
+        if (*current_char_ == '\n') {
             handle_newline();
         }
 
@@ -129,8 +140,8 @@ void Lexer::handle_newline() {
     column_ = 0; // reset the column number
 }
 
-bool Lexer::at_end(std::string_view::const_iterator iterator) const {
-    return iterator >= end_;
+bool Lexer::at_end() const {
+    return token_start_ >= string_end_;
 }
 
 } // namespace sodium

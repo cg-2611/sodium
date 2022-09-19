@@ -10,8 +10,7 @@ target_sources(libnac
 
 add_subdirectory(nac/ast)
 add_subdirectory(nac/basic)
-add_subdirectory(nac/errors)
-add_subdirectory(nac/exceptions)
+add_subdirectory(nac/diagnostics)
 add_subdirectory(nac/lexer)
 add_subdirectory(nac/parser)
 add_subdirectory(nac/token)

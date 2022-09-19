@@ -5,17 +5,13 @@
 #include <optional>
 #include <string>
 
-#include "sodium/nac/exceptions/exception.h"
-#include "sodium/nac/exceptions/io_exception.h"
-
 namespace sodium::util {
 
 std::optional<std::string> read_file(const std::string &file_path) {
     auto file = std::ifstream(file_path, std::ios::ate);
 
     if (!file.is_open()) {
-        throw IOException(ExceptionKind::FILE_OPEN_FAIL, file_path);
-        // return {};
+        return {};
     }
 
     auto file_size = file.tellg();
@@ -25,8 +21,7 @@ std::optional<std::string> read_file(const std::string &file_path) {
     file.read(file_contents.data(), file_size);
 
     if (file.fail()) {
-        throw IOException(ExceptionKind::FILE_READ_FAIL, file_path);
-        // return {};
+        return {};
     }
 
     return file_contents;

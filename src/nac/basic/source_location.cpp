@@ -31,4 +31,8 @@ SourceRange SourceLocation::to(SourceLocation location) const {
     return SourceRange(*this, location);
 }
 
+std::string SourceLocation::to_string() const {
+    return std::string(std::to_string(line_) + ":" + std::to_string(column_));
+}
+
 } // namespace sodium

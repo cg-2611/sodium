@@ -6,6 +6,7 @@
 
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/expr.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
 #include "sodium/nac/lexer/lexer.h"
 
 /*
@@ -13,10 +14,12 @@
         2
 */
 TEST(ParseExprTest, ParserCorrectlyDispatchesToParseAIntegerLiteralExpression) {
-    auto src = std::string_view("2");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("2");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto expr = parser.parse_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, expr->node_kind());
@@ -28,10 +31,12 @@ TEST(ParseExprTest, ParserCorrectlyDispatchesToParseAIntegerLiteralExpression) {
         2
 */
 TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitIntegerLiteral) {
-    auto src = std::string_view("2");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("2");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto integer_literal_expr = parser.parse_integer_literal_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, integer_literal_expr->node_kind());
@@ -45,10 +50,12 @@ TEST(ParseExprTest, ParserCorrectlyParsesASingleDigitIntegerLiteral) {
         567
 */
 TEST(ParseExprTest, ParserCorrectlyParsesAMultiDigitIntegerLiteral) {
-    auto src = std::string_view("567");
-    auto token_buffer = sodium::Lexer(src).tokenize();
+    auto _ = sodium::DiagnosticEngine();
 
-    auto parser = sodium::Parser(token_buffer);
+    auto src = std::string_view("567");
+    auto token_buffer = sodium::Lexer(src, _).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, _);
     auto integer_literal_expr = parser.parse_integer_literal_expr();
 
     EXPECT_EQ(sodium::ASTNodeKind::EXPR, integer_literal_expr->node_kind());

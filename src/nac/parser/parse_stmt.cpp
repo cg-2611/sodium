@@ -7,8 +7,7 @@
 #include "sodium/nac/ast/expr.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/basic/source_range.h"
-#include "sodium/nac/errors/error_manager.h"
-#include "sodium/nac/errors/parser_error.h"
+#include "sodium/nac/parser/parser_diagnostics.h"
 #include "sodium/nac/token/token.h"
 
 namespace sodium {
@@ -17,14 +16,14 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     switch (token_.kind()) {
         case TokenKind::LEFT_BRACE: return parse_block();
         case TokenKind::KEYWORD_RETURN: return parse_return_stmt();
-        default: error_expected("statement"); return nullptr;
+        default: error_expected(ParserErrorKind::EXPECTED_STATEMENT); return nullptr;
     }
 }
 
 std::unique_ptr<Block> Parser::parse_block() {
     auto left_brace_location = token_.range().start();
 
-    if (!expect(TokenKind::LEFT_BRACE, "{ to begin block")) {
+    if (!expect(TokenKind::LEFT_BRACE, ParserErrorKind::EXPECTED_LEFT_BRACE_BLOCK)) {
         return nullptr;
     }
 
@@ -42,7 +41,7 @@ std::unique_ptr<Block> Parser::parse_block() {
 
     auto right_brace_location = token_.range().end();
 
-    if (!expect(TokenKind::RIGHT_BRACE, "} to end block")) {
+    if (!expect(TokenKind::RIGHT_BRACE, ParserErrorKind::EXPECTED_RIGHT_BRACE_BLOCK)) {
         return nullptr;
     }
 
@@ -52,7 +51,7 @@ std::unique_ptr<Block> Parser::parse_block() {
 std::unique_ptr<ReturnStmt> Parser::parse_return_stmt() {
     auto return_keyword_location = token_.range().start();
 
-    if (!expect(TokenKind::KEYWORD_RETURN, "return keyword")) {
+    if (!expect(TokenKind::KEYWORD_RETURN, ParserErrorKind::EXPECTED_KEYWORD_RETURN)) {
         return nullptr;
     }
 
@@ -63,7 +62,7 @@ std::unique_ptr<ReturnStmt> Parser::parse_return_stmt() {
 
     auto semicolon_location = token_.range().end();
 
-    if (!expect(TokenKind::SEMICOLON, ";")) {
+    if (!expect(TokenKind::SEMICOLON, ParserErrorKind::EXPECTED_SEMICOLON)) {
         return nullptr;
     }
 

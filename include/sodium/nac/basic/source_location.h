@@ -1,6 +1,8 @@
 #ifndef SODIUM_NAC_BASIC_SOURCE_LOCATION_H
 #define SODIUM_NAC_BASIC_SOURCE_LOCATION_H
 
+#include <string>
+
 namespace sodium {
 
 class SourceRange;
@@ -31,6 +33,8 @@ public:
     [[nodiscard]] bool is_valid() const;
 
     [[nodiscard]] SourceRange to(SourceLocation location) const;
+
+    [[nodiscard]] std::string to_string() const;
 
 private:
     int line_;

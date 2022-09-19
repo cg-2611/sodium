@@ -1,6 +1,8 @@
+#include <cstdlib>
 #include <iostream>
 
 #include "sodium/nac/basic/file.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
 #include "sodium/nac/nac.h"
 
 int main(int argc, const char *argv[]) {
@@ -9,11 +11,15 @@ int main(int argc, const char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    try {
-        sodium::File file(argv[1]);
-        sodium::compile_file(file);
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << '\n';
+    auto file = sodium::File(argv[1]);
+    if (file.diagnostics().has_problems()) {
+        file.diagnostics().emit_diagnostics(std::cerr);
+        return EXIT_FAILURE;
+    }
+
+    auto problems = sodium::compile_file(file);
+    if (problems) {
+        file.diagnostics().emit_diagnostics(std::cerr);
         return EXIT_FAILURE;
     }
 
