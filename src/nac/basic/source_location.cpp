@@ -6,16 +6,16 @@ namespace sodium {
 
 SourceLocation::SourceLocation() : line_(0), column_(0), position_(nullptr) {}
 
-SourceLocation::SourceLocation(int line, int column, const char *position)
+SourceLocation::SourceLocation(uint32_t line, uint32_t column, const char *position)
         : line_(line),
           column_(column),
           position_(position) {}
 
-int SourceLocation::line() const {
+uint32_t SourceLocation::line() const {
     return line_;
 }
 
-int SourceLocation::column() const {
+uint32_t SourceLocation::column() const {
     return column_;
 }
 

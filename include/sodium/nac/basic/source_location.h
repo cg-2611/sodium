@@ -18,13 +18,13 @@ public:
     /// \param line The line number of the location.
     /// \param column The column number of the location.
     /// \param position Pointer to the character at the location.
-    SourceLocation(int line, int column, const char *position);
+    SourceLocation(uint32_t line, uint32_t column, const char *position);
 
     /// \return The line number of \c this location.
-    [[nodiscard]] int line() const;
+    [[nodiscard]] uint32_t line() const;
 
     /// \return  The column number of \c this location.
-    [[nodiscard]] int column() const;
+    [[nodiscard]] uint32_t column() const;
 
     /// \return The position of \c this location.
     [[nodiscard]] const char *position() const;
@@ -37,8 +37,8 @@ public:
     [[nodiscard]] std::string to_string() const;
 
 private:
-    int line_;
-    int column_;
+    uint32_t line_;
+    uint32_t column_;
     const char *position_;
 };
 

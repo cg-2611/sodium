@@ -38,7 +38,7 @@ public:
     /// \param kind The kind of token being constructed.
     /// \param range The SourceRange of the token.
     /// \param length The length of the token.
-    Token(TokenKind kind, SourceRange range, int length);
+    Token(TokenKind kind, SourceRange range, uint32_t length);
 
     /// \return The kind of \c this token.
     [[nodiscard]] TokenKind kind() const;
@@ -47,7 +47,7 @@ public:
     [[nodiscard]] SourceRange range() const;
 
     /// \return The length of \c this token.
-    [[nodiscard]] int length() const;
+    [[nodiscard]] uint32_t length() const;
 
     /// \return The value of \c this token.
     [[nodiscard]] std::string value() const;
@@ -57,7 +57,7 @@ public:
 private:
     TokenKind kind_;
     SourceRange range_;
-    int length_;
+    uint32_t length_;
 };
 
 } // namespace sodium

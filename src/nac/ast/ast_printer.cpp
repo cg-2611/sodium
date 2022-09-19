@@ -16,7 +16,7 @@ namespace sodium {
 
 ASTPrinter::ASTPrinter() : ASTPrinter(4) {}
 
-ASTPrinter::ASTPrinter(int spaces) : indentation_spaces_(spaces), indentation_level_(0) {}
+ASTPrinter::ASTPrinter(uint32_t spaces) : indentation_spaces_(spaces), indentation_level_(0) {}
 
 void ASTPrinter::print_ast(const AST &ast) {
     ast.root()->accept(*this);
@@ -119,7 +119,7 @@ void ASTPrinter::visit(const Type &type) {
 
 void ASTPrinter::print_indentation() const {
     auto spaces = indentation_spaces_ * indentation_level_;
-    for (int i = 0; i < spaces; ++i) {
+    for (size_t i = 0; i < spaces; ++i) {
         std::cout << " ";
     }
 }

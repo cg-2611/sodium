@@ -43,10 +43,10 @@ private:
     std::string_view::const_iterator current_char_; // the current character
     std::string_view::const_iterator string_end_;   // the end of the string
 
-    int line_;   // the current line number of the token
-    int column_; // te current column number of the token
+    uint32_t line_;   // the current line number of the token
+    uint32_t column_; // te current column number of the token
 
-    int length_; // the length of the current token
+    uint32_t length_; // the length of the current token
 
     // returns a token with given kind at given location
     [[nodiscard]] Token make_token(TokenKind kind, SourceLocation start) const;

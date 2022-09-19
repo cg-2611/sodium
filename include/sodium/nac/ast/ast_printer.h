@@ -18,7 +18,7 @@ public:
 
     /// Constructor for ASTPrinter.
     /// \param spaces The  number of spaces of indentation used in the tree.
-    ASTPrinter(int spaces);
+    ASTPrinter(uint32_t spaces);
 
     /// Print an AST.
     /// \param ast The AST to print.
@@ -61,8 +61,8 @@ public:
     void visit(const ReturnStmt &return_stmt) override;
 
 private:
-    int indentation_spaces_;
-    int indentation_level_;
+    uint32_t indentation_spaces_;
+    uint32_t indentation_level_;
 
     static void print_range(SourceRange range); // print the specified range
     void print_indentation() const;             // print the correct number of spaces of indentation
