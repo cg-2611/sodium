@@ -21,7 +21,7 @@ enum class ParserErrorKind {
     EXPECTED_IDENTIFIER,
     EXPECTED_INTEGER_LITERAL,
 
-    // punctuation tokens
+    // symbol tokens
     EXPECTED_ARROW,
     EXPECTED_LEFT_BRACE_BLOCK,
     EXPECTED_LEFT_PAREN_PARAMETER_LIST,

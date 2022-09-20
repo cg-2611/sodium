@@ -32,7 +32,7 @@ constexpr std::string_view ParserError::description_from_kind(ParserErrorKind ki
         case ParserErrorKind::EXPECTED_IDENTIFIER: return "expected identifier";
         case ParserErrorKind::EXPECTED_INTEGER_LITERAL: return "expected integer literal";
 
-        // punctuation tokens
+        // symbol tokens
         case ParserErrorKind::EXPECTED_ARROW: return "expected \'->\'";
         case ParserErrorKind::EXPECTED_LEFT_BRACE_BLOCK: return "expected \'{\' to begin block";
         case ParserErrorKind::EXPECTED_LEFT_PAREN_PARAMETER_LIST: return "expected \'(\' to begin parameter list";

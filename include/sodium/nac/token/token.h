@@ -18,7 +18,7 @@ enum class TokenKind {
     IDENTIFIER,
     INTEGER_LITERAL,
 
-    // punctuation
+    // symbols
     ARROW,
     LEFT_BRACE,
     RIGHT_BRACE,
