@@ -148,6 +148,88 @@ TEST(ParserTest, ParserRecoversAfterDiagnosingParserErrorWhenParsingADeclaration
 }
 
 /*
+    tests source file:
+        name1() -> int {}
+        func name2() -> int {}
+        name3() -> int {}
+*/
+TEST(ParserTest, ParserDiagnosesMultipleParserErrorWhenParsingAMultipleInvalidDeclarations1) {
+    auto diagnostics = sodium::DiagnosticEngine();
+
+    auto src = std::string_view("name1() -> int {}\n"
+                                "func name2() -> int {}\n"
+                                "name3() -> int {}");
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, diagnostics);
+    auto source_file = parser.parse_source_file();
+
+    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
+
+    ASSERT_EQ(1, source_file->decls().size());
+    EXPECT_EQ(sodium::ASTNodeKind::DECL, source_file->decls()[0]->node_kind());
+    EXPECT_EQ(sodium::DeclKind::FUNC, source_file->decls()[0]->decl_kind());
+
+    EXPECT_TRUE(diagnostics.has_problems());
+    EXPECT_EQ(2, diagnostics.count_errors());
+
+    ASSERT_EQ(2, diagnostics.count());
+
+    auto *diagnostic1 = diagnostics.get(0);
+    ASSERT_NE(nullptr, diagnostic1);
+
+    auto *parser_error1 = dynamic_cast<sodium::ParserError *>(diagnostic1);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, parser_error1->diagnostic_kind());
+    EXPECT_EQ(sodium::ParserErrorKind::EXPECTED_DECLARATION, parser_error1->kind());
+
+    auto *diagnostic2 = diagnostics.get(1);
+    ASSERT_NE(nullptr, diagnostic2);
+
+    auto *parser_error2 = dynamic_cast<sodium::ParserError *>(diagnostic2);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, parser_error2->diagnostic_kind());
+    EXPECT_EQ(sodium::ParserErrorKind::EXPECTED_DECLARATION, parser_error2->kind());
+}
+
+/*
+    tests source file:
+        name() -> int {}
+        func () -> int {}
+*/
+TEST(ParserTest, ParserDiagnosesMultipleParserErrorWhenParsingAMultipleInvalidDeclarations2) {
+    auto diagnostics = sodium::DiagnosticEngine();
+
+    auto src = std::string_view("name() -> int {}\n"
+                                "func () -> int {}");
+    auto token_buffer = sodium::Lexer(src, diagnostics).tokenize();
+
+    auto parser = sodium::Parser(token_buffer, diagnostics);
+    auto source_file = parser.parse_source_file();
+
+    EXPECT_EQ(sodium::ASTNodeKind::SOURCE_FILE, source_file->node_kind());
+
+    EXPECT_EQ(0, source_file->decls().size());
+
+    EXPECT_TRUE(diagnostics.has_problems());
+    EXPECT_EQ(2, diagnostics.count_errors());
+
+    ASSERT_EQ(2, diagnostics.count());
+
+    auto *diagnostic1 = diagnostics.get(0);
+    ASSERT_NE(nullptr, diagnostic1);
+
+    auto *parser_error1 = dynamic_cast<sodium::ParserError *>(diagnostic1);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, parser_error1->diagnostic_kind());
+    EXPECT_EQ(sodium::ParserErrorKind::EXPECTED_DECLARATION, parser_error1->kind());
+
+    auto *diagnostic2 = diagnostics.get(1);
+    ASSERT_NE(nullptr, diagnostic2);
+
+    auto *parser_error2 = dynamic_cast<sodium::ParserError *>(diagnostic2);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, parser_error2->diagnostic_kind());
+    EXPECT_EQ(sodium::ParserErrorKind::EXPECTED_IDENTIFIER, parser_error2->kind());
+}
+
+/*
     tests identifier:
         identifier
 */
