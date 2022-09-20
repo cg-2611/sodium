@@ -125,8 +125,7 @@ void ASTPrinter::print_indentation() const {
 }
 
 void ASTPrinter::print_range(SourceRange range) {
-    std::cout << " (" << range.start().line() << ":" << range.start().column() << " -> " << range.end().line() << ":"
-              << range.end().column() << ")\n";
+    std::cout << " (" << range.start().to_string() << " - " << range.end().to_string() << ")\n";
 }
 
 void ASTPrinter::indent() {
