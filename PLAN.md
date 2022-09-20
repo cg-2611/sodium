@@ -30,14 +30,14 @@ Non-terminal symbol names are in CamelCase.
 
 #### Lexical Structure
 The lexical structure describes the sequence of characters that form valid tokens of Sodium.
-A token consists of an reserved words, punctuation, identifier or literal.
+A token consists of an reserved words, symbols, identifier or literal.
 ```
 ReservedWord = Keyword | Type ;
 
 Keyword = "func" | "return" ;
 Type = "int" ;
 
-Punctuation = "->" | "{" | "}" | "(" | ")" | ";" ;
+Symbol = "->" | "{" | "}" | "(" | ")" | ";" ;
 
 Identifier = IdentifierHead IdentifierCharacter* ;
 IdentifierHead = "_" | LETTER ;
