@@ -335,7 +335,7 @@ TEST(LexerTest, LexerRejectsInvalidIdentifierAndDiagnosesLexerError2) {
 
     auto lexer = sodium::Lexer("ident$ifier", diagnostics);
 
-    auto _ = lexer.next_token(); // ignore first token, only interested error token
+    auto _ = lexer.next_token(); // ignore first token, only interested in error token
     auto token = lexer.next_token();
 
     EXPECT_EQ(sodium::TokenKind::ERROR_TOKEN, token.kind());
@@ -352,4 +352,40 @@ TEST(LexerTest, LexerRejectsInvalidIdentifierAndDiagnosesLexerError2) {
     auto *lexer_error = dynamic_cast<sodium::LexerError *>(diagnostic);
     EXPECT_EQ(sodium::DiagnosticKind::ERROR, lexer_error->diagnostic_kind());
     EXPECT_EQ(sodium::LexerErrorKind::UNRECOGNISED_TOKEN, lexer_error->kind());
+}
+
+TEST(LexerTest, LexerDiagnosesMultipleLexerErrorsForMultipleInvalidTokens) {
+    auto diagnostics = sodium::DiagnosticEngine();
+
+    auto lexer = sodium::Lexer("ide$ntif$ier", diagnostics);
+
+    auto _ = lexer.next_token(); // ignore first token, only interested in error tokens
+    auto error_token1 = lexer.next_token();
+    _ = lexer.next_token(); // ignore third token, only interested in error tokens
+    auto error_token2 = lexer.next_token();
+
+    EXPECT_EQ(sodium::TokenKind::ERROR_TOKEN, error_token1.kind());
+    EXPECT_EQ("$", error_token1.value());
+
+    EXPECT_EQ(sodium::TokenKind::ERROR_TOKEN, error_token2.kind());
+    EXPECT_EQ("$", error_token2.value());
+
+    EXPECT_TRUE(diagnostics.has_problems());
+    EXPECT_EQ(2, diagnostics.count_errors());
+
+    ASSERT_EQ(2, diagnostics.count());
+
+    auto *diagnostic1 = diagnostics.get(0);
+    ASSERT_NE(nullptr, diagnostic1);
+
+    auto *lexer_error1 = dynamic_cast<sodium::LexerError *>(diagnostic1);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, lexer_error1->diagnostic_kind());
+    EXPECT_EQ(sodium::LexerErrorKind::UNRECOGNISED_TOKEN, lexer_error1->kind());
+
+    auto *diagnostic2 = diagnostics.get(1);
+    ASSERT_NE(nullptr, diagnostic2);
+
+    auto *lexer_error2 = dynamic_cast<sodium::LexerError *>(diagnostic2);
+    EXPECT_EQ(sodium::DiagnosticKind::ERROR, lexer_error2->diagnostic_kind());
+    EXPECT_EQ(sodium::LexerErrorKind::UNRECOGNISED_TOKEN, lexer_error2->kind());
 }
