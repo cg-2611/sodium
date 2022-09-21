@@ -1,5 +1,5 @@
-# find llvm version 14 as it is required by the sodium compiler
-find_package(LLVM 14 REQUIRED CONFIG)
+# find llvm version 15 as it is required by the sodium compiler
+find_package(LLVM 15 REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}: ${LLVM_DIR}")
 

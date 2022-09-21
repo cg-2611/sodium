@@ -2,166 +2,146 @@
 
 #include <memory>
 #include <string_view>
-#include <utility>
 
-#include "sodium/nac/errors/error_manager.h"
-#include "sodium/nac/errors/error.h"
-#include "sodium/nac/errors/lexer_error.h"
-#include "sodium/nac/lexer/token.h"
+#include "sodium/nac/basic/file.h"
+#include "sodium/nac/basic/source_location.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
+#include "sodium/nac/lexer/lexer_diagnostics.h"
+#include "sodium/nac/token/token.h"
+#include "sodium/nac/token/token_buffer.h"
 
 namespace sodium {
 
-// helper functions
-static constexpr bool isSpace(char c) noexcept;
-static constexpr bool isDigit(char c) noexcept;
-static constexpr bool isAlpha(char c) noexcept;
-static constexpr bool isIdentifierCharacter(char c) noexcept;
-static inline bool isKeyword(const char *start, size_t length); // returns true if identifier is a keyword
-static inline bool isType(const char *start, size_t length);    // returns true if identifier is a type
+Lexer::Lexer(std::string_view src, DiagnosticEngine &diagnostics)
+        : diagnostics_(diagnostics),
+          token_start_(src.begin()),
+          current_char_(src.begin()),
+          string_end_(src.cend()),
+          line_(1),
+          column_(1),
+          length_(0) {}
 
-Lexer::Lexer(std::string_view src) : start_(src.data()), current_(start_), end_(src.end()), line_(1), column_(1) {}
-
-[[nodiscard]] std::unique_ptr<Token> Lexer::tokenize() {
-    std::unique_ptr<Token> token(getNextToken());
-
-    // skip all tokens until the first valid token is encountered
-    while (token->kind() == TokenKind::ERROR_TOKEN) {
-        // for each error token encountered add it to the vector of errors
-        ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, token.get());
-        token = getNextToken();
+TokenBuffer Lexer::tokenize() {
+    // return an eof token if we have an empty string
+    if (at_end()) {
+        return TokenBuffer(make_token(TokenKind::EOF_TOKEN, {line_, column_, current_char_}));
     }
 
-    Token *currentToken = token.get();
+    auto token_buffer = TokenBuffer();
 
-    while (!atEndOfString()) {
-        currentToken->next(getNextToken());
+    while (!at_end()) {
+        auto token = next_token();
 
-        // if the token is an error, add it to the vector of errors and read the next token
-        if (currentToken->next()->kind() == TokenKind::ERROR_TOKEN) {
-            ErrorManager::addError<LexerError>(ErrorKind::UNRECOGNISED_TOKEN, currentToken->next());
-            continue;
+        // skip error tokens until we have a valid token
+        while (token.kind() == TokenKind::ERROR_TOKEN) {
+            token = next_token();
         }
 
-        currentToken = currentToken->next();
+        token_buffer.push(token);
     }
 
-    return token;
+    return token_buffer;
 }
 
-[[nodiscard]] std::unique_ptr<Token> Lexer::getNextToken() {
-    // skip leading whitespace before the token
-    skipWhitespace();
-    start_ = current_;
+Token Lexer::next_token() {
+    skip_whitespace();
 
-    if (atEndOfString()) {
-        return makeToken(TokenKind::EOF_TOKEN);
-    }
+    length_ = 0; // reset the length of the current token
 
-    if (atEndOfLine()) {
-        advance();
-        ++line_;
-        column_ = 1;
-        return makeToken(TokenKind::EOL_TOKEN);
-    }
+    token_start_ = current_char_;
+    auto start_location = SourceLocation(line_, column_, token_start_);
 
     advance();
 
-    if (isIdentifierCharacter(*start_)) {
-        // read an identifier if the current token starts with a valid identifier character
-        size_t length = readIdentifier();
-
-        if (isKeyword(start_, length)) {
-            return makeToken(TokenKind::KEYWORD);
-        }
-
-        if (isType(start_, length)) {
-            return makeToken(TokenKind::TYPE);
-        }
-
-        return makeToken(TokenKind::IDENTIFIER);
-    } else if (isDigit(*start_)) {
-        // read a numeric literal if the current token starts with a digit
-        readNumericLiteral();
-        return makeToken(TokenKind::NUMERIC_LITERAL);
+    if (at_end()) {
+        return make_token(TokenKind::EOF_TOKEN, start_location);
     }
 
-    switch (*start_) {
-        case '{': return makeToken(TokenKind::LEFT_BRACE);
-        case '}': return makeToken(TokenKind::RIGHT_BRACE);
-        case '(': return makeToken(TokenKind::LEFT_PAREN);
-        case ')': return makeToken(TokenKind::RIGHT_PAREN);
+    // if we have an identifier, handle it
+    if (is_identifier_start(*token_start_)) {
+        consume_identifier();
+
+        auto identifier = std::string_view(start_location.position(), length_);
+        if (is_reserved(identifier)) {
+            return make_token(RESERVED_WORDS.at(identifier), start_location);
+        }
+
+        return make_token(TokenKind::IDENTIFIER, start_location);
+    }
+
+    // if we have an integer literal, handle it
+    if (is_digit(*token_start_)) {
+        consume_integer_literal();
+        return make_token(TokenKind::INTEGER_LITERAL, start_location);
+    }
+
+    switch (*token_start_) {
+        case '{': return make_token(TokenKind::LEFT_BRACE, start_location);
+        case '}': return make_token(TokenKind::RIGHT_BRACE, start_location);
+        case '(': return make_token(TokenKind::LEFT_PAREN, start_location);
+        case ')': return make_token(TokenKind::RIGHT_PAREN, start_location);
+        case ';': return make_token(TokenKind::SEMICOLON, start_location);
         case '-':
             // if the current token starts with a '-' and the next character is a '>'
-            if (*current_ == '>') {
+            if (*current_char_ == '>') {
                 advance();
-                return makeToken(TokenKind::ARROW);
+                return make_token(TokenKind::ARROW, start_location);
             }
             [[fallthrough]]; // temporary until '-' is a valid token
-        default: return makeToken(TokenKind::ERROR_TOKEN);
+        default: return make_lexer_error(LexerErrorKind::UNRECOGNISED_TOKEN, start_location);
     }
 }
 
-[[nodiscard]] std::unique_ptr<Token> Lexer::makeToken(TokenKind kind) {
-    return std::make_unique<Token>(kind, start_, current_ - start_, line_, column_);
+Token Lexer::make_token(TokenKind kind, SourceLocation start) const {
+    return Token(kind, start.to({line_, column_, current_char_}), length_);
 }
 
-size_t Lexer::readIdentifier() {
-    while (isIdentifierCharacter(*current_) || isDigit(*current_)) {
-        advance();
-    }
+Token Lexer::make_lexer_error(LexerErrorKind kind, SourceLocation location) const {
+    auto error_token = make_token(TokenKind::ERROR_TOKEN, location);
+    auto lexer_error = std::make_unique<LexerError>(kind, error_token);
 
-    return current_ - start_;
+    diagnostics_.diagnose(std::move(lexer_error));
+
+    return error_token;
 }
 
-size_t Lexer::readNumericLiteral() {
-    while (isDigit(*current_)) {
-        advance();
-    }
-
-    return current_ - start_;
-}
-
-void Lexer::advance() noexcept {
-    ++current_;
-    ++column_;
-}
-
-void Lexer::skipWhitespace() noexcept {
-    while (isSpace(*current_)) {
+void Lexer::consume_identifier() {
+    while (is_identifier_start(*current_char_) || is_digit(*current_char_)) {
         advance();
     }
 }
 
-inline bool Lexer::atEndOfString() const noexcept {
-    return start_ >= end_;
+void Lexer::consume_integer_literal() {
+    while (is_digit(*current_char_)) {
+        advance();
+    }
 }
 
-inline bool Lexer::atEndOfLine() const noexcept {
-    return *start_ == '\n';
+void Lexer::advance() {
+    if (!at_end()) {
+        ++current_char_;
+        ++column_;
+        ++length_;
+    }
 }
 
-static inline bool isKeyword(const char *start, size_t length) {
-    return KEYWORDS.contains(std::string_view(start, length));
+void Lexer::skip_whitespace() {
+    while (is_space(*current_char_)) {
+        if (*current_char_ == '\n') {
+            handle_newline();
+        }
+
+        advance();
+    }
 }
 
-static inline bool isType(const char *start, size_t length) {
-    return TYPES.contains(std::string_view(start, length));
+void Lexer::handle_newline() {
+    ++line_;
+    column_ = 0; // reset the column number
 }
 
-static constexpr bool isIdentifierCharacter(char c) noexcept {
-    return isAlpha(c) || c == '_';
-}
-
-static constexpr bool isAlpha(char c) noexcept {
-    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-}
-
-static constexpr bool isDigit(char c) noexcept {
-    return c >= '0' && c <= '9';
-}
-
-static constexpr bool isSpace(char c) noexcept {
-    return c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == ' ';
+bool Lexer::at_end() const {
+    return token_start_ >= string_end_;
 }
 
 } // namespace sodium
