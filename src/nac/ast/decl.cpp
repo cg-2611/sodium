@@ -18,50 +18,27 @@ DeclKind Decl::decl_kind() const {
     return kind_;
 }
 
-FuncDecl::FuncDecl(std::unique_ptr<FuncSignature> signature, std::unique_ptr<Block> body, SourceRange range)
-        : Decl(DeclKind::FUNC, SourceRange(range)),
-          signature_(std::move(signature)),
+FuncDecl::FuncDecl(std::unique_ptr<Identifier> name, std::unique_ptr<Type> return_type, std::unique_ptr<Block> body,
+                   SourceRange range)
+        : Decl(DeclKind::FUNC, range),
+          name_(std::move(name)),
+          return_type_(std::move(return_type)),
           body_(std::move(body)) {}
 
 void FuncDecl::accept(ASTVisitor &visitor) const {
     visitor.visit(*this);
 }
 
-FuncSignature *FuncDecl::signature() const {
-    return signature_.get();
+Identifier *FuncDecl::name() const {
+    return name_.get();
+}
+
+Type *FuncDecl::return_type() const {
+    return return_type_.get();
 }
 
 Block *FuncDecl::body() const {
     return body_.get();
-}
-
-FuncSignature::FuncSignature(std::unique_ptr<Identifier> name, std::unique_ptr<ParameterList> parameter_list,
-                             std::unique_ptr<Type> return_type, SourceRange range)
-        : ASTNode(ASTNodeKind::FUNC_SIGNATURE, range),
-          name_(std::move(name)),
-          parameter_list_(std::move(parameter_list)),
-          return_type_(std::move(return_type)) {}
-
-void FuncSignature::accept(ASTVisitor &visitor) const {
-    visitor.visit(*this);
-}
-
-Identifier *FuncSignature::name() const {
-    return name_.get();
-}
-
-ParameterList *FuncSignature::parameter_list() const {
-    return parameter_list_.get();
-}
-
-Type *FuncSignature::return_type() const {
-    return return_type_.get();
-}
-
-ParameterList::ParameterList(SourceRange range) : ASTNode(ASTNodeKind::PARAMETER_LIST, range) {}
-
-void ParameterList::accept(ASTVisitor &visitor) const {
-    visitor.visit(*this);
 }
 
 } // namespace sodium

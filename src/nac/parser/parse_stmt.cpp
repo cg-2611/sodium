@@ -55,7 +55,7 @@ std::unique_ptr<ReturnStmt> Parser::parse_return_stmt() {
         return nullptr;
     }
 
-    std::unique_ptr<Expr> return_expr(parse_expr());
+    auto return_expr = parse_expr();
     if (!return_expr) {
         return nullptr;
     }
