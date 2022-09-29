@@ -40,14 +40,6 @@ public:
     /// \param func_decl The function declaration to be printed.
     void visit(const FuncDecl &func_decl) override;
 
-    /// Print a function signature.
-    /// \param function_signature The function signature to be printed.
-    void visit(const FuncSignature &func_signature) override;
-
-    /// Prints a parameter list.
-    /// \param parameter_list The parameter list to be printed.
-    void visit(const ParameterList &parameter_list) override;
-
     /// Prints a integer literal.
     /// \param integer_literal_expr The integer literal to be printed.
     void visit(const IntegerLiteralExpr &integer_literal_expr) override;

@@ -11,9 +11,7 @@ class ASTVisitor;
 enum class ASTNodeKind {
     DECL,
     EXPR,
-    FUNC_SIGNATURE,
     IDENTIFIER,
-    PARAMETER_LIST,
     STMT,
     SOURCE_FILE,
     TYPE

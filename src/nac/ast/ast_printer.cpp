@@ -43,32 +43,11 @@ void ASTPrinter::visit(const FuncDecl &func_decl) {
 
     indent();
 
-    // visit the signature and body of the function declaration
-    func_decl.signature()->accept(*this);
+    func_decl.name()->accept(*this);
+    func_decl.return_type()->accept(*this);
     func_decl.body()->accept(*this);
 
     dedent();
-}
-
-void ASTPrinter::visit(const FuncSignature &func_signature) {
-    print_indentation();
-    std::cout << "signature:";
-    print_range(func_signature.range());
-
-    indent();
-
-    // visit the name, parameter list and return type of the function signature
-    func_signature.name()->accept(*this);
-    func_signature.parameter_list()->accept(*this);
-    func_signature.return_type()->accept(*this);
-
-    dedent();
-}
-
-void ASTPrinter::visit(const ParameterList &parameter_list) {
-    print_indentation();
-    std::cout << "parameters:";
-    print_range(parameter_list.range());
 }
 
 void ASTPrinter::visit(const Block &block) {

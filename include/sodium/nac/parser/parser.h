@@ -53,16 +53,6 @@ public:
     /// declaration.
     std::unique_ptr<FuncDecl> parse_func_decl();
 
-    /// Parses an function signature.
-    /// \return The parsed function signature AST node, or \c nullptr if there was an error while parsing the function
-    /// signature.
-    std::unique_ptr<FuncSignature> parse_func_signature();
-
-    /// Parses a parameter list.
-    /// \return The parsed parameter list AST node, or \c nullptr if there was an error while parsing the parameter
-    /// list.
-    std::unique_ptr<ParameterList> parse_parameter_list();
-
     /// Parses an function return type.
     /// \return The parsed function return type AST node, or \c nullptr if there was an error while parsing the function
     /// return type.

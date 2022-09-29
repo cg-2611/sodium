@@ -5,10 +5,8 @@ namespace sodium {
 
 class Block;
 class FuncDecl;
-class FuncSignature;
 class Identifier;
 class IntegerLiteralExpr;
-class ParameterList;
 class ReturnStmt;
 class SourceFile;
 class Type;
@@ -31,14 +29,6 @@ public:
     /// Visit a FuncDecl AST node.
     /// \param func_decl The FuncDecl being visited.
     virtual void visit(const FuncDecl &func_decl) = 0;
-
-    /// Visit a FuncSignature AST node.
-    /// \param function_signature The FuncSignature being visited.
-    virtual void visit(const FuncSignature &function_signature) = 0;
-
-    /// Visit a ParameterList AST node.
-    /// \param parameter_list The ParameterList being visited.
-    virtual void visit(const ParameterList &parameter_list) = 0;
 
     /// Visit a Block AST node.
     /// \param block The Block being visited.
