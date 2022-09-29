@@ -4,7 +4,6 @@
   - implement file io for `nac`
   - implement a lexer for `nac`
   - implement a parser for `nac`
-  - implement type checking for `nac`
   - interface `nac` front-end with llvm back-end
   - compile examples/main.na
 
