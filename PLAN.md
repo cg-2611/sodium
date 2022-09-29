@@ -58,10 +58,7 @@ SourceFile = Declaration* EOF ;
 ```
 Declaration = FunctionDeclaration ;
 
-FunctionDeclaration = FunctionSignature Block ;
-FunctionSignature = "func" Identifier ParameterList ReturnType ;
-
-ParameterList = "(" ")" ;
+FunctionDeclaration = "func" Identifier "(" ")" ReturnType Block ;
 
 ReturnType = "->" Type ;
 ```
