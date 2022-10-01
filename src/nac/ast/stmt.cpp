@@ -4,10 +4,13 @@
 #include <utility>
 #include <vector>
 
+#include "llvm/IR/Value.h"
+
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/ast_visitor.h"
 #include "sodium/nac/ast/expr.h"
 #include "sodium/nac/basic/source_range.h"
+#include "sodium/nac/codegen/codegen_visitor.h"
 
 namespace sodium {
 
@@ -25,6 +28,10 @@ void Block::accept(ASTVisitor &visitor) const {
     visitor.visit(*this);
 }
 
+llvm::Value *Block::accept(CodegenVisitor &visitor) const {
+    return visitor.codegen(*this);
+}
+
 const std::vector<std::unique_ptr<Stmt>> &Block::stmts() const {
     return stmts_;
 }
@@ -35,6 +42,10 @@ ReturnStmt::ReturnStmt(std::unique_ptr<Expr> expr, SourceRange range)
 
 void ReturnStmt::accept(ASTVisitor &visitor) const {
     visitor.visit(*this);
+}
+
+llvm::Value *ReturnStmt::accept(CodegenVisitor &visitor) const {
+    return visitor.codegen(*this);
 }
 
 Expr *ReturnStmt::expr() const {

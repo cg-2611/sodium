@@ -3,9 +3,16 @@
 
 #include "sodium/nac/basic/source_range.h"
 
+namespace llvm {
+
+class Value;
+
+} // namespace llvm
+
 namespace sodium {
 
 class ASTVisitor;
+class CodegenVisitor;
 
 /// An enum of the different kinds of AST nodes.
 enum class ASTNodeKind {
@@ -31,6 +38,8 @@ public:
     /// Accepts an ASTVisitor for \c a derived AST node.
     /// \param visitor The ASTVisitor being accepted by \c the derived AST node.
     virtual void accept(ASTVisitor &visitor) const = 0;
+
+    virtual llvm::Value *accept(CodegenVisitor &visitor) const = 0;
 
     /// \return The kind of \c this node.
     [[nodiscard]] ASTNodeKind node_kind() const;

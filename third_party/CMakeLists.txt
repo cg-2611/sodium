@@ -3,10 +3,10 @@ find_package(LLVM 15 REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}: ${LLVM_DIR}")
 
-# add llvm libraries to sodium compiler target
-target_include_directories(nac PRIVATE ${LLVM_INCLUDE_DIRS})
+# add llvm libraries to sodium compiler library target
+target_include_directories(libnac PRIVATE ${LLVM_INCLUDE_DIRS})
 llvm_map_components_to_libnames(LLVM_LIBS support core irreader)
-target_link_libraries(nac PRIVATE ${LLVM_LIBS})
+target_link_libraries(libnac PRIVATE ${LLVM_LIBS})
 
 if(BUILD_TESTS)
     add_subdirectory(googletest)

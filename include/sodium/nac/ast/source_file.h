@@ -6,9 +6,16 @@
 
 #include "sodium/nac/ast/ast_node.h"
 
+namespace llvm {
+
+class Value;
+
+} // namespace llvm
+
 namespace sodium {
 
 class ASTVisitor;
+class CodegenVisitor;
 class Decl;
 class SourceRange;
 
@@ -23,6 +30,8 @@ public:
     /// Accepts an ASTVisitor for \c this source file.
     /// \param visitor The ASTVisitor being accepted by \c this.
     void accept(ASTVisitor &visitor) const override;
+
+    llvm::Value *accept(CodegenVisitor &visitor) const override;
 
     /// \return The declarations in \c this source file.
     [[nodiscard]] const std::vector<std::unique_ptr<Decl>> &decls() const;

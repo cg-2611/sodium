@@ -24,32 +24,32 @@ public:
     /// \param ast The AST to print.
     void print_ast(const AST &ast);
 
-    /// Prints a source file ast node.
-    /// \param source_file The source file node to be printed.
+    /// Prints a SourceFile AST node.
+    /// \param source_file The SourceFile node to be printed.
     void visit(const SourceFile &source_file) override;
 
-    /// Prints an identifier.
+    /// Prints an Identifier.
     /// \param identifier The identifier to be printed.
     void visit(const Identifier &identifier) override;
 
-    /// Prints a type.
-    /// \param type The type to be printed.
+    /// Prints a Type.
+    /// \param type The Type to be printed.
     void visit(const Type &type) override;
 
-    /// Print a function declaration.
-    /// \param func_decl The function declaration to be printed.
+    /// Print a FuncDecl.
+    /// \param func_decl The FuncDecl to be printed.
     void visit(const FuncDecl &func_decl) override;
 
-    /// Prints a integer literal.
-    /// \param integer_literal_expr The integer literal to be printed.
+    /// Prints an IntegerLiteralExpr.
+    /// \param integer_literal_expr The IntegerLiteralExpr to be printed.
     void visit(const IntegerLiteralExpr &integer_literal_expr) override;
 
-    /// Prints a block.
-    /// \param block The block to be printed.
+    /// Prints a Block.
+    /// \param block The Block to be printed.
     void visit(const Block &block) override;
 
-    /// Prints a return statement.
-    /// \param return_stmt The return statement to be printed.
+    /// Prints a ReturnStmt.
+    /// \param return_stmt The ReturnStmt to be printed.
     void visit(const ReturnStmt &return_stmt) override;
 
 private:

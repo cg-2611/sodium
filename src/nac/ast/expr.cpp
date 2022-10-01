@@ -1,8 +1,11 @@
 #include "sodium/nac/ast/expr.h"
 
+#include "llvm/IR/Value.h"
+
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/ast_visitor.h"
 #include "sodium/nac/basic/source_range.h"
+#include "sodium/nac/codegen/codegen_visitor.h"
 
 namespace sodium {
 
@@ -18,6 +21,10 @@ IntegerLiteralExpr::IntegerLiteralExpr(int value, SourceRange range)
 
 void IntegerLiteralExpr::accept(ASTVisitor &visitor) const {
     visitor.visit(*this);
+}
+
+llvm::Value *IntegerLiteralExpr::accept(CodegenVisitor &visitor) const {
+    return visitor.codegen(*this);
 }
 
 int IntegerLiteralExpr::value() const {

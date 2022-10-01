@@ -36,6 +36,18 @@ void ASTPrinter::visit(const SourceFile &source_file) {
     dedent();
 }
 
+void ASTPrinter::visit(const Identifier &identifier) {
+    print_indentation();
+    std::cout << "identifier: " << identifier.value();
+    print_range(identifier.range());
+}
+
+void ASTPrinter::visit(const Type &type) {
+    print_indentation();
+    std::cout << "return type: " << type.name();
+    print_range(type.range());
+}
+
 void ASTPrinter::visit(const FuncDecl &func_decl) {
     print_indentation();
     std::cout << "func decl:";
@@ -48,6 +60,12 @@ void ASTPrinter::visit(const FuncDecl &func_decl) {
     func_decl.body()->accept(*this);
 
     dedent();
+}
+
+void ASTPrinter::visit(const IntegerLiteralExpr &integer_literal_expr) {
+    print_indentation();
+    std::cout << "value: " << integer_literal_expr.value();
+    print_range(integer_literal_expr.range());
 }
 
 void ASTPrinter::visit(const Block &block) {
@@ -76,24 +94,6 @@ void ASTPrinter::visit(const ReturnStmt &return_stmt) {
     return_stmt.expr()->accept(*this);
 
     dedent();
-}
-
-void ASTPrinter::visit(const IntegerLiteralExpr &integer_literal_expr) {
-    print_indentation();
-    std::cout << "value: " << integer_literal_expr.value();
-    print_range(integer_literal_expr.range());
-}
-
-void ASTPrinter::visit(const Identifier &identifier) {
-    print_indentation();
-    std::cout << "identifier: " << identifier.value();
-    print_range(identifier.range());
-}
-
-void ASTPrinter::visit(const Type &type) {
-    print_indentation();
-    std::cout << "return type: " << type.name();
-    print_range(type.range());
 }
 
 void ASTPrinter::print_indentation() const {

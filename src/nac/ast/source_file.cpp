@@ -4,10 +4,13 @@
 #include <utility>
 #include <vector>
 
+#include "llvm/IR/Value.h"
+
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/ast_visitor.h"
 #include "sodium/nac/ast/decl.h"
 #include "sodium/nac/basic/source_range.h"
+#include "sodium/nac/codegen/codegen_visitor.h"
 
 namespace sodium {
 
@@ -17,6 +20,10 @@ SourceFile::SourceFile(std::vector<std::unique_ptr<Decl>> decls, SourceRange ran
 
 void SourceFile::accept(ASTVisitor &visitor) const {
     visitor.visit(*this);
+}
+
+llvm::Value *SourceFile::accept(CodegenVisitor &visitor) const {
+    return visitor.codegen(*this);
 }
 
 const std::vector<std::unique_ptr<Decl>> &SourceFile::decls() const {
