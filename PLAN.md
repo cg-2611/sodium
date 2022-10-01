@@ -4,8 +4,9 @@
   - implement file io for `nac`
   - implement a lexer for `nac`
   - implement a parser for `nac`
-  - interface `nac` front-end with llvm back-end
-  - compile examples/main.na
+  - implement codegen for `nac`
+  - produce `nac` compiler executable
+  - compile examples/main.na using `nac`
 
 - v0.2.0:
   - implement variables
