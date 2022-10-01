@@ -6,9 +6,16 @@
 
 #include "sodium/nac/ast/ast_node.h"
 
+namespace llvm {
+
+class Value;
+
+} // namespace llvm
+
 namespace sodium {
 
 class ASTVisitor;
+class CodegenVisitor;
 class Expr;
 class SourceRange;
 
@@ -54,6 +61,8 @@ public:
     /// \param visitor The ASTVisitor being accepted by \c this.
     void accept(ASTVisitor &visitor) const override;
 
+    llvm::Value *accept(CodegenVisitor &visitor) const override;
+
     /// \return The  statements in \c this block.
     [[nodiscard]] const std::vector<std::unique_ptr<Stmt>> &stmts() const;
 
@@ -72,6 +81,8 @@ public:
     /// Accepts an ASTVisitor for \c this return statement.
     /// \param visitor The ASTVisitor being accepted by \c this.
     void accept(ASTVisitor &visitor) const override;
+
+    llvm::Value *accept(CodegenVisitor &visitor) const override;
 
     /// \return The expression being returned by \c this statement.
     [[nodiscard]] Expr *expr() const;
