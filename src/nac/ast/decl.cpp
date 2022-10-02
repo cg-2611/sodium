@@ -3,12 +3,15 @@
 #include <memory>
 #include <utility>
 
+#include "llvm/IR/Value.h"
+
 #include "sodium/nac/ast/ast_node.h"
 #include "sodium/nac/ast/ast_visitor.h"
 #include "sodium/nac/ast/identifier.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/ast/type.h"
 #include "sodium/nac/basic/source_range.h"
+#include "sodium/nac/codegen/codegen_visitor.h"
 
 namespace sodium {
 
@@ -27,6 +30,10 @@ FuncDecl::FuncDecl(std::unique_ptr<Identifier> name, std::unique_ptr<Type> retur
 
 void FuncDecl::accept(ASTVisitor &visitor) const {
     visitor.visit(*this);
+}
+
+llvm::Value *FuncDecl::accept(CodegenVisitor &visitor) const {
+    return visitor.codegen(*this);
 }
 
 Identifier *FuncDecl::name() const {

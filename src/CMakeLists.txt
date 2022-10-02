@@ -1,8 +1,3 @@
-# for libnac target
-add_library(libnac)
-target_compile_features(libnac PRIVATE cxx_std_20)
-target_compile_options(libnac PRIVATE -Wall -Wextra -Wpedantic)
-target_include_directories(libnac PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_sources(libnac
     PRIVATE
         nac/nac.cpp
@@ -10,6 +5,7 @@ target_sources(libnac
 
 add_subdirectory(nac/ast)
 add_subdirectory(nac/basic)
+add_subdirectory(nac/codegen)
 add_subdirectory(nac/diagnostics)
 add_subdirectory(nac/lexer)
 add_subdirectory(nac/parser)

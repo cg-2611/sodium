@@ -5,10 +5,17 @@
 
 #include "sodium/nac/ast/ast_node.h"
 
+namespace llvm {
+
+class Value;
+
+} // namespace llvm
+
 namespace sodium {
 
 class ASTVisitor;
 class Block;
+class CodegenVisitor;
 class Identifier;
 class SourceRange;
 class Type;
@@ -56,6 +63,8 @@ public:
     /// Accepts an ASTVisitor for \c this function declaration.
     /// \param visitor The ASTVisitor being accepted by \c this.
     void accept(ASTVisitor &visitor) const override;
+
+    llvm::Value *accept(CodegenVisitor &visitor) const override;
 
     /// \return The name of \c this function declaration.
     [[nodiscard]] Identifier *name() const;

@@ -26,9 +26,21 @@ public:
     /// \param source_file The SourceFile being visited.
     virtual void visit(const SourceFile &source_file) = 0;
 
+    /// Visit a Identifier AST node.
+    /// \param identifier The Identifier being visited.
+    virtual void visit(const Identifier &identifier) = 0;
+
+    /// Visit a Type AST node.
+    /// \param type The Type being visited.
+    virtual void visit(const Type &type) = 0;
+
     /// Visit a FuncDecl AST node.
     /// \param func_decl The FuncDecl being visited.
     virtual void visit(const FuncDecl &func_decl) = 0;
+
+    /// Visit a IntegerLiteralExpr AST node.
+    /// \param integer_literal_expr The integerLiteralExpr being visited.
+    virtual void visit(const IntegerLiteralExpr &integer_literal_expr) = 0;
 
     /// Visit a Block AST node.
     /// \param block The Block being visited.
@@ -37,18 +49,6 @@ public:
     /// Visit a ReturnStmt AST node.
     /// \param return_stmt The ReturnStmt being visited.
     virtual void visit(const ReturnStmt &return_stmt) = 0;
-
-    /// Visit a IntegerLiteralExpr AST node.
-    /// \param integer_literal_expr The integerLiteralExpr being visited.
-    virtual void visit(const IntegerLiteralExpr &integer_literal_expr) = 0;
-
-    /// Visit a Identifier AST node.
-    /// \param identifier The Identifier being visited.
-    virtual void visit(const Identifier &identifier) = 0;
-
-    /// Visit a Type AST node.
-    /// \param type The Type being visited.
-    virtual void visit(const Type &type) = 0;
 
 protected:
     ASTVisitor() = default;

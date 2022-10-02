@@ -1,6 +1,7 @@
 #ifndef SODIUM_NAC_LEXER_LEXER_DIAGNOSTICS_H
 #define SODIUM_NAC_LEXER_LEXER_DIAGNOSTICS_H
 
+#include <string>
 #include <string_view>
 
 #include "sodium/nac/diagnostics/error.h"

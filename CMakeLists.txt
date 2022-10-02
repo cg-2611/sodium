@@ -4,6 +4,12 @@ project(sodium VERSION 0.0.0)
 
 add_executable(nac)
 
+# for libnac target
+add_library(libnac)
+target_compile_features(libnac PRIVATE cxx_std_20)
+target_compile_options(libnac PRIVATE -Wall -Wextra -Wpedantic)
+target_include_directories(libnac PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
 add_subdirectory(src) # sources are added for sodium compiler executable in src
 
 if(BUILD_TESTS)

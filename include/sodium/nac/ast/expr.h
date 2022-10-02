@@ -3,9 +3,16 @@
 
 #include "sodium/nac/ast/ast_node.h"
 
+namespace llvm {
+
+class Value;
+
+} // namespace llvm
+
 namespace sodium {
 
 class ASTVisitor;
+class CodegenVisitor;
 class SourceRange;
 
 /// An enum of the different kinds of expressions in Sodium.
@@ -48,6 +55,8 @@ public:
     /// Accepts an ASTVisitor for \c this integer literal expression.
     /// \param visitor The ASTVisitor being accepted by \c this.
     void accept(ASTVisitor &visitor) const override;
+
+    llvm::Value *accept(CodegenVisitor &visitor) const override;
 
     /// \return The integer value of \c this integer literal.
     [[nodiscard]] int value() const;

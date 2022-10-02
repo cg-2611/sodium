@@ -1,6 +1,7 @@
 #include "sodium/nac/lexer/lexer_diagnostics.h"
 
 #include <string>
+#include <string_view>
 
 #include "sodium/nac/diagnostics/error.h"
 #include "sodium/nac/token/token.h"

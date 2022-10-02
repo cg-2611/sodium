@@ -19,8 +19,8 @@
 
 namespace sodium {
 
-Parser::Parser(const TokenBuffer &token_buffer, DiagnosticEngine &diagnostic_engine)
-        : diagnostic_engine_(diagnostic_engine),
+Parser::Parser(const TokenBuffer &token_buffer, DiagnosticEngine &diagnostics)
+        : diagnostics_(diagnostics),
           token_cursor_(token_buffer),
           token_(Token::dummy()) {
     advance();
@@ -90,7 +90,7 @@ bool Parser::expect(TokenKind expected, ParserErrorKind kind) {
 
 void Parser::error_expected(ParserErrorKind kind) const {
     auto parser_error = std::make_unique<ParserError>(kind, token_);
-    diagnostic_engine_.diagnose(std::move(parser_error));
+    diagnostics_.diagnose(std::move(parser_error));
 }
 
 void Parser::synchronize_decl() {

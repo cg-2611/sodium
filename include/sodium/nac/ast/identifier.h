@@ -5,9 +5,16 @@
 
 #include "sodium/nac/ast/ast_node.h"
 
+namespace llvm {
+
+class Value;
+
+} // namespace llvm
+
 namespace sodium {
 
 class ASTVisitor;
+class CodegenVisitor;
 class SourceRange;
 
 /// A derived class of ASTNode, used to represent an identifier in Sodium.
@@ -21,6 +28,8 @@ public:
     /// Accepts an ASTVisitor for \c this identifier.
     /// \param visitor The ASTVisitor being accepted by \c this.
     void accept(ASTVisitor &visitor) const override;
+
+    llvm::Value *accept(CodegenVisitor &visitor) const override;
 
     /// \return The value of \c this identifier.
     [[nodiscard]] const std::string &value() const;
