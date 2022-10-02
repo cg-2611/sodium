@@ -1,7 +1,10 @@
 #include "sodium/nac/parser/parser_diagnostics.h"
 
-#include "sodium/nac/token/token.h"
 #include <optional>
+#include <string>
+#include <string_view>
+
+#include "sodium/nac/token/token.h"
 
 namespace sodium {
 

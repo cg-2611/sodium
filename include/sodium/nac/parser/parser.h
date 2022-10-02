@@ -26,7 +26,8 @@ class Parser {
 public:
     /// Constructor for Parser.
     /// \param token_buffer The tokens to be parsed.
-    Parser(const TokenBuffer &token_buffer, DiagnosticEngine &diagnostic_engine);
+    /// \param diagnostics The DiagnosticEngine to report errors to.
+    Parser(const TokenBuffer &token_buffer, DiagnosticEngine &diagnostics);
 
     /// Parses Sodium programming language tokens into an AST.
     /// \return The AST formed of the parsed tokens.
@@ -81,7 +82,7 @@ public:
     std::unique_ptr<ReturnStmt> parse_return_stmt();
 
 private:
-    DiagnosticEngine &diagnostic_engine_;
+    DiagnosticEngine &diagnostics_;
 
     TokenCursor token_cursor_;
     Token token_;

@@ -2,6 +2,7 @@
 #define SODIUM_NAC_PARSER_PARSER_DIAGNOSTICS_H
 
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include "sodium/nac/diagnostics/error.h"
