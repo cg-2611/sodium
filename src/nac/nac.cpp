@@ -18,7 +18,11 @@ bool compile_file(const File &file) {
     auto parser = Parser(tokens, file.diagnostics());
     auto ast = parser.parse();
 
-    auto codegen = Codegen(ast);
+    if (file.diagnostics().has_problems()) {
+        return false;
+    }
+
+    auto codegen = Codegen(ast, file.diagnostics());
     codegen.generate();
     codegen.print_llvm_ir(); // for debugging
 

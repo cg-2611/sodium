@@ -9,6 +9,7 @@
 namespace sodium {
 
 enum class ErrorKind {
+    CODEGEN,
     LEXER,
     PARSER
 };

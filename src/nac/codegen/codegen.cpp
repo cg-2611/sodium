@@ -1,6 +1,7 @@
 #include "sodium/nac/codegen/codegen.h"
 
 #include <memory>
+#include <utility>
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
@@ -19,11 +20,14 @@
 #include "sodium/nac/ast/source_file.h"
 #include "sodium/nac/ast/stmt.h"
 #include "sodium/nac/ast/type.h"
+#include "sodium/nac/codegen/codegen_diagnostics.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
 
 namespace sodium {
 
-Codegen::Codegen(const AST &ast)
+Codegen::Codegen(const AST &ast, DiagnosticEngine &diagnostics)
         : ast_(ast),
+          diagnostics_(diagnostics),
           context_(std::make_unique<llvm::LLVMContext>()),
           builder_(std::make_unique<llvm::IRBuilder<>>(*context_)),
           module_(std::make_unique<llvm::Module>("module", *context_)) {}
@@ -70,7 +74,10 @@ llvm::Value *Codegen::codegen(const FuncDecl &func_decl) {
 
     llvm::Value *return_value = func_decl.body()->accept(*this);
     if (!return_value) {
-        // error no return value
+        auto codegen_error =
+            std::make_unique<CodegenError>(CodegenErrorKind::NO_RETURN_EXPRESSION, func_decl.body()->range().end());
+        diagnostics_.diagnose(std::move(codegen_error));
+
         func->eraseFromParent();
         return nullptr;
     }
@@ -88,7 +95,8 @@ llvm::Value *Codegen::codegen(const IntegerLiteralExpr &integer_literal_expr) {
 
 llvm::Value *Codegen::codegen(const Block &block) {
     if (block.stmts().empty()) {
-        // error empty block
+        auto codegen_error = std::make_unique<CodegenError>(CodegenErrorKind::NO_RETURN_STATEMENT, block.range().end());
+        diagnostics_.diagnose(std::move(codegen_error));
         return nullptr;
     }
 
@@ -97,7 +105,9 @@ llvm::Value *Codegen::codegen(const Block &block) {
     auto *return_stmt = block.stmts()[STMT_COUNT - 1].get();
 
     if (!return_stmt || return_stmt->stmt_kind() != StmtKind::RETURN) {
-        // error no return
+        auto codegen_error = std::make_unique<CodegenError>(CodegenErrorKind::NO_RETURN_STATEMENT, block.range().end());
+        diagnostics_.diagnose(std::move(codegen_error));
+
         return nullptr;
     }
 
@@ -105,6 +115,13 @@ llvm::Value *Codegen::codegen(const Block &block) {
 }
 
 llvm::Value *Codegen::codegen(const ReturnStmt &return_stmt) {
+    if (!return_stmt.expr()) {
+        auto codegen_error =
+            std::make_unique<CodegenError>(CodegenErrorKind::NO_RETURN_EXPRESSION, return_stmt.range().end());
+        diagnostics_.diagnose(std::move(codegen_error));
+        return nullptr;
+    }
+
     return return_stmt.expr()->accept(*this);
 }
 

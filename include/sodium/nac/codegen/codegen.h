@@ -7,6 +7,7 @@
 #include "llvm/IR/LLVMContext.h"
 
 #include "sodium/nac/codegen/codegen_visitor.h"
+#include "sodium/nac/diagnostics/diagnostic_engine.h"
 
 namespace llvm {
 
@@ -23,7 +24,10 @@ class AST;
 /// Used to generate  the LLVM IR of the AST using the visitor pattern and CodegenVisitor interface.
 class Codegen : public CodegenVisitor {
 public:
-    Codegen(const AST &ast);
+    /// Constructor for Codegen.
+    /// \param AST The AST to generate LLVM IR for.
+    /// \param diagnostics The DiagnosticEngine to report errors to.
+    Codegen(const AST &ast, DiagnosticEngine &diagnostics);
 
     /// Generate the LLVM IR for the AST.
     void generate();
@@ -53,6 +57,7 @@ public:
 
 private:
     const AST &ast_;
+    DiagnosticEngine &diagnostics_;
 
     std::unique_ptr<llvm::LLVMContext> context_;
     std::unique_ptr<llvm::IRBuilder<>> builder_;
