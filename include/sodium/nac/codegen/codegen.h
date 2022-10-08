@@ -30,10 +30,7 @@ public:
     Codegen(const AST &ast, DiagnosticEngine &diagnostics);
 
     /// Generate the LLVM IR for the AST.
-    void generate();
-
-    /// Print the generated LLVM IR.
-    void print_llvm_ir() const;
+    llvm::Module *generate();
 
     /// Generate LLVM IR for a FuncDecl.
     /// \param func_decl The FuncDecl to generate the LLVM IR for.

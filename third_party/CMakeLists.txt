@@ -3,9 +3,14 @@ find_package(LLVM 15 REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}: ${LLVM_DIR}")
 
+foreach(target ${LLVM_TARGETS_TO_BUILD})
+    list(APPEND targets ${target})
+endforeach()
+
+
 # add llvm libraries to sodium compiler library target
 target_include_directories(libnac PRIVATE ${LLVM_INCLUDE_DIRS})
-llvm_map_components_to_libnames(LLVM_LIBS support core irreader)
+llvm_map_components_to_libnames(LLVM_LIBS support core irreader ${targets})
 target_link_libraries(libnac PRIVATE ${LLVM_LIBS})
 
 if(BUILD_TESTS)

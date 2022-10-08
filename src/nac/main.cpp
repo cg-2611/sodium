@@ -23,7 +23,5 @@ int main(int argc, const char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    std::cout << "[nac]: compilation complete\n"; // temporary
-
     return EXIT_SUCCESS;
 }

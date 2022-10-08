@@ -12,6 +12,7 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/Target/TargetMachine.h"
 
 #include "sodium/nac/ast/ast.h"
 #include "sodium/nac/ast/decl.h"
@@ -32,12 +33,10 @@ Codegen::Codegen(const AST &ast, DiagnosticEngine &diagnostics)
           builder_(std::make_unique<llvm::IRBuilder<>>(*context_)),
           module_(std::make_unique<llvm::Module>("module", *context_)) {}
 
-void Codegen::generate() {
+llvm::Module *Codegen::generate() {
     ast_.root()->accept(*this);
-}
 
-void Codegen::print_llvm_ir() const {
-    module_->print(llvm::outs(), nullptr);
+    return module_.get();
 }
 
 llvm::Value *Codegen::codegen(const SourceFile &source_file) {
