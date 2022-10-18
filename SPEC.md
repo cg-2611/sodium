@@ -5,7 +5,7 @@ Non-terminal symbol names are in CamelCase.
 ### Lexical Structure
 ---
 The lexical structure describes the sequence of characters that form valid tokens of Sodium.
-A token consists of an reserved words, symbols, and literals.
+A token consists of an reserved words, literal, and symbols.
 ```
 ReservedWord = Keyword | Type ;
 
