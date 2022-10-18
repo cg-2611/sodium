@@ -7,7 +7,6 @@
 
 *.na    text
 
-*.cpp   text diff=cpp
-*.h     text diff=cpp
+*.rs   text diff=rust
 
 *.md    text diff=markdown
