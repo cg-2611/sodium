@@ -45,7 +45,7 @@ FunctionDeclaration = "func" Identifier "(" ")" FunctionReturnType Block ;
 FunctionReturnType = "->" Type ;
 ```
 ```
-Expression = Block | IntegerLiteralExpression | ReturnExpression ;
+Expression = Block | IntegerLiteralExpression | ReturnExpression ";" ;
 
 Block = "{" Statement* "}"
 
