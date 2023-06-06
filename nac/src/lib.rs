@@ -1,5 +1,9 @@
-pub mod basic;
+pub mod ast;
 pub mod driver;
+pub mod errors;
 pub mod lexer;
+pub mod parser;
+pub mod session;
+pub mod source;
 pub mod token;
 pub mod util;

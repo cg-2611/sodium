@@ -1,11 +1,11 @@
-use super::Token;
+use crate::token::Token;
 
 pub struct TokenStream {
     tokens: Vec<Token>,
 }
 
 impl TokenStream {
-    pub fn new(tokens: Vec<Token>) -> Self {
+    pub fn from(tokens: Vec<Token>) -> Self {
         Self { tokens }
     }
 

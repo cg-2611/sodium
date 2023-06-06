@@ -7,6 +7,6 @@
 
 *.na    text
 
-*.rs   text diff=rust
+*.rs    text diff=rust
 
 *.md    text diff=markdown

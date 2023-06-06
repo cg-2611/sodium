@@ -1,15 +1,15 @@
 use std::str::Chars;
 
-pub struct SourceCursor<'src> {
+pub struct Cursor<'src> {
     chars: Chars<'src>,
 }
 
-impl<'src> SourceCursor<'src> {
+impl<'src> Cursor<'src> {
     pub fn new(src: &'src str) -> Self {
         Self { chars: src.chars() }
     }
 
-    pub fn next(&mut self) -> Option<char> {
+    pub fn advance(&mut self) -> Option<char> {
         self.chars.next()
     }
 

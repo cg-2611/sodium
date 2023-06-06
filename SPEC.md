@@ -3,53 +3,50 @@ Terminal symbol names are in all UPPERCASE.
 Non-terminal symbol names are in CamelCase.
 
 ### Lexical Structure
----
 The lexical structure describes the sequence of characters that form valid tokens of Sodium.
-A token consists of an reserved words, literal, and symbols.
+A token consists of a keyword, literal, or symbol.
 ```
-ReservedWord = Keyword | Type ;
+Keyword ::= "fn" | "ret" ;
+```
+```
+Symbol ::= "->" | "{" | "}" | "(" | ")" ;
+```
+```
+Identifier ::= IdentifierHead IdentifierCharacter* ;
+IdentifierHead ::= "_" | LETTER ;
+IdentifierCharacter ::= IdentifierHead | DIGIT ;
 
-Keyword = "func" | "return" ;
-Type = "int" ;
+IntegerLiteral ::= DIGIT* ;
 ```
 ```
-Symbol = "->" | "{" | "}" | "(" | ")" | ";" ;
-```
-```
-Identifier = IdentifierHead IdentifierCharacter* ;
-IdentifierHead = "_" | LETTER ;
-IdentifierCharacter = IdentifierHead | DIGIT ;
+LETTER ::= [a-zA-Z] ;
 
-IntegerLiteral = DIGIT* ;
-```
-```
-LETTER = [a-zA-Z] ;
-
-DIGIT = [0-9] ;
+DIGIT ::= [0-9] ;
 ```
 
 ### Syntactic Structure
----
 The syntactic structure describes the sequence of valid tokens that form valid syntax of Sodium.
 ```
-SourceFile = Declaration* EOF ;
+SourceFile ::= Declaration* EOF ;
 ```
 ```
-Statement = Declaration | Expression ;
+Statement ::= Declaration | Expression ";" ;
 ```
 ```
-Declaration = FunctionDeclaration ;
+Declaration ::= FunctionDeclaration ;
 
-FunctionDeclaration = "func" Identifier "(" ")" FunctionReturnType Block ;
+FunctionDeclaration ::= "fn" Identifier "(" ")" FunctionReturnType Block ;
 
-FunctionReturnType = "->" Type ;
+FunctionReturnType ::= "->" Type ;
+
+Type ::= Identifier ;
 ```
 ```
-Expression = Block | IntegerLiteralExpression | ReturnExpression ";" ;
+Expression ::= Block | IntegerLiteralExpression | ReturnExpression ;
 
-Block = "{" Statement* "}"
+Block ::= "{" Statement* "}"
 
-IntegerLiteralExpression = IntegerLiteral ;
+IntegerLiteralExpression ::= IntegerLiteral ;
 
-ReturnExpression = "return" Expression ;
+ReturnExpression ::= "ret" Expression ;
 ```
