@@ -1,5 +1,3 @@
-use diagnostics::unrecognised_token_error;
-
 use crate::session::Session;
 use crate::source::{Cursor, Location};
 use crate::token::token_stream::TokenStream;
@@ -32,7 +30,7 @@ impl<'src> Lexer<'src> {
             match token.kind() {
                 TokenKind::EOF => break,
                 TokenKind::Unknown(c) => {
-                    session.report_diagnostic(unrecognised_token_error(c, *token.range()));
+                    session.report_diagnostic(lexer.unrecognised_token_error(c, *token.range()));
                     tokens.push(token);
                 }
                 _ => tokens.push(token),
