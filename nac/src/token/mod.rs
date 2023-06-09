@@ -32,8 +32,8 @@ pub enum Keyword {
 
 #[derive(Clone)]
 pub struct Token {
-    kind: TokenKind,
-    range: Range,
+    pub kind: TokenKind,
+    pub range: Range,
 }
 
 impl Token {
@@ -46,13 +46,5 @@ impl Token {
             kind: TokenKind::EOF,
             range: Range::dummy(),
         }
-    }
-
-    pub fn kind(&self) -> &TokenKind {
-        &self.kind
-    }
-
-    pub fn range(&self) -> &Range {
-        &self.range
     }
 }

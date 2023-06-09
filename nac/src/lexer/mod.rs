@@ -27,10 +27,10 @@ impl<'src> Lexer<'src> {
         loop {
             let token = lexer.next_token();
 
-            match token.kind() {
+            match token.kind {
                 TokenKind::EOF => break,
                 TokenKind::Unknown(c) => {
-                    session.report_diagnostic(lexer.unrecognised_token_error(c, *token.range()));
+                    session.report_diagnostic(lexer.unrecognised_token_error(c, token.range));
                     tokens.push(token);
                 }
                 _ => tokens.push(token),
