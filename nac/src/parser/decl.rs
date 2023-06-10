@@ -1,56 +1,41 @@
 use crate::ast::decl::{Decl, DeclKind, FnDecl};
-use crate::errors::{Diagnostic, DiagnosticLevel, Result};
+use crate::errors::Result;
 use crate::parser::Parser;
 use crate::token::{Keyword, TokenKind};
 
-impl Parser {
-    pub fn parse_decl(&mut self) -> Result<Decl> {
-        match self.token.kind() {
+impl<'s> Parser<'s> {
+    pub fn parse_decl(&mut self) -> Result<Option<Decl>> {
+        match self.token.kind {
+            TokenKind::EOF => Ok(None),
             TokenKind::Keyword(Keyword::Fn) => {
                 let fn_decl = self.parse_fn_decl()?;
-                Ok(Decl::new(DeclKind::Fn(fn_decl), *self.token.range()))
+                let fn_decl_range = fn_decl.range;
+                Ok(Some(Decl::new(
+                    DeclKind::Fn(Box::new(fn_decl)),
+                    fn_decl_range,
+                )))
             }
-            _ => Err(Diagnostic::new(
-                DiagnosticLevel::Error,
-                format!("expected decl, found {:?}", self.token.kind()),
-                *self.token.range(),
-            )),
+            _ => Err(self.error("expected decl", self.token.range)),
         }
     }
 
     pub fn parse_fn_decl(&mut self) -> Result<FnDecl> {
-        let fn_keyword = *self.token.range().start();
+        let fn_keyword = self.expect(TokenKind::Keyword(Keyword::Fn))?;
 
-        if !self.expect(&TokenKind::Keyword(Keyword::Fn)) {
-            return Err(Diagnostic::new(
-                DiagnosticLevel::Error,
-                format!("expected fn keyword, found {:?}", self.token.kind()),
-                fn_keyword.to(self.token.range().end()),
-            ));
-        }
+        let ident = self.parse_identifier()?;
 
-        let name = self.parse_identifier()?;
-
-        if !self.expect(&TokenKind::LeftParen) {
-            return Err(Diagnostic::new(
-                DiagnosticLevel::Error,
-                format!("expected (, found {:?}", self.token.kind()),
-                fn_keyword.to(self.token.range().end()),
-            ));
-        }
-
-        if !self.expect(&TokenKind::RightParen) {
-            return Err(Diagnostic::new(
-                DiagnosticLevel::Error,
-                format!("expected ), found {:?}", self.token.kind()),
-                fn_keyword.to(self.token.range().end()),
-            ));
-        }
+        self.expect(TokenKind::LeftParen)?;
+        self.expect(TokenKind::RightParen)?;
 
         let ret_type = self.parse_ret_type()?;
-
         let body = self.parse_block()?;
+        let body_range = body.range;
 
-        Ok(FnDecl::new(name, ret_type, body))
+        Ok(FnDecl::new(
+            ident,
+            ret_type,
+            body,
+            fn_keyword.to(body_range),
+        ))
     }
 }

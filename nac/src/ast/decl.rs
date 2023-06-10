@@ -4,52 +4,34 @@ use crate::ast::Identifier;
 use crate::source::Range;
 
 pub enum DeclKind {
-    Fn(FnDecl),
+    Fn(Box<FnDecl>),
 }
 
 pub struct Decl {
-    kind: DeclKind,
-    range: Range,
+    pub kind: DeclKind,
+    pub range: Range,
 }
 
 impl Decl {
     pub fn new(kind: DeclKind, range: Range) -> Self {
         Self { kind, range }
     }
-
-    pub fn kind(&self) -> &DeclKind {
-        &self.kind
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
-    }
 }
 
 pub struct FnDecl {
-    name: Identifier,
-    ret_type: Type,
-    body: Block,
+    pub ident: Identifier,
+    pub ret_type: Box<Type>,
+    pub body: Box<Block>,
+    pub range: Range,
 }
 
 impl FnDecl {
-    pub fn new(name: Identifier, ret_type: Type, body: Block) -> Self {
+    pub fn new(ident: Identifier, ret_type: Box<Type>, body: Box<Block>, range: Range) -> Self {
         Self {
-            name,
+            ident,
             ret_type,
             body,
+            range,
         }
-    }
-
-    pub fn name(&self) -> &Identifier {
-        &self.name
-    }
-
-    pub fn ret_type(&self) -> &Type {
-        &self.ret_type
-    }
-
-    pub fn body(&self) -> &Block {
-        &self.body
     }
 }

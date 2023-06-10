@@ -1,32 +1,20 @@
 use crate::ast::stmt::{Stmt, StmtKind};
-use crate::errors::{Diagnostic, DiagnosticLevel, Result};
+use crate::errors::Result;
 use crate::parser::Parser;
-use crate::token::{Keyword, TokenKind};
+use crate::token::TokenKind;
 
-impl Parser {
+impl<'s> Parser<'s> {
     pub fn parse_stmt(&mut self) -> Result<Stmt> {
-        match self.token.kind() {
-            TokenKind::Keyword(Keyword::Ret) => {
-                let ret_expr = self.parse_ret_expr()?;
+        self.parse_expr_stmt()
+    }
 
-                if !self.expect(&TokenKind::Semicolon) {
-                    return Err(Diagnostic::new(
-                        DiagnosticLevel::Error,
-                        format!("expected ;, found {:?}", self.token.kind()),
-                        ret_expr.range(),
-                    ));
-                }
-
-                let start = *ret_expr.range().start();
-                let semicolon = *self.token.range().start();
-
-                Ok(Stmt::new(StmtKind::RetExpr(ret_expr), start.to(&semicolon)))
-            }
-            _ => Err(Diagnostic::new(
-                DiagnosticLevel::Error,
-                format!("expected stmt, found {:?}", self.token.kind()),
-                *self.token.range(),
-            )),
-        }
+    pub fn parse_expr_stmt(&mut self) -> Result<Stmt> {
+        let expr = self.parse_expr()?;
+        let expr_range = expr.range;
+        let semicolon = self.expect(TokenKind::Semicolon)?;
+        Ok(Stmt::new(
+            StmtKind::ExprStmt(expr),
+            expr_range.to(semicolon),
+        ))
     }
 }

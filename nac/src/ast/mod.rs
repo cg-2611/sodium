@@ -1,7 +1,9 @@
 pub mod decl;
 pub mod expr;
+pub mod printer;
 pub mod stmt;
 pub mod ty;
+pub mod visitor;
 
 use crate::ast::decl::Decl;
 use crate::source::Range;
@@ -21,39 +23,23 @@ impl AST {
 }
 
 pub struct SourceFile {
-    decls: Vec<Decl>,
-    range: Range,
+    pub decls: Vec<Box<Decl>>,
+    pub range: Range,
 }
 
 impl SourceFile {
-    pub fn new(decls: Vec<Decl>, range: Range) -> Self {
+    pub fn new(decls: Vec<Box<Decl>>, range: Range) -> Self {
         Self { decls, range }
-    }
-
-    pub fn decls(&self) -> &Vec<Decl> {
-        &self.decls
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
     }
 }
 
 pub struct Identifier {
-    value: String,
-    range: Range,
+    pub value: String,
+    pub range: Range,
 }
 
 impl Identifier {
     pub fn new(value: String, range: Range) -> Self {
         Self { value, range }
-    }
-
-    pub fn value(&self) -> &String {
-        &self.value
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
     }
 }

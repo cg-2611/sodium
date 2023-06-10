@@ -1,5 +1,5 @@
 use crate::session::Session;
-use crate::source::{Cursor, Location};
+use crate::source::{Cursor, Location, Range};
 use crate::token::token_stream::TokenStream;
 use crate::token::{Keyword, Token, TokenKind};
 
@@ -28,7 +28,10 @@ impl<'src> Lexer<'src> {
             let token = lexer.next_token();
 
             match token.kind {
-                TokenKind::EOF => break,
+                TokenKind::EOF => {
+                    tokens.push(token);
+                    break;
+                }
                 TokenKind::Unknown(c) => {
                     session.report_diagnostic(lexer.unrecognised_token_error(c, token.range));
                     tokens.push(token);
@@ -65,13 +68,17 @@ impl<'src> Lexer<'src> {
     }
 
     fn make_token(&self, kind: TokenKind, start: Location) -> Token {
-        let end = Location::new(self.line, self.column);
-        Token::new(kind, start.to(&end))
+        Token::new(
+            kind,
+            Range::new(start, Location::new(self.line, self.column)),
+        )
     }
 
     fn advance(&mut self) -> char {
-        self.column += 1;
-        self.cursor.advance().unwrap_or('\0')
+        self.cursor.advance().map_or('\0', |c| {
+            self.column += 1;
+            c
+        })
     }
 
     fn peek(&self) -> char {

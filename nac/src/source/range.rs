@@ -14,10 +14,6 @@ impl Location {
     pub fn dummy() -> Self {
         Self { line: 0, column: 0 }
     }
-
-    pub fn to(&self, location: &Self) -> Range {
-        Range::new(*self, *location)
-    }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -44,6 +40,13 @@ impl Range {
 
     pub fn end(&self) -> &Location {
         &self.end
+    }
+
+    pub fn to(&self, end: Range) -> Self {
+        Self {
+            start: self.start,
+            end: end.end,
+        }
     }
 }
 

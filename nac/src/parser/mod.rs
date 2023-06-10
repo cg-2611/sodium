@@ -1,6 +1,6 @@
 use crate::ast::decl::Decl;
 use crate::ast::{Identifier, SourceFile, AST};
-use crate::errors::{Diagnostic, DiagnosticLevel, Result};
+use crate::errors::Result;
 use crate::session::Session;
 use crate::source::Range;
 use crate::token::cursor::Cursor;
@@ -13,67 +13,74 @@ pub mod expr;
 pub mod stmt;
 pub mod ty;
 
-pub struct Parser {
+pub struct Parser<'s> {
+    session: &'s Session,
     cursor: Cursor,
     token: Token,
 }
 
-impl Parser {
-    fn new(token_stream: TokenStream) -> Self {
-        Self {
+impl<'s> Parser<'s> {
+    pub fn new(session: &'s Session, token_stream: TokenStream) -> Self {
+        let mut parser = Self {
+            session,
             cursor: Cursor::new(token_stream),
             token: Token::dummy(),
-        }
+        };
+
+        parser.advance();
+        parser
     }
 
-    pub fn parse(session: &Session, token_stream: TokenStream) -> Result<AST> {
-        let mut parser = Parser::new(token_stream);
-        let root = parser.parse_source_file()?;
+    pub fn parse(session: &'s Session, token_stream: TokenStream) -> Result<AST> {
+        let mut parser = Parser::new(session, token_stream);
+        let root = parser.parse_source_file().unwrap_or_else(|diagnostic| {
+            parser.session.report_diagnostic(diagnostic);
+            SourceFile {
+                decls: Vec::new(),
+                range: Range::dummy(),
+            }
+        });
+
         Ok(AST::new(root))
     }
 
     pub fn parse_source_file(&mut self) -> Result<SourceFile> {
-        let mut decls: Vec<Decl> = Vec::new();
+        let start = self.token.range;
+        let mut decls: Vec<Box<Decl>> = Vec::new();
 
-        loop {
-            self.advance();
-            match self.token.kind() {
-                TokenKind::EOF => break,
-                _ => {
-                    let decl = self.parse_decl()?;
-                    decls.push(decl);
-                }
-            }
+        while let Some(decl) = self.parse_decl()? {
+            decls.push(Box::new(decl));
         }
 
-        Ok(SourceFile::new(decls, Range::dummy()))
+        Ok(SourceFile::new(decls, start.to(self.token.range)))
     }
 
     pub fn parse_identifier(&mut self) -> Result<Identifier> {
-        let kind = self.token.kind().clone();
-        match kind {
-            TokenKind::Identifier(value) => {
-                self.advance();
-                Ok(Identifier::new(value, Range::dummy()))
-            }
-            _ => Err(Diagnostic::new(
-                DiagnosticLevel::Error,
-                format!("expected identifier, found {:?}", self.token.kind()),
-                *self.token.range(),
-            )),
-        }
+        let ident = self.expect_ident()?;
+        self.advance();
+
+        Ok(ident)
     }
 
     fn advance(&mut self) {
         self.token = self.cursor.advance().unwrap_or_else(Token::dummy);
     }
 
-    fn expect(&mut self, kind: &TokenKind) -> bool {
-        let present = self.token.kind() == kind;
-        if present {
-            self.advance()
+    fn expect(&mut self, kind: TokenKind) -> Result<Range> {
+        if self.token.kind == kind {
+            let range = self.token.range;
+            self.advance();
+            Ok(range)
+        } else {
+            self.expected(kind)
         }
+    }
 
-        present
+    fn expect_ident(&self) -> Result<Identifier> {
+        if let TokenKind::Identifier(value) = &self.token.kind {
+            Ok(Identifier::new(String::from(value), self.token.range))
+        } else {
+            self.expected_identifier()
+        }
     }
 }

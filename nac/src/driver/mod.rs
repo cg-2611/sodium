@@ -1,8 +1,6 @@
-use crate::ast::decl::DeclKind;
-use crate::ast::expr::{ExprKind, LiteralKind};
-use crate::ast::stmt::StmtKind;
 use std::process;
 
+use crate::ast::printer::ASTPrinter;
 use crate::errors::{Diagnostic, DiagnosticLevel, Result};
 use crate::lexer::Lexer;
 use crate::parser::Parser;
@@ -32,32 +30,17 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
     }
 
     let ast = Parser::parse(session, token_stream);
-    println!("source file:");
-    for decl in ast.unwrap().root().decls() {
-        match decl.kind() {
-            DeclKind::Fn(fn_decl) => {
-                println!("    fn decl:");
-                println!("        name: {}", fn_decl.name().value());
-                println!("        ret type: {}", fn_decl.ret_type().value().value());
-                println!("        body:");
-                for stmt in fn_decl.body().stmts() {
-                    match stmt.kind() {
-                        StmtKind::RetExpr(ret_expr) => {
-                            println!("            ret expr:");
-                            match ret_expr.expr().kind() {
-                                ExprKind::Block(_) => println!("               block"),
-                                ExprKind::Literal(literal) => match literal.kind() {
-                                    LiteralKind::Integer(x) => {
-                                        println!("               integer literal: {}", x)
-                                    }
-                                },
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
+    if session.has_errors() {
+        session.emit_diagnostics();
+        return Err(Diagnostic::without_range(
+            DiagnosticLevel::Fatal,
+            String::from("compilation error"),
+        ));
     }
+
+    let ast = ast.unwrap();
+    ASTPrinter::print_ast(&ast);
 
     Ok(())
 }

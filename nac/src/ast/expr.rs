@@ -2,64 +2,40 @@ use crate::ast::stmt::Stmt;
 use crate::source::Range;
 
 pub enum ExprKind {
-    Block(Block),
+    Block(Box<Block>),
+    Ret(Box<RetExpr>),
     Literal(Literal),
 }
 
 pub struct Expr {
-    kind: ExprKind,
-    range: Range,
+    pub kind: ExprKind,
+    pub range: Range,
 }
 
 impl Expr {
     pub fn new(kind: ExprKind, range: Range) -> Self {
         Self { kind, range }
     }
-
-    pub fn kind(&self) -> &ExprKind {
-        &self.kind
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
-    }
 }
 
 pub struct Block {
-    stmts: Vec<Stmt>,
-    range: Range,
+    pub stmts: Vec<Stmt>,
+    pub range: Range,
 }
 
 impl Block {
     pub fn new(stmts: Vec<Stmt>, range: Range) -> Self {
         Self { stmts, range }
     }
-
-    pub fn stmts(&self) -> &Vec<Stmt> {
-        &self.stmts
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
-    }
 }
 
 pub struct RetExpr {
-    expr: Expr,
-    range: Range,
+    pub expr: Box<Expr>,
+    pub range: Range,
 }
-
 impl RetExpr {
-    pub fn new(expr: Expr, range: Range) -> Self {
+    pub fn new(expr: Box<Expr>, range: Range) -> Self {
         Self { expr, range }
-    }
-
-    pub fn expr(&self) -> &Expr {
-        &self.expr
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
     }
 }
 
@@ -68,20 +44,12 @@ pub enum LiteralKind {
 }
 
 pub struct Literal {
-    kind: LiteralKind,
-    range: Range,
+    pub kind: LiteralKind,
+    pub range: Range,
 }
 
 impl Literal {
     pub fn new(kind: LiteralKind, range: Range) -> Self {
         Self { kind, range }
-    }
-
-    pub fn kind(&self) -> &LiteralKind {
-        &self.kind
-    }
-
-    pub fn range(&self) -> Range {
-        self.range
     }
 }
