@@ -1,7 +1,11 @@
+use crate::errors::Result;
 use crate::session::Session;
 use crate::source::{Cursor, Location, Range};
 use crate::token::token_stream::TokenStream;
 use crate::token::{Keyword, Token, TokenKind};
+
+#[cfg(test)]
+mod tests;
 
 pub mod diagnostics;
 
@@ -12,7 +16,7 @@ pub struct Lexer<'src> {
 }
 
 impl<'src> Lexer<'src> {
-    fn new(src: &'src str) -> Self {
+    pub fn new(src: &'src str) -> Self {
         Self {
             cursor: Cursor::new(src),
             line: 1,
@@ -20,7 +24,7 @@ impl<'src> Lexer<'src> {
         }
     }
 
-    pub fn tokenize(session: &Session, src: &'src str) -> TokenStream {
+    pub fn tokenize(session: &Session, src: &'src str) -> Result<TokenStream> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut lexer = Lexer::new(src);
 
@@ -40,7 +44,7 @@ impl<'src> Lexer<'src> {
             }
         }
 
-        TokenStream::from(tokens)
+        Ok(TokenStream::from(tokens))
     }
 
     pub fn next_token(&mut self) -> Token {

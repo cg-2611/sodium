@@ -29,7 +29,7 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
         ));
     }
 
-    let ast = Parser::parse(session, token_stream);
+    let ast = Parser::parse(session, token_stream.unwrap());
 
     if session.has_errors() {
         session.emit_diagnostics();
