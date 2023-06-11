@@ -25,4 +25,8 @@ impl Session {
     pub fn has_errors(&self) -> bool {
         self.diagnostic_handler.borrow().has_errors()
     }
+
+    pub fn error_count(&self) -> u32 {
+        self.diagnostic_handler.borrow().error_count()
+    }
 }
