@@ -15,13 +15,13 @@ impl SourceFile {
 
         if let Some(extension) = file_path.extension().and_then(|e| e.to_str()) {
             if extension != "na" {
-                return Err(Diagnostic::without_range(
+                return Err(Diagnostic::new(
                     DiagnosticLevel::Fatal,
                     format!("invalid path {}: file extension must be .na", path),
                 ));
             }
         } else {
-            return Err(Diagnostic::without_range(
+            return Err(Diagnostic::new(
                 DiagnosticLevel::Fatal,
                 format!("could not determine extension of file {}", path),
             ));
@@ -30,7 +30,7 @@ impl SourceFile {
         let name = match file_path.file_name().and_then(|n| n.to_str()) {
             Some(name) => name,
             None => {
-                return Err(Diagnostic::without_range(
+                return Err(Diagnostic::new(
                     DiagnosticLevel::Fatal,
                     format!("could not determine name of file {}", path),
                 ))

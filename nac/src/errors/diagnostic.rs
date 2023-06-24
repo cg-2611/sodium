@@ -2,13 +2,13 @@ use std::fmt::Display;
 
 use crate::source::Range;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum DiagnosticLevel {
     Error,
     Fatal,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Diagnostic {
     level: DiagnosticLevel,
     message: String,
@@ -16,19 +16,19 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    pub fn new(level: DiagnosticLevel, message: String, range: Range) -> Self {
-        Self {
-            level,
-            message,
-            range: Some(range),
-        }
-    }
-
-    pub fn without_range(level: DiagnosticLevel, message: String) -> Self {
+    pub fn new(level: DiagnosticLevel, message: String) -> Self {
         Self {
             level,
             message,
             range: None,
+        }
+    }
+
+    pub fn ranged(level: DiagnosticLevel, message: String, range: Range) -> Self {
+        Self {
+            level,
+            message,
+            range: Some(range),
         }
     }
 

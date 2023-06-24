@@ -23,7 +23,7 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
 
     if session.has_errors() {
         session.emit_diagnostics();
-        return Err(Diagnostic::without_range(
+        return Err(Diagnostic::new(
             DiagnosticLevel::Fatal,
             String::from("compilation error"),
         ));
@@ -33,7 +33,7 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
 
     if session.has_errors() {
         session.emit_diagnostics();
-        return Err(Diagnostic::without_range(
+        return Err(Diagnostic::new(
             DiagnosticLevel::Fatal,
             String::from("compilation error"),
         ));
@@ -49,7 +49,7 @@ pub fn main() {
     let exit_code = catch_unwind(|| {
         let args: Vec<String> = std::env::args().collect();
         if args.len() < 2 {
-            return Err(Diagnostic::without_range(
+            return Err(Diagnostic::new(
                 DiagnosticLevel::Fatal,
                 String::from("invalid arguments passed"),
             ));
@@ -61,7 +61,7 @@ pub fn main() {
             Err(diagnostic) => {
                 session.report_diagnostic(diagnostic);
                 session.emit_diagnostics();
-                return Err(Diagnostic::without_range(
+                return Err(Diagnostic::new(
                     DiagnosticLevel::Fatal,
                     String::from("compilation error"),
                 ));
