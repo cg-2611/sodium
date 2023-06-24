@@ -33,9 +33,15 @@ impl<'s> Parser<'s> {
         let left_brace = self.expect(TokenKind::LeftBrace)?;
         let mut stmts: Vec<Stmt> = Vec::new();
 
-        while self.token.kind != TokenKind::RightBrace {
-            let stmt = self.parse_stmt()?;
-            stmts.push(stmt);
+        while self.token.kind != TokenKind::RightBrace && self.token.kind != TokenKind::EOF {
+            let stmt = self.parse_stmt();
+
+            match stmt {
+                Ok(stmt) => stmts.push(stmt),
+                Err(diagnostic) => {
+                    self.report_diagnostic(diagnostic, Some(Parser::recover_stmt));
+                }
+            }
         }
 
         let right_brace = self.expect(TokenKind::RightBrace)?;

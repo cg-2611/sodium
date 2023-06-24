@@ -7,6 +7,9 @@ use crate::token::cursor::Cursor;
 use crate::token::token_stream::TokenStream;
 use crate::token::{Token, TokenKind};
 
+#[cfg(test)]
+mod tests;
+
 pub mod decl;
 pub mod diagnostics;
 pub mod expr;
@@ -33,14 +36,7 @@ impl<'s> Parser<'s> {
 
     pub fn parse(session: &'s Session, token_stream: TokenStream) -> Result<AST> {
         let mut parser = Parser::new(session, token_stream);
-        let root = parser.parse_source_file().unwrap_or_else(|diagnostic| {
-            parser.session.report_diagnostic(diagnostic);
-            SourceFile {
-                decls: Vec::new(),
-                range: Range::dummy(),
-            }
-        });
-
+        let root = parser.parse_source_file()?;
         Ok(AST::new(root))
     }
 
@@ -48,8 +44,14 @@ impl<'s> Parser<'s> {
         let start = self.token.range;
         let mut decls: Vec<Box<Decl>> = Vec::new();
 
-        while let Some(decl) = self.parse_decl()? {
-            decls.push(Box::new(decl));
+        loop {
+            match self.parse_decl() {
+                Ok(Some(decl)) => decls.push(Box::new(decl)),
+                Ok(None) => break,
+                Err(diagnostic) => {
+                    self.report_diagnostic(diagnostic, Some(Parser::recover_decl));
+                }
+            }
         }
 
         Ok(SourceFile::new(decls, start.to(self.token.range)))
@@ -72,7 +74,7 @@ impl<'s> Parser<'s> {
             self.advance();
             Ok(range)
         } else {
-            self.expected(kind)
+            self.expected_token(kind)
         }
     }
 
