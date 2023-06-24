@@ -39,6 +39,7 @@ impl RetExpr {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub enum LiteralKind {
     Integer(i32),
 }
