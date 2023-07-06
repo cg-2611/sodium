@@ -1,6 +1,6 @@
 use std::process;
 
-use crate::ast::printer::ASTPrinter;
+use crate::codegen::Codegen;
 use crate::errors::{Diagnostic, DiagnosticLevel, Result};
 use crate::lexer::Lexer;
 use crate::parser::Parser;
@@ -39,8 +39,7 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
         ));
     }
 
-    let ast = ast.unwrap();
-    ASTPrinter::print_ast(&ast);
+    let module = Codegen::codegen("module", ast.unwrap());
 
     Ok(())
 }

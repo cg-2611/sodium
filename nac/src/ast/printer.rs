@@ -11,44 +11,44 @@ pub struct ASTPrinter {
     indent: usize,
 }
 
-impl<'ast> MutVisitor<'ast> for ASTPrinter {
-    fn visit_source_file(&mut self, source_file: &'ast SourceFile) {
+impl<'ast> MutVisitor<'ast, ()> for ASTPrinter {
+    fn visit_source_file_mut(&mut self, source_file: &'ast SourceFile) {
         self.walk_source_file(source_file);
     }
 
-    fn visit_decl(&mut self, decl: &'ast Decl) {
+    fn visit_decl_mut(&mut self, decl: &'ast Decl) {
         self.walk_decl(decl);
     }
 
-    fn visit_fn_decl(&mut self, fn_decl: &'ast FnDecl) {
+    fn visit_fn_decl_mut(&mut self, fn_decl: &'ast FnDecl) {
         self.walk_fn_decl(fn_decl);
     }
 
-    fn visit_ident(&mut self, ident: &'ast Identifier) {
+    fn visit_ident_mut(&mut self, ident: &'ast Identifier) {
         self.walk_ident(ident);
     }
 
-    fn visit_type(&mut self, ty: &'ast Type) {
+    fn visit_type_mut(&mut self, ty: &'ast Type) {
         self.walk_type(ty);
     }
 
-    fn visit_block(&mut self, block: &'ast Block) {
+    fn visit_block_mut(&mut self, block: &'ast Block) {
         self.walk_block(block);
     }
 
-    fn visit_stmt(&mut self, stmt: &'ast Stmt) {
+    fn visit_stmt_mut(&mut self, stmt: &'ast Stmt) {
         self.walk_stmt(stmt);
     }
 
-    fn visit_expr(&mut self, expr: &'ast Expr) {
+    fn visit_expr_mut(&mut self, expr: &'ast Expr) {
         self.walk_expr(expr);
     }
 
-    fn visit_ret_expr(&mut self, ret_expr: &'ast RetExpr) {
+    fn visit_ret_expr_mut(&mut self, ret_expr: &'ast RetExpr) {
         self.walk_ret_expr(ret_expr);
     }
 
-    fn visit_literal(&mut self, literal: &'ast Literal) {
+    fn visit_literal_mut(&mut self, literal: &'ast Literal) {
         self.walk_literal(literal);
     }
 }
@@ -61,7 +61,7 @@ impl<'ast> ASTPrinter {
             indent: 0,
         };
 
-        ast_printer.visit_source_file(ast.root());
+        ast_printer.visit_source_file_mut(ast.root());
         println!("{}", ast_printer.out);
     }
 
@@ -70,7 +70,7 @@ impl<'ast> ASTPrinter {
         self.indent();
 
         for decl in &source_file.decls {
-            self.visit_decl(decl);
+            self.visit_decl_mut(decl);
         }
 
         self.dedent();
@@ -82,7 +82,7 @@ impl<'ast> ASTPrinter {
         self.indent();
 
         match &decl.kind {
-            DeclKind::Fn(fn_decl) => self.visit_fn_decl(fn_decl),
+            DeclKind::Fn(fn_decl) => self.visit_fn_decl_mut(fn_decl),
         }
 
         self.dedent();
@@ -94,9 +94,9 @@ impl<'ast> ASTPrinter {
 
         self.indent();
 
-        self.visit_ident(&fn_decl.ident);
-        self.visit_type(&fn_decl.ret_type);
-        self.visit_block(&fn_decl.body);
+        self.visit_ident_mut(&fn_decl.ident);
+        self.visit_type_mut(&fn_decl.ret_type);
+        self.visit_block_mut(&fn_decl.body);
 
         self.dedent();
     }
@@ -111,7 +111,7 @@ impl<'ast> ASTPrinter {
         self.writeln(format!("type ({}):", ty.ident.range).as_str());
         self.indent();
 
-        self.visit_ident(&ty.ident);
+        self.visit_ident_mut(&ty.ident);
 
         self.dedent();
     }
@@ -122,7 +122,7 @@ impl<'ast> ASTPrinter {
         self.indent();
 
         for stmt in &block.stmts {
-            self.visit_stmt(stmt);
+            self.visit_stmt_mut(stmt);
         }
 
         self.dedent();
@@ -134,7 +134,7 @@ impl<'ast> ASTPrinter {
         self.indent();
 
         match &stmt.kind {
-            StmtKind::ExprStmt(expr) => self.visit_expr(expr),
+            StmtKind::ExprStmt(expr) => self.visit_expr_mut(expr),
         }
 
         self.dedent();
@@ -146,9 +146,9 @@ impl<'ast> ASTPrinter {
         self.indent();
 
         match &expr.kind {
-            ExprKind::Block(block) => self.visit_block(block),
-            ExprKind::Literal(literal) => self.visit_literal(literal),
-            ExprKind::Ret(ret_expr) => self.visit_ret_expr(ret_expr),
+            ExprKind::Block(block) => self.visit_block_mut(block),
+            ExprKind::Literal(literal) => self.visit_literal_mut(literal),
+            ExprKind::Ret(ret_expr) => self.visit_ret_expr_mut(ret_expr),
         }
 
         self.dedent();
@@ -159,7 +159,7 @@ impl<'ast> ASTPrinter {
         self.writeln(format!("ret expr ({}):", ret_expr.range).as_str());
         self.indent();
 
-        self.visit_expr(&ret_expr.expr);
+        self.visit_expr_mut(&ret_expr.expr);
 
         self.dedent();
     }

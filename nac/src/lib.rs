@@ -1,7 +1,9 @@
 pub mod ast;
+pub mod codegen;
 pub mod driver;
 pub mod errors;
 pub mod lexer;
+pub mod llvm;
 pub mod parser;
 pub mod session;
 pub mod source;
