@@ -32,7 +32,6 @@ impl Codegen {
     pub fn codegen(module_id: &str, ast: AST) -> Module {
         let codegen = Codegen::new(module_id);
         codegen.visit_source_file(ast.root());
-        codegen.module.write_to_file("main.ll");
         codegen.module.clone()
     }
 

@@ -1,19 +1,17 @@
-use std::ffi::{c_char, c_ulonglong, CString};
+use std::ffi::c_ulonglong;
 
 use llvm_sys::analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction};
 use llvm_sys::core::{
     LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMBuildRet, LLVMConstInt, LLVMContextCreate,
     LLVMContextDispose, LLVMCreateBuilderInContext, LLVMDisposeBuilder, LLVMDisposeModule,
-    LLVMFunctionType, LLVMInt32TypeInContext, LLVMModuleCreateWithNameInContext,
-    LLVMPositionBuilderAtEnd, LLVMPrintModuleToFile, LLVMPrintModuleToString,
+    LLVMDumpModule, LLVMFunctionType, LLVMInt32TypeInContext, LLVMModuleCreateWithNameInContext,
+    LLVMPositionBuilderAtEnd, LLVMPrintModuleToFile,
 };
 use llvm_sys::prelude::{
-    LLVMBasicBlockRef, LLVMBool, LLVMBuilderRef, LLVMContextRef, LLVMModuleRef, LLVMTypeRef,
-    LLVMValueRef,
+    LLVMBasicBlockRef, LLVMBuilderRef, LLVMContextRef, LLVMModuleRef, LLVMTypeRef, LLVMValueRef,
 };
 
-const LLVM_TRUE: LLVMBool = 1;
-const LLVM_FALSE: LLVMBool = 0;
+use crate::llvm::{c_string_from, LLVM_FALSE, LLVM_TRUE};
 
 pub struct Context(LLVMContextRef);
 
@@ -38,20 +36,7 @@ impl Module {
     }
 
     pub fn print(&self) {
-        let string = unsafe { LLVMPrintModuleToString(self.0) };
-        let string = unsafe { CString::from_raw(string) };
-
-        println!("{:?}", string);
-
-        let string = match string.to_str() {
-            Ok(string) => string,
-            Err(e) => {
-                println!("{:?}", e);
-                ""
-            }
-        };
-
-        println!("{:?}", string);
+        unsafe { LLVMDumpModule(self.0) }
     }
 
     pub fn write_to_file(&self, file_name: &str) {
@@ -74,11 +59,6 @@ impl Builder {
 pub struct Value(LLVMValueRef);
 pub struct Type(LLVMTypeRef);
 pub struct BasicBlock(LLVMBasicBlockRef);
-
-pub fn c_string_from(string: &str) -> *const c_char {
-    let c_string = CString::new(string).unwrap();
-    c_string.into_raw()
-}
 
 pub fn llvm_int32_type(context: &Context) -> Type {
     unsafe { Type(LLVMInt32TypeInContext(context.0)) }
