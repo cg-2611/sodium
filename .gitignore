@@ -3,5 +3,9 @@
 .idea/
 .vscode/
 
-build/
-target/
+/build/
+/target/
+
+/examples/*
+!/examples/*.na
+

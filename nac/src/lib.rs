@@ -7,5 +7,6 @@ pub mod llvm;
 pub mod parser;
 pub mod session;
 pub mod source;
+pub mod target;
 pub mod token;
 pub mod util;

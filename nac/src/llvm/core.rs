@@ -1,6 +1,6 @@
 use std::ffi::c_ulonglong;
 
-use llvm_sys::analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction};
+use llvm_sys::analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction, LLVMVerifyModule};
 use llvm_sys::core::{
     LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMBuildRet, LLVMConstInt, LLVMContextCreate,
     LLVMContextDispose, LLVMCreateBuilderInContext, LLVMDisposeBuilder, LLVMDisposeModule,
@@ -22,7 +22,6 @@ impl Default for Context {
     }
 }
 
-#[derive(Clone)]
 pub struct Module(LLVMModuleRef);
 
 impl Module {
@@ -45,6 +44,22 @@ impl Module {
             LLVMPrintModuleToFile(self.0, file_name, std::ptr::null_mut());
         }
     }
+
+    pub fn get_ref(&self) -> LLVMModuleRef {
+        self.0
+    }
+}
+
+pub fn llvm_verify_module(module: &Module) -> bool {
+    let verified = unsafe {
+        LLVMVerifyModule(
+            module.0,
+            LLVMVerifierFailureAction::LLVMPrintMessageAction,
+            std::ptr::null_mut(),
+        )
+    };
+
+    verified == LLVM_TRUE
 }
 
 pub struct Builder(LLVMBuilderRef);

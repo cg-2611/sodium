@@ -6,8 +6,8 @@ use crate::ast::visitor::Visitor;
 use crate::ast::{Identifier, SourceFile, AST};
 use crate::llvm::{
     llvm_add_block, llvm_add_function, llvm_build_ret, llvm_const_int, llvm_dispose_builder,
-    llvm_dispose_context, llvm_dispose_module, llvm_function_type, llvm_int32_type,
-    llvm_position_builder_at_end, llvm_verify_function, Builder, Context, Module, Value,
+    llvm_function_type, llvm_int32_type, llvm_position_builder_at_end, llvm_verify_function,
+    llvm_verify_module, Builder, Context, Module, Value,
 };
 
 pub struct Codegen {
@@ -29,22 +29,16 @@ impl Codegen {
         }
     }
 
-    pub fn codegen(module_id: &str, ast: AST) -> Module {
+    pub fn codegen(module_id: &str, ast: AST) -> (Context, Module) {
         let codegen = Codegen::new(module_id);
         codegen.visit_source_file(ast.root());
-        codegen.module.clone()
+        llvm_dispose_builder(&codegen.builder);
+
+        (codegen.context, codegen.module)
     }
 
     pub fn print_llvm_ir(&self) {
         self.module.print();
-    }
-}
-
-impl Drop for Codegen {
-    fn drop(&mut self) {
-        llvm_dispose_builder(&self.builder);
-        llvm_dispose_module(&self.module);
-        llvm_dispose_context(&self.context);
     }
 }
 
@@ -95,6 +89,8 @@ impl<'ast> Codegen {
         for decl in &source_file.decls {
             self.visit_decl(decl);
         }
+
+        llvm_verify_module(&self.module);
 
         None
     }
