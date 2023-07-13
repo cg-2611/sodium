@@ -4,37 +4,31 @@ use crate::ast::stmt::{Stmt, StmtKind};
 use crate::ast::ty::Type;
 use crate::ast::visitor::Visitor;
 use crate::ast::{Identifier, SourceFile, AST};
-use crate::llvm::{
-    llvm_add_block, llvm_add_function, llvm_build_ret, llvm_const_int, llvm_dispose_builder,
-    llvm_function_type, llvm_int32_type, llvm_position_builder_at_end, llvm_verify_function,
-    llvm_verify_module, Builder, Context, Module, Value,
-};
+use crate::llvm::{Builder, Context, Module, Value};
 
-pub struct Codegen {
-    context: Context,
-    module: Module,
-    builder: Builder,
+pub struct Codegen<'ctx> {
+    context: &'ctx Context,
+    module: Module<'ctx>,
+    builder: Builder<'ctx>,
 }
 
-impl Codegen {
-    pub fn new(module_id: &str) -> Self {
-        let context = Context::default();
-        let module = Module::new(module_id, &context);
-        let builder = Builder::new(&context);
-
+impl<'ctx> Codegen<'ctx> {
+    pub fn new(context: &'ctx Context, module_name: &str) -> Self {
         Self {
             context,
-            module,
-            builder,
+            module: context.create_module(module_name),
+            builder: context.create_builder(),
         }
     }
 
-    pub fn codegen(module_id: &str, ast: AST) -> (Context, Module) {
-        let codegen = Codegen::new(module_id);
+    pub fn codegen<'ast>(
+        context: &'ctx Context,
+        module_name: &str,
+        ast: &'ast AST,
+    ) -> Module<'ctx> {
+        let codegen = Codegen::new(context, module_name);
         codegen.visit_source_file(ast.root());
-        llvm_dispose_builder(&codegen.builder);
-
-        (codegen.context, codegen.module)
+        codegen.module
     }
 
     pub fn print_llvm_ir(&self) {
@@ -42,7 +36,7 @@ impl Codegen {
     }
 }
 
-impl<'ast> Visitor<'ast, Option<Value>> for Codegen {
+impl<'ast, 'ctx> Visitor<'ast, Option<Value>> for Codegen<'ctx> {
     fn visit_source_file(&self, source_file: &'ast SourceFile) -> Option<Value> {
         self.walk_source_file(source_file)
     }
@@ -84,13 +78,11 @@ impl<'ast> Visitor<'ast, Option<Value>> for Codegen {
     }
 }
 
-impl<'ast> Codegen {
+impl<'ast, 'ctx> Codegen<'ctx> {
     pub fn walk_source_file(&self, source_file: &'ast SourceFile) -> Option<Value> {
         for decl in &source_file.decls {
             self.visit_decl(decl);
         }
-
-        llvm_verify_module(&self.module);
 
         None
     }
@@ -102,18 +94,21 @@ impl<'ast> Codegen {
     }
 
     pub fn walk_fn_decl(&self, fn_decl: &'ast FnDecl) -> Option<Value> {
-        let fn_ret_type = llvm_int32_type(&self.context);
-        let fn_type = llvm_function_type(fn_ret_type);
-        let fn_value = llvm_add_function(&self.module, fn_decl.ident.value.as_str(), fn_type);
+        let fn_ret_type = self.context.i32_type();
+        let fn_type = fn_ret_type.fn_type();
+        let fn_value = self
+            .module
+            .add_function(fn_decl.ident.value.as_str(), &fn_type);
 
-        let block = llvm_add_block(&self.context, &fn_value, "entry");
-        llvm_position_builder_at_end(&self.builder, &block);
+        let block = self.context.append_basic_block(&fn_value, "entry");
+        self.builder.position_at_end(&block);
 
         self.visit_block(&fn_decl.body);
 
-        llvm_verify_function(&fn_value);
-
-        Some(fn_value)
+        match fn_value.verify_fn() {
+            Ok(_) => Some(fn_value),
+            Err(_) => None,
+        }
     }
 
     pub fn walk_ident(&self, ident: &'ast Identifier) -> Option<Value> {
@@ -133,7 +128,7 @@ impl<'ast> Codegen {
 
         let ret_expr_stmt = block.stmts.last().unwrap();
         self.visit_stmt(ret_expr_stmt)
-            .map(|ret_value| llvm_build_ret(&self.builder, &ret_value))
+            .map(|ret_value| self.builder.build_ret(&ret_value))
     }
 
     pub fn walk_stmt(&self, stmt: &'ast Stmt) -> Option<Value> {
@@ -157,8 +152,8 @@ impl<'ast> Codegen {
     pub fn walk_literal(&self, literal: &'ast Literal) -> Option<Value> {
         match literal.kind {
             LiteralKind::Integer(x) => {
-                let int_type = llvm_int32_type(&self.context);
-                Some(llvm_const_int(int_type, x, true))
+                let int_type = self.context.i32_type();
+                Some(int_type.const_int(x as u64))
             }
         }
     }

@@ -3,7 +3,7 @@ use std::process;
 use crate::codegen::Codegen;
 use crate::errors::{Diagnostic, DiagnosticLevel, Result};
 use crate::lexer::Lexer;
-use crate::llvm::{llvm_dispose_context, llvm_dispose_module};
+use crate::llvm::Context;
 use crate::parser::Parser;
 use crate::session::Session;
 use crate::source::SourceFile;
@@ -41,11 +41,9 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
         ));
     }
 
-    let (context, module) = Codegen::codegen("module", ast.unwrap());
+    let context = Context::create();
+    let module = Codegen::codegen(&context, "module", &ast.unwrap());
     TargetGen::compile_module(&module);
-
-    llvm_dispose_module(&module);
-    llvm_dispose_context(&context);
 
     Ok(())
 }

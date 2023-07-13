@@ -1,4 +1,5 @@
-use std::ffi::CString;
+use std::ffi::c_char;
+use std::mem::MaybeUninit;
 
 use llvm_sys::target::{
     LLVM_InitializeAllAsmParsers, LLVM_InitializeAllAsmPrinters, LLVM_InitializeAllDisassemblers,
@@ -11,84 +12,148 @@ use llvm_sys::target_machine::{
     LLVMTargetMachineRef, LLVMTargetRef,
 };
 
-use crate::llvm::{c_string_from, mut_c_string_from, Module};
+use crate::llvm::{GetRef, LLVMString, Module};
 
 pub struct Target(LLVMTargetRef);
+
+impl Target {
+    pub fn new(target: LLVMTargetRef) -> Self {
+        Self(target)
+    }
+
+    pub fn initialise_all() {
+        unsafe {
+            LLVM_InitializeAllTargets();
+            LLVM_InitializeAllTargetInfos();
+            LLVM_InitializeAllAsmParsers();
+            LLVM_InitializeAllAsmPrinters();
+            LLVM_InitializeAllDisassemblers();
+            LLVM_InitializeAllTargetMCs();
+        }
+    }
+
+    pub fn from_triple(triple: &TargetTriple) -> Result<Self, LLVMString> {
+        let mut target = std::ptr::null_mut();
+        let mut error_string = MaybeUninit::uninit();
+
+        let error = unsafe {
+            LLVMGetTargetFromTriple(triple.get_ptr(), &mut target, error_string.as_mut_ptr())
+        };
+
+        let error_string = unsafe { error_string.assume_init() };
+        if error == true.into() && !error_string.is_null() {
+            return Err(LLVMString::new(error_string));
+        }
+
+        Ok(Target::new(target))
+    }
+
+    pub fn create_target_machine(
+        &self,
+        triple: &TargetTriple,
+        cpu: &LLVMString,
+        features: &LLVMString,
+        level: LLVMCodeGenOptLevel,
+        reloc: LLVMRelocMode,
+        code_model: LLVMCodeModel,
+    ) -> Option<TargetMachine> {
+        let target_machine = unsafe {
+            LLVMCreateTargetMachine(
+                self.get_ref(),
+                triple.get_ptr(),
+                cpu.get_ptr(),
+                features.get_ptr(),
+                level,
+                reloc,
+                code_model,
+            )
+        };
+
+        if target_machine.is_null() {
+            return None;
+        }
+
+        Some(TargetMachine::new(target_machine))
+    }
+}
+
+impl GetRef<LLVMTargetRef> for Target {
+    fn get_ref(&self) -> LLVMTargetRef {
+        self.0
+    }
+}
+
 pub struct TargetMachine(LLVMTargetMachineRef);
 
-pub fn llvm_initialise_all_targets() {
-    unsafe {
-        LLVM_InitializeAllTargets();
-        LLVM_InitializeAllTargetInfos();
-        LLVM_InitializeAllAsmParsers();
-        LLVM_InitializeAllAsmPrinters();
-        LLVM_InitializeAllDisassemblers();
-        LLVM_InitializeAllTargetMCs();
+impl TargetMachine {
+    pub fn new(target: LLVMTargetMachineRef) -> Self {
+        Self(target)
+    }
+
+    pub fn get_host_cpu_name() -> LLVMString {
+        unsafe { LLVMString::new(LLVMGetHostCPUName()) }
+    }
+
+    pub fn get_host_cpu_features() -> LLVMString {
+        let features = unsafe { LLVMGetHostCPUFeatures() };
+        LLVMString::new(features)
+    }
+
+    pub fn write_to_file(&self, module: &Module, path: &str) -> Result<(), LLVMString> {
+        let path = LLVMString::from(path);
+        let mut error_string = MaybeUninit::uninit();
+
+        let error = unsafe {
+            let path = path.get_ptr() as *mut _;
+
+            LLVMTargetMachineEmitToFile(
+                self.get_ref(),
+                module.get_ref(),
+                path,
+                LLVMCodeGenFileType::LLVMObjectFile,
+                error_string.as_mut_ptr(),
+            )
+        };
+
+        let error_string = unsafe { error_string.assume_init() };
+        if error == true.into() && !error_string.is_null() {
+            return Err(LLVMString::new(error_string));
+        }
+
+        Ok(())
     }
 }
 
-pub fn llvm_get_target_triple() -> String {
-    let triple = unsafe { LLVMGetDefaultTargetTriple() };
-    let c_string = unsafe { CString::from_raw(triple) };
-    c_string.into_string().unwrap()
+impl GetRef<LLVMTargetMachineRef> for TargetMachine {
+    fn get_ref(&self) -> LLVMTargetMachineRef {
+        self.0
+    }
 }
 
-pub fn llvm_get_target_from_triple(triple: &str) -> Target {
-    let triple = c_string_from(triple);
-    let mut target: LLVMTargetRef = std::ptr::null_mut();
+impl Drop for TargetMachine {
+    fn drop(&mut self) {
+        unsafe { LLVMDisposeTargetMachine(self.get_ref()) }
+    }
+}
 
-    unsafe {
-        LLVMGetTargetFromTriple(triple, &mut target, std::ptr::null_mut());
+pub struct TargetTriple(LLVMString);
+
+impl TargetTriple {
+    pub fn new(triple: LLVMString) -> Self {
+        Self(triple)
     }
 
-    Target(target)
-}
+    pub fn create(triple: &str) -> Self {
+        let triple = LLVMString::from(triple);
+        TargetTriple::new(triple)
+    }
 
-pub fn llvm_get_host_cpu() -> String {
-    let cpu = unsafe { LLVMGetHostCPUName() };
-    let c_string = unsafe { CString::from_raw(cpu) };
-    c_string.into_string().unwrap()
-}
+    pub fn get_default_triple() -> Self {
+        let triple = unsafe { LLVMString::new(LLVMGetDefaultTargetTriple()) };
+        TargetTriple::new(triple)
+    }
 
-pub fn llvm_get_host_cpu_features() -> String {
-    let features = unsafe { LLVMGetHostCPUFeatures() };
-    let c_string = unsafe { CString::from_raw(features) };
-    c_string.into_string().unwrap()
-}
-
-pub fn llvm_create_target_machine(
-    target: &Target,
-    triple: &str,
-    cpu: &str,
-    features: &str,
-    level: LLVMCodeGenOptLevel,
-    reloc: LLVMRelocMode,
-    code_model: LLVMCodeModel,
-) -> TargetMachine {
-    let triple = c_string_from(triple);
-    let cpu = c_string_from(cpu);
-    let features = c_string_from(features);
-
-    let target_machine = unsafe {
-        LLVMCreateTargetMachine(target.0, triple, cpu, features, level, reloc, code_model)
-    };
-    TargetMachine(target_machine)
-}
-
-pub fn llvm_dispose_target_machine(machine: &TargetMachine) {
-    unsafe { LLVMDisposeTargetMachine(machine.0) }
-}
-
-pub fn llvm_emit_to_object_file(machine: &TargetMachine, module: &Module, path: &str) {
-    let path = mut_c_string_from(path);
-
-    unsafe {
-        LLVMTargetMachineEmitToFile(
-            machine.0,
-            module.get_ref(),
-            path,
-            LLVMCodeGenFileType::LLVMObjectFile,
-            std::ptr::null_mut(),
-        )
-    };
+    pub fn get_ptr(&self) -> *const c_char {
+        self.0.get_ptr()
+    }
 }

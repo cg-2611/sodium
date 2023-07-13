@@ -1,13 +1,15 @@
-use crate::llvm::{llvm_emit_to_object_file, Module, TargetMachine};
-use crate::target::TargetGen;
 use std::path::Path;
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, process};
+
 use tempfile::Builder;
 
-impl<'m> TargetGen<'m> {
-    pub fn link_executable(&self, module: &'m Module, target_machine: &TargetMachine) {
+use crate::llvm::{Module, TargetMachine};
+use crate::target::TargetGen;
+
+impl<'ctx> TargetGen<'ctx> {
+    pub fn link_executable(&self, module: &'ctx Module, target_machine: &TargetMachine) {
         let tempdir = Builder::new().prefix("nac_").tempdir().unwrap();
         let tempdir_path = tempdir.path().to_str().unwrap();
 
@@ -24,7 +26,9 @@ impl<'m> TargetGen<'m> {
         let path = Path::new(tempdir_path).join(filename);
         let path = path.to_str().unwrap();
 
-        llvm_emit_to_object_file(target_machine, module, path);
+        target_machine
+            .write_to_file(module, path)
+            .expect("failed to write object file");
 
         Command::new("clang")
             .arg(path)
