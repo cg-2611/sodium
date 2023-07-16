@@ -12,9 +12,8 @@ impl<'s> Parser<'s> {
         recover: Option<impl Fn(&mut Parser<'s>)>,
     ) {
         self.session.report_diagnostic(diagnostic);
-        match recover {
-            Some(f) => f(self),
-            None => {}
+        if let Some(f) = recover {
+            f(self)
         };
     }
 
