@@ -9,14 +9,14 @@ use crate::llvm::{BasicBlock, Context, GetRef, Value};
 
 pub struct Builder<'ctx> {
     builder: LLVMBuilderRef,
-    _context: PhantomData<&'ctx Context>,
+    _marker: PhantomData<&'ctx Context>,
 }
 
 impl<'ctx> Builder<'ctx> {
     pub fn new(builder: LLVMBuilderRef) -> Self {
         Self {
             builder,
-            _context: PhantomData,
+            _marker: PhantomData,
         }
     }
 

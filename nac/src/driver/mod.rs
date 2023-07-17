@@ -1,5 +1,3 @@
-use std::process;
-
 use crate::codegen::CodeGen;
 use crate::errors::{Diagnostic, DiagnosticLevel, Result};
 use crate::lexer::Lexer;
@@ -12,7 +10,7 @@ use crate::target::TargetGen;
 const EXIT_SUCCESS: i32 = 0;
 const EXIT_FAILURE: i32 = 1;
 
-fn catch_unwind(f: impl FnOnce() -> Result<()>) -> i32 {
+fn catch_with_exit_code(f: impl FnOnce() -> Result<()>) -> i32 {
     let result = f();
     match result {
         Ok(_) => EXIT_SUCCESS,
@@ -50,7 +48,7 @@ fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
 }
 
 pub fn main() {
-    let exit_code = catch_unwind(|| {
+    let exit_code = catch_with_exit_code(|| {
         let session = Session::new();
 
         let args: Vec<String> = std::env::args().collect();
@@ -75,5 +73,5 @@ pub fn main() {
         compile_source_file(&session, &src)
     });
 
-    process::exit(exit_code);
+    std::process::exit(exit_code);
 }

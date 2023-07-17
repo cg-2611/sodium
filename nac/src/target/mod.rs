@@ -28,9 +28,13 @@ impl<'s, 'ctx> TargetGen<'s, 'ctx> {
     }
 
     pub fn compile_module(session: &'s Session, module: &'ctx Module) -> Result<()> {
-        let target_gen = Self::new(session, module)?;
+        let target_gen = match Self::new(session, module) {
+            Ok(target_gen) => target_gen,
+            Err(diagnostic) => return Err(diagnostic),
+        };
 
-        if let Some(diagnostic) = target_gen.link().err() {
+        let result = target_gen.link();
+        if let Some(diagnostic) = result.err() {
             target_gen.session.report_diagnostic(diagnostic)
         }
 

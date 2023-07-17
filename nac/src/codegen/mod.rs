@@ -89,7 +89,10 @@ impl<'s, 'ctx, 'ast> Visitor<'ast, Result<Option<Value>>> for CodeGen<'s, 'ctx> 
 impl<'s, 'ctx, 'ast> CodeGen<'s, 'ctx> {
     pub fn walk_source_file(&self, source_file: &'ast SourceFile) -> Result<Option<Value>> {
         for decl in &source_file.decls {
-            self.visit_decl(decl)?;
+            let result = self.visit_decl(decl);
+            if let Some(diagnostic) = result.err() {
+                self.session.report_diagnostic(diagnostic);
+            }
         }
 
         Ok(None)
@@ -111,10 +114,7 @@ impl<'s, 'ctx, 'ast> CodeGen<'s, 'ctx> {
         let block = self.context.append_basic_block(&fn_value, "entry");
         self.builder.position_at_end(&block);
 
-        let block_value = self.visit_block(&fn_decl.body);
-        if let Some(diagnostic) = block_value.err() {
-            self.session.report_diagnostic(diagnostic)
-        }
+        self.visit_block(&fn_decl.body)?;
 
         fn_value
             .verify_fn()

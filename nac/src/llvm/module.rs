@@ -9,14 +9,14 @@ use crate::llvm::{Context, GetRef, LLVMResult, LLVMString, Type, Value};
 
 pub struct Module<'ctx> {
     module: LLVMModuleRef,
-    _context: PhantomData<&'ctx Context>,
+    _marker: PhantomData<&'ctx Context>,
 }
 
 impl<'ctx> Module<'ctx> {
     pub fn new(module: LLVMModuleRef) -> Self {
         Self {
             module,
-            _context: PhantomData,
+            _marker: PhantomData,
         }
     }
 
