@@ -1,6 +1,8 @@
 use std::marker::PhantomData;
 
-use llvm_sys::core::{LLVMBuildRet, LLVMDisposeBuilder, LLVMPositionBuilderAtEnd};
+use llvm_sys::core::{
+    LLVMBuildRet, LLVMBuildRetVoid, LLVMDisposeBuilder, LLVMPositionBuilderAtEnd,
+};
 use llvm_sys::prelude::LLVMBuilderRef;
 
 use crate::llvm::{BasicBlock, Context, GetRef, Value};
@@ -18,8 +20,13 @@ impl<'ctx> Builder<'ctx> {
         }
     }
 
-    pub fn build_ret(&self, value: &Value) -> Value {
-        unsafe { Value::new(LLVMBuildRet(self.get_ref(), value.get_ref())) }
+    pub fn build_ret(&self, value: Option<Value>) -> Value {
+        unsafe {
+            match value {
+                Some(value) => Value::new(LLVMBuildRet(self.get_ref(), value.get_ref())),
+                None => Value::new(LLVMBuildRetVoid(self.get_ref())),
+            }
+        }
     }
 
     pub fn position_at_end(&self, block: &BasicBlock) {

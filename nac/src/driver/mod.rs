@@ -1,6 +1,6 @@
 use std::process;
 
-use crate::codegen::Codegen;
+use crate::codegen::CodeGen;
 use crate::errors::{Diagnostic, DiagnosticLevel, Result};
 use crate::lexer::Lexer;
 use crate::llvm::Context;
@@ -20,54 +20,55 @@ fn catch_unwind(f: impl FnOnce() -> Result<()>) -> i32 {
     }
 }
 
+fn early_exit(session: &Session) -> Result<()> {
+    if session.has_errors() {
+        session.emit_diagnostics();
+        return Err(Diagnostic::new(
+            DiagnosticLevel::Fatal,
+            String::from("early exit"),
+        ));
+    }
+
+    Ok(())
+}
+
 fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
-    let token_stream = Lexer::tokenize(session, src.contents());
+    let token_stream = Lexer::tokenize(session, src.contents())?;
+    early_exit(session)?;
 
-    if session.has_errors() {
-        session.emit_diagnostics();
-        return Err(Diagnostic::new(
-            DiagnosticLevel::Fatal,
-            String::from("compilation error"),
-        ));
-    }
-
-    let ast = Parser::parse(session, token_stream.unwrap());
-
-    if session.has_errors() {
-        session.emit_diagnostics();
-        return Err(Diagnostic::new(
-            DiagnosticLevel::Fatal,
-            String::from("compilation error"),
-        ));
-    }
+    let ast = Parser::parse(session, token_stream)?;
+    early_exit(session)?;
 
     let context = Context::create();
-    let module = Codegen::codegen(&context, "module", &ast.unwrap());
-    TargetGen::compile_module(&module);
+    let module = CodeGen::codegen(session, &context, "module", &ast)?;
+    early_exit(session)?;
+
+    TargetGen::compile_module(session, &module)?;
+    early_exit(session)?;
 
     Ok(())
 }
 
 pub fn main() {
     let exit_code = catch_unwind(|| {
+        let session = Session::new();
+
         let args: Vec<String> = std::env::args().collect();
         if args.len() < 2 {
-            return Err(Diagnostic::new(
+            let error = Diagnostic::new(
                 DiagnosticLevel::Fatal,
                 String::from("invalid arguments passed"),
-            ));
+            );
+
+            session.report_diagnostic(error);
+            return early_exit(&session);
         }
 
-        let session = Session::new();
         let src = match SourceFile::from(&args[1]) {
             Ok(src) => src,
             Err(diagnostic) => {
                 session.report_diagnostic(diagnostic);
-                session.emit_diagnostics();
-                return Err(Diagnostic::new(
-                    DiagnosticLevel::Fatal,
-                    String::from("compilation error"),
-                ));
+                return early_exit(&session);
             }
         };
 

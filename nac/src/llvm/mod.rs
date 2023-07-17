@@ -15,10 +15,13 @@ pub use self::values::*;
 pub mod basic_block;
 pub mod builder;
 pub mod context;
+pub mod diagnostics;
 pub mod module;
 pub mod target;
 pub mod types;
 pub mod values;
+
+pub type LLVMResult<T> = Result<T, LLVMString>;
 
 pub trait GetRef<T> {
     fn get_ref(&self) -> T;

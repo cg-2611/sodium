@@ -2,25 +2,45 @@ use llvm_sys::target_machine::LLVMCodeGenOptLevel;
 use llvm_sys::target_machine::LLVMCodeModel;
 use llvm_sys::target_machine::LLVMRelocMode;
 
+use crate::errors::Result;
 use crate::llvm::{Module, Target, TargetMachine, TargetTriple};
+use crate::session::Session;
+use crate::target::diagnostics::{target_machine_error, target_triple_error};
 
+pub mod diagnostics;
 pub mod link;
 
-pub struct TargetGen<'ctx> {
+pub struct TargetGen<'s, 'ctx> {
+    session: &'s Session,
     module: &'ctx Module<'ctx>,
+    target_machine: TargetMachine,
 }
 
-impl<'ctx> TargetGen<'ctx> {
-    pub fn new(module: &'ctx Module) -> Self {
-        Self { module }
+impl<'s, 'ctx> TargetGen<'s, 'ctx> {
+    pub fn new(session: &'s Session, module: &'ctx Module) -> Result<Self> {
+        let target_machine = Self::create_target_machine()?;
+
+        Ok(Self {
+            session,
+            module,
+            target_machine,
+        })
     }
 
-    pub fn compile_module(module: &'ctx Module) {
-        let target_gen = TargetGen::new(module);
+    pub fn compile_module(session: &'s Session, module: &'ctx Module) -> Result<()> {
+        let target_gen = Self::new(session, module)?;
 
+        if let Some(diagnostic) = target_gen.link().err() {
+            target_gen.session.report_diagnostic(diagnostic)
+        }
+
+        Ok(())
+    }
+
+    pub fn create_target_machine() -> Result<TargetMachine> {
         Target::initialise_all();
         let target_triple = TargetTriple::get_default_triple();
-        let target = Target::from_triple(&target_triple).unwrap();
+        let target = Target::from_triple(&target_triple).map_err(target_triple_error)?;
 
         let cpu = TargetMachine::get_host_cpu_name();
         let features = TargetMachine::get_host_cpu_features();
@@ -34,8 +54,8 @@ impl<'ctx> TargetGen<'ctx> {
                 LLVMRelocMode::LLVMRelocDefault,
                 LLVMCodeModel::LLVMCodeModelDefault,
             )
-            .unwrap();
+            .ok_or(target_machine_error())?;
 
-        target_gen.link_executable(target_gen.module, &target_machine);
+        Ok(target_machine)
     }
 }

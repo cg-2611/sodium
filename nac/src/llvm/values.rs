@@ -1,7 +1,7 @@
 use llvm_sys::analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction};
 use llvm_sys::prelude::LLVMValueRef;
 
-use crate::llvm::{GetRef, LLVMString};
+use crate::llvm::{GetRef, LLVMResult, LLVMString};
 
 pub struct Value(LLVMValueRef);
 
@@ -10,7 +10,7 @@ impl Value {
         Self(value)
     }
 
-    pub fn verify_fn(&self) -> Result<(), LLVMString> {
+    pub fn verify_fn(&self) -> LLVMResult<()> {
         let error = unsafe {
             LLVMVerifyFunction(
                 self.get_ref(),

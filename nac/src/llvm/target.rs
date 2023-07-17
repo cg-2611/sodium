@@ -12,7 +12,7 @@ use llvm_sys::target_machine::{
     LLVMTargetMachineRef, LLVMTargetRef,
 };
 
-use crate::llvm::{GetRef, LLVMString, Module};
+use crate::llvm::{GetRef, LLVMResult, LLVMString, Module};
 
 pub struct Target(LLVMTargetRef);
 
@@ -32,7 +32,7 @@ impl Target {
         }
     }
 
-    pub fn from_triple(triple: &TargetTriple) -> Result<Self, LLVMString> {
+    pub fn from_triple(triple: &TargetTriple) -> LLVMResult<Self> {
         let mut target = std::ptr::null_mut();
         let mut error_string = MaybeUninit::uninit();
 
@@ -99,7 +99,7 @@ impl TargetMachine {
         LLVMString::new(features)
     }
 
-    pub fn write_to_file(&self, module: &Module, path: &str) -> Result<(), LLVMString> {
+    pub fn write_to_file(&self, module: &Module, path: &str) -> LLVMResult<()> {
         let path = LLVMString::from(path);
         let mut error_string = MaybeUninit::uninit();
 
