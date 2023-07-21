@@ -4,22 +4,22 @@ use crate::ast::stmt::{Stmt, StmtKind};
 use crate::ast::ty::Type;
 use crate::ast::visitor::Visitor;
 use crate::ast::{Identifier, SourceFile, AST};
-use crate::codegen::diagnostics::empty_block_error;
-use crate::errors::Result;
 use crate::llvm::{Builder, Context, Module, Value};
 use crate::session::Session;
 
+pub use self::diagnostics::{CodeGenError, CodeGenResult};
+
 pub mod diagnostics;
 
-pub struct CodeGen<'s, 'ctx> {
-    session: &'s Session,
+pub struct CodeGen<'a, 'ctx> {
+    session: &'a Session,
     context: &'ctx Context,
     module: Module<'ctx>,
     builder: Builder<'ctx>,
 }
 
-impl<'s, 'ctx> CodeGen<'s, 'ctx> {
-    pub fn new(session: &'s Session, context: &'ctx Context, module_name: &str) -> Self {
+impl<'a, 'ctx> CodeGen<'a, 'ctx> {
+    pub fn new(session: &'a Session, context: &'ctx Context, module_name: &str) -> Self {
         Self {
             session,
             context,
@@ -29,11 +29,11 @@ impl<'s, 'ctx> CodeGen<'s, 'ctx> {
     }
 
     pub fn codegen<'ast>(
-        session: &'s Session,
+        session: &'a Session,
         context: &'ctx Context,
         module_name: &str,
         ast: &'ast AST,
-    ) -> Result<Module<'ctx>> {
+    ) -> CodeGenResult<'a, Module<'ctx>> {
         let codegen = Self::new(session, context, module_name);
         codegen.visit_source_file(ast.root())?;
         Ok(codegen.module)
@@ -44,67 +44,70 @@ impl<'s, 'ctx> CodeGen<'s, 'ctx> {
     }
 }
 
-impl<'s, 'ctx, 'ast> Visitor<'ast, Result<Option<Value>>> for CodeGen<'s, 'ctx> {
-    fn visit_source_file(&self, source_file: &'ast SourceFile) -> Result<Option<Value>> {
+impl<'a, 'ctx, 'ast> Visitor<'ast, CodeGenResult<'a, Option<Value>>> for CodeGen<'a, 'ctx> {
+    fn visit_source_file(&self, source_file: &'ast SourceFile) -> CodeGenResult<'a, Option<Value>> {
         self.walk_source_file(source_file)
     }
 
-    fn visit_decl(&self, decl: &'ast Decl) -> Result<Option<Value>> {
+    fn visit_decl(&self, decl: &'ast Decl) -> CodeGenResult<'a, Option<Value>> {
         self.walk_decl(decl)
     }
 
-    fn visit_fn_decl(&self, fn_decl: &'ast FnDecl) -> Result<Option<Value>> {
+    fn visit_fn_decl(&self, fn_decl: &'ast FnDecl) -> CodeGenResult<'a, Option<Value>> {
         self.walk_fn_decl(fn_decl)
     }
 
-    fn visit_ident(&self, ident: &'ast Identifier) -> Result<Option<Value>> {
+    fn visit_ident(&self, ident: &'ast Identifier) -> CodeGenResult<'a, Option<Value>> {
         self.walk_ident(ident)
     }
 
-    fn visit_type(&self, ty: &'ast Type) -> Result<Option<Value>> {
+    fn visit_type(&self, ty: &'ast Type) -> CodeGenResult<'a, Option<Value>> {
         self.walk_type(ty)
     }
 
-    fn visit_block(&self, block: &'ast Block) -> Result<Option<Value>> {
+    fn visit_block(&self, block: &'ast Block) -> CodeGenResult<'a, Option<Value>> {
         self.walk_block(block)
     }
 
-    fn visit_stmt(&self, stmt: &'ast Stmt) -> Result<Option<Value>> {
+    fn visit_stmt(&self, stmt: &'ast Stmt) -> CodeGenResult<'a, Option<Value>> {
         self.walk_stmt(stmt)
     }
 
-    fn visit_expr(&self, expr: &'ast Expr) -> Result<Option<Value>> {
+    fn visit_expr(&self, expr: &'ast Expr) -> CodeGenResult<'a, Option<Value>> {
         self.walk_expr(expr)
     }
 
-    fn visit_ret_expr(&self, ret_expr: &'ast RetExpr) -> Result<Option<Value>> {
+    fn visit_ret_expr(&self, ret_expr: &'ast RetExpr) -> CodeGenResult<'a, Option<Value>> {
         self.walk_ret_expr(ret_expr)
     }
 
-    fn visit_literal(&self, literal: &'ast Literal) -> Result<Option<Value>> {
+    fn visit_literal(&self, literal: &'ast Literal) -> CodeGenResult<'a, Option<Value>> {
         self.walk_literal(literal)
     }
 }
 
-impl<'s, 'ctx, 'ast> CodeGen<'s, 'ctx> {
-    pub fn walk_source_file(&self, source_file: &'ast SourceFile) -> Result<Option<Value>> {
+impl<'a, 'ctx, 'ast> CodeGen<'a, 'ctx> {
+    pub fn walk_source_file(
+        &self,
+        source_file: &'ast SourceFile,
+    ) -> CodeGenResult<'a, Option<Value>> {
         for decl in &source_file.decls {
             let result = self.visit_decl(decl);
-            if let Some(diagnostic) = result.err() {
-                self.session.report_diagnostic(diagnostic);
+            if let Some(mut diagnostic) = result.err() {
+                diagnostic.emit();
             }
         }
 
         Ok(None)
     }
 
-    pub fn walk_decl(&self, decl: &'ast Decl) -> Result<Option<Value>> {
+    pub fn walk_decl(&self, decl: &'ast Decl) -> CodeGenResult<'a, Option<Value>> {
         match &decl.kind {
             DeclKind::Fn(fn_decl) => self.visit_fn_decl(fn_decl),
         }
     }
 
-    pub fn walk_fn_decl(&self, fn_decl: &'ast FnDecl) -> Result<Option<Value>> {
+    pub fn walk_fn_decl(&self, fn_decl: &'ast FnDecl) -> CodeGenResult<'a, Option<Value>> {
         let fn_ret_type = self.context.i32_type();
         let fn_type = fn_ret_type.fn_type();
         let fn_value = self
@@ -118,24 +121,24 @@ impl<'s, 'ctx, 'ast> CodeGen<'s, 'ctx> {
 
         fn_value
             .verify_fn()
-            .map_err(|message| message.to_error_ranged(fn_decl.range))?;
+            .map_err(|message| self.codegen_error(&message.as_string(), fn_decl.range))?;
 
         Ok(Some(fn_value))
     }
 
-    pub fn walk_ident(&self, ident: &'ast Identifier) -> Result<Option<Value>> {
+    pub fn walk_ident(&self, ident: &'ast Identifier) -> CodeGenResult<'a, Option<Value>> {
         let _ = ident;
         Ok(None)
     }
 
-    pub fn walk_type(&self, ty: &'ast Type) -> Result<Option<Value>> {
+    pub fn walk_type(&self, ty: &'ast Type) -> CodeGenResult<'a, Option<Value>> {
         let _ = ty;
         Ok(None)
     }
 
-    pub fn walk_block(&self, block: &'ast Block) -> Result<Option<Value>> {
+    pub fn walk_block(&self, block: &'ast Block) -> CodeGenResult<'a, Option<Value>> {
         if block.stmts.is_empty() {
-            return Err(empty_block_error(block));
+            return Err(self.codegen_error("empty block", block.range));
         }
 
         let (last_stmt, stmts) = block.stmts.split_last().unwrap();
@@ -148,13 +151,13 @@ impl<'s, 'ctx, 'ast> CodeGen<'s, 'ctx> {
             .map(|ret_value| Some(self.builder.build_ret(ret_value)))
     }
 
-    pub fn walk_stmt(&self, stmt: &'ast Stmt) -> Result<Option<Value>> {
+    pub fn walk_stmt(&self, stmt: &'ast Stmt) -> CodeGenResult<'a, Option<Value>> {
         match &stmt.kind {
             StmtKind::ExprStmt(expr) => self.visit_expr(expr),
         }
     }
 
-    pub fn walk_expr(&self, expr: &'ast Expr) -> Result<Option<Value>> {
+    pub fn walk_expr(&self, expr: &'ast Expr) -> CodeGenResult<'a, Option<Value>> {
         match &expr.kind {
             ExprKind::Block(_) => Ok(None),
             ExprKind::Ret(ret_expr) => self.visit_ret_expr(ret_expr),
@@ -162,11 +165,11 @@ impl<'s, 'ctx, 'ast> CodeGen<'s, 'ctx> {
         }
     }
 
-    pub fn walk_ret_expr(&self, ret_expr: &'ast RetExpr) -> Result<Option<Value>> {
+    pub fn walk_ret_expr(&self, ret_expr: &'ast RetExpr) -> CodeGenResult<'a, Option<Value>> {
         self.visit_expr(&ret_expr.expr)
     }
 
-    pub fn walk_literal(&self, literal: &'ast Literal) -> Result<Option<Value>> {
+    pub fn walk_literal(&self, literal: &'ast Literal) -> CodeGenResult<'a, Option<Value>> {
         let literal = match literal.kind {
             LiteralKind::Integer(x) => {
                 let int_type = self.context.i32_type();

@@ -1,16 +1,16 @@
 use crate::codegen::CodeGen;
-use crate::errors::{Diagnostic, DiagnosticLevel, Result};
+use crate::errors::NACResult;
 use crate::lexer::Lexer;
 use crate::llvm::Context;
 use crate::parser::Parser;
 use crate::session::Session;
-use crate::source::SourceFile;
+use crate::source::file::SourceFileReader;
 use crate::target::TargetGen;
 
 const EXIT_SUCCESS: i32 = 0;
 const EXIT_FAILURE: i32 = 1;
 
-fn catch_with_exit_code(f: impl FnOnce() -> Result<()>) -> i32 {
+fn catch_unwind_with_exit_code(f: impl FnOnce() -> NACResult<()>) -> i32 {
     let result = f();
     match result {
         Ok(_) => EXIT_SUCCESS,
@@ -18,59 +18,33 @@ fn catch_with_exit_code(f: impl FnOnce() -> Result<()>) -> i32 {
     }
 }
 
-fn early_exit(session: &Session) -> Result<()> {
-    if session.has_errors() {
-        session.emit_diagnostics();
-        return Err(Diagnostic::new(
-            DiagnosticLevel::Fatal,
-            String::from("early exit"),
-        ));
-    }
+fn compile_file(session: &Session, path: &str) -> NACResult<()> {
+    let src_file = session.run_pass(|| SourceFileReader::source_file_from_path(session, path))?;
 
-    Ok(())
-}
+    let token_stream = session.run_pass(|| Lexer::tokenize(session, src_file.contents()))?;
 
-fn compile_source_file(session: &Session, src: &SourceFile) -> Result<()> {
-    let token_stream = Lexer::tokenize(session, src.contents())?;
-    early_exit(session)?;
-
-    let ast = Parser::parse(session, token_stream)?;
-    early_exit(session)?;
+    let ast = session.run_pass(|| Parser::parse(session, token_stream))?;
 
     let context = Context::create();
-    let module = CodeGen::codegen(session, &context, "module", &ast)?;
-    early_exit(session)?;
+    let module = session.run_pass(|| CodeGen::codegen(session, &context, "module", &ast))?;
 
-    TargetGen::compile_module(session, &module)?;
-    early_exit(session)?;
+    session.run_pass(|| TargetGen::compile_module(session, &module))?;
 
     Ok(())
 }
 
 pub fn main() {
-    let exit_code = catch_with_exit_code(|| {
+    let exit_code = catch_unwind_with_exit_code(|| {
         let session = Session::new();
 
         let args: Vec<String> = std::env::args().collect();
         if args.len() < 2 {
-            let error = Diagnostic::new(
-                DiagnosticLevel::Fatal,
-                String::from("invalid arguments passed"),
-            );
-
-            session.report_diagnostic(error);
-            return early_exit(&session);
+            return Err(session
+                .create_error("invalid arguments passed".to_string())
+                .emit());
         }
 
-        let src = match SourceFile::from(&args[1]) {
-            Ok(src) => src,
-            Err(diagnostic) => {
-                session.report_diagnostic(diagnostic);
-                return early_exit(&session);
-            }
-        };
-
-        compile_source_file(&session, &src)
+        compile_file(&session, &args[1])
     });
 
     std::process::exit(exit_code);

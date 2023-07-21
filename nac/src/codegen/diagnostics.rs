@@ -1,10 +1,13 @@
-use crate::ast::expr::Block;
-use crate::errors::{Diagnostic, DiagnosticLevel};
+use crate::codegen::CodeGen;
+use crate::errors::{Diagnostic, ErrorOccurred};
+use crate::source::Range;
 
-pub fn empty_block_error(block: &Block) -> Diagnostic {
-    Diagnostic::ranged(
-        DiagnosticLevel::Error,
-        String::from("block has no statements"),
-        block.range,
-    )
+pub type CodeGenError<'a> = Diagnostic<'a, ErrorOccurred>;
+pub type CodeGenResult<'a, T> = Result<T, CodeGenError<'a>>;
+
+impl<'a, 'ctx> CodeGen<'a, 'ctx> {
+    pub fn codegen_error(&self, message: &str, range: Range) -> CodeGenError<'a> {
+        self.session
+            .create_ranged_error(String::from(message), range)
+    }
 }

@@ -1,10 +1,9 @@
-use std::cell::RefCell;
-
-use crate::errors::{Diagnostic, DiagnosticHandler};
+use crate::errors::{Diagnostic, DiagnosticHandler, ErrorOccurred, NACResult};
+use crate::source::Range;
 
 #[derive(Default)]
 pub struct Session {
-    diagnostic_handler: RefCell<DiagnosticHandler>,
+    diagnostic_handler: DiagnosticHandler,
 }
 
 impl Session {
@@ -14,19 +13,32 @@ impl Session {
         }
     }
 
-    pub fn report_diagnostic(&self, diagnostic: Diagnostic) {
-        self.diagnostic_handler.borrow_mut().report(diagnostic);
+    pub fn run_pass<'a, T>(
+        &self,
+        pass: impl FnOnce() -> Result<T, Diagnostic<'a, ErrorOccurred>>,
+    ) -> NACResult<T> {
+        let result = pass().map_err(|mut error| error.emit())?;
+        self.has_errors()?;
+        Ok(result)
     }
 
-    pub fn emit_diagnostics(&self) {
-        self.diagnostic_handler.borrow().emit();
+    pub fn create_ranged_error(
+        &self,
+        message: String,
+        range: Range,
+    ) -> Diagnostic<'_, ErrorOccurred> {
+        self.diagnostic_handler.create_ranged_error(message, range)
     }
 
-    pub fn has_errors(&self) -> bool {
-        self.diagnostic_handler.borrow().has_errors()
+    pub fn create_error(&self, message: String) -> Diagnostic<'_, ErrorOccurred> {
+        self.diagnostic_handler.create_error(message)
     }
 
-    pub fn error_count(&self) -> u32 {
-        self.diagnostic_handler.borrow().error_count()
+    pub fn error_count(&self) -> usize {
+        self.diagnostic_handler.error_count()
+    }
+
+    pub fn has_errors(&self) -> NACResult<()> {
+        self.diagnostic_handler.has_errors().map_or(Ok(()), Err)
     }
 }

@@ -1,8 +1,9 @@
-use crate::errors::Result;
 use crate::session::Session;
 use crate::source::{Cursor, Location, Range};
 use crate::token::token_stream::TokenStream;
 use crate::token::{Keyword, Token, TokenKind};
+
+pub use self::diagnostics::{LexerError, LexerResult};
 
 #[cfg(test)]
 mod tests;
@@ -15,16 +16,8 @@ pub struct Lexer<'src> {
     column: u32,
 }
 
-impl<'src> Lexer<'src> {
-    pub fn new(src: &'src str) -> Self {
-        Self {
-            cursor: Cursor::new(src),
-            line: 1,
-            column: 1,
-        }
-    }
-
-    pub fn tokenize(session: &Session, src: &'src str) -> Result<TokenStream> {
+impl<'a, 'src> Lexer<'src> {
+    pub fn tokenize(session: &'a Session, src: &'src str) -> LexerResult<'a, TokenStream> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut lexer = Lexer::new(src);
 
@@ -37,7 +30,9 @@ impl<'src> Lexer<'src> {
                     break;
                 }
                 TokenKind::Unknown(c) => {
-                    session.report_diagnostic(lexer.unrecognised_token_error(c, token.range));
+                    let message = format!("unrecognized token '{}'", c);
+                    session.create_ranged_error(message, token.range).emit();
+
                     tokens.push(token);
                 }
                 _ => tokens.push(token),
@@ -45,6 +40,16 @@ impl<'src> Lexer<'src> {
         }
 
         Ok(TokenStream::from(tokens))
+    }
+}
+
+impl<'src> Lexer<'src> {
+    pub fn new(src: &'src str) -> Self {
+        Self {
+            cursor: Cursor::new(src),
+            line: 1,
+            column: 1,
+        }
     }
 
     pub fn next_token(&mut self) -> Token {

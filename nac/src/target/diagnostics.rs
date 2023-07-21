@@ -1,54 +1,35 @@
-use crate::errors::{Diagnostic, DiagnosticLevel};
-use crate::llvm::LLVMString;
+use crate::errors::{Diagnostic, ErrorOccurred};
+use crate::target::TargetGen;
 
-pub fn target_machine_error() -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        String::from("error creating target machine for target generation"),
-    )
-}
+pub type TargetGenError<'a> = Diagnostic<'a, ErrorOccurred>;
+pub type TargetGenResult<'a, T> = Result<T, TargetGenError<'a>>;
 
-pub fn target_triple_error(message: LLVMString) -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        format!(
-            "error getting target triple for target generation: {:?}",
-            message.as_string()
-        ),
-    )
-}
+impl<'a, 'ctx> TargetGen<'a, 'ctx> {
+    pub fn target_gen_error(&self, message: String) -> TargetGenError<'a> {
+        self.session.create_error(message)
+    }
 
-pub fn failed_to_create_directories(error: std::io::Error) -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        format!("failed to create directories: {:?}", error),
-    )
-}
+    pub fn error_create_directories(&self, error: std::io::Error) -> TargetGenError<'a> {
+        let message = format!("failed to create directories: {:?}", error);
+        self.target_gen_error(message)
+    }
 
-pub fn failed_to_create_tempdir(error: std::io::Error) -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        format!("failed to create tempdir: {:?}", error),
-    )
-}
+    pub fn error_create_temp_dir(&self, error: std::io::Error) -> TargetGenError<'a> {
+        let message = format!("failed to create tempdir: {:?}", error);
+        self.target_gen_error(message)
+    }
 
-pub fn failed_to_create_path() -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        String::from("failed to create path string"),
-    )
-}
+    pub fn error_create_path(&self) -> TargetGenError<'a> {
+        self.target_gen_error("failed to create path string".to_string())
+    }
 
-pub fn failed_to_get_current_time(error: std::time::SystemTimeError) -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        format!("failed to get current time for temp file name: {:?}", error),
-    )
-}
+    pub fn error_get_current_time(&self, error: std::time::SystemTimeError) -> TargetGenError<'a> {
+        let message = format!("failed to get current time for temp file name: {:?}", error);
+        self.target_gen_error(message)
+    }
 
-pub fn failed_to_invoke_linker(error: std::io::Error) -> Diagnostic {
-    Diagnostic::new(
-        DiagnosticLevel::Fatal,
-        format!("failed to invoke linker: {:?}", error),
-    )
+    pub fn error_invoke_linker(&self, error: std::io::Error) -> TargetGenError<'a> {
+        let message = format!("failed to invoke linker: {:?}", error);
+        self.target_gen_error(message)
+    }
 }

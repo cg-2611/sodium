@@ -1,44 +1,34 @@
 use crate::ast::expr::Literal;
 use crate::ast::Identifier;
-use crate::errors::{Diagnostic, DiagnosticLevel, Result};
+use crate::errors::{Diagnostic, ErrorOccurred};
 use crate::parser::Parser;
 use crate::source::Range;
 use crate::token::{Keyword, TokenKind};
 
-impl<'s> Parser<'s> {
-    pub fn report_diagnostic(
-        &mut self,
-        diagnostic: Diagnostic,
-        recover: Option<impl Fn(&mut Parser<'s>)>,
-    ) {
-        self.session.report_diagnostic(diagnostic);
-        if let Some(f) = recover {
-            f(self)
-        };
+pub type ParserError<'a> = Diagnostic<'a, ErrorOccurred>;
+pub type ParserResult<'a, T> = Result<T, ParserError<'a>>;
+
+impl<'a> Parser<'a> {
+    pub fn parser_error(&self, message: &str, range: Range) -> ParserError<'a> {
+        self.session
+            .create_ranged_error(String::from(message), range)
     }
 
-    pub fn expected_token(&self, kind: TokenKind) -> Result<Range> {
-        Err(self.expected_found(format!("expected {:?}", kind).as_str(), self.token.range))
+    pub fn error_expected_token(&self, kind: TokenKind) -> ParserResult<'a, Range> {
+        Err(self.error_expected_found(format!("expected {:?}", kind).as_str(), self.token.range))
     }
 
-    pub fn expected_identifier(&self) -> Result<Identifier> {
-        Err(self.error("expected identifier", self.token.range))
+    pub fn expected_identifier(&self) -> ParserResult<'a, Identifier> {
+        Err(self.error_expected_found("expected identifier", self.token.range))
     }
 
-    pub fn expected_integer_literal(&self) -> Result<Literal> {
-        Err(self.error("expected integer literal", self.token.range))
+    pub fn expected_integer_literal(&self) -> ParserResult<'a, Literal> {
+        Err(self.error_expected_found("expected integer literal", self.token.range))
     }
 
-    pub fn error(&self, message: &str, range: Range) -> Diagnostic {
-        self.expected_found(message, range)
-    }
-
-    fn expected_found(&self, message: &str, range: Range) -> Diagnostic {
-        Diagnostic::ranged(
-            DiagnosticLevel::Error,
-            format!("{}, found {:?}", message, self.token.kind),
-            range,
-        )
+    fn error_expected_found(&self, message: &str, range: Range) -> ParserError<'a> {
+        let message = format!("{}, found {:?}", message, self.token.kind);
+        self.session.create_ranged_error(message, range)
     }
 
     pub fn recover_decl(&mut self) {
@@ -51,7 +41,11 @@ impl<'s> Parser<'s> {
     }
 
     pub fn recover_stmt(&mut self) {
-        self.recover(&[TokenKind::LeftBrace, TokenKind::Semicolon]);
+        self.recover(&[
+            TokenKind::LeftBrace,
+            TokenKind::RightBrace,
+            TokenKind::Semicolon,
+        ]);
         if self.token.kind == TokenKind::Semicolon {
             self.advance();
         }

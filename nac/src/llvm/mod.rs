@@ -1,16 +1,17 @@
 use std::ffi::{c_char, CStr};
 use std::fmt;
-use std::fmt::{Debug, Display, Formatter};
+use std::fmt::{Display, Formatter};
 
 use llvm_sys::core::{LLVMCreateMessage, LLVMDisposeMessage};
 
-pub use self::basic_block::*;
-pub use self::builder::*;
-pub use self::context::*;
-pub use self::module::*;
-pub use self::target::*;
-pub use self::types::*;
-pub use self::values::*;
+pub use self::basic_block::BasicBlock;
+pub use self::builder::Builder;
+pub use self::context::Context;
+pub use self::diagnostics::LLVMResult;
+pub use self::module::Module;
+pub use self::target::{Target, TargetMachine, TargetTriple};
+pub use self::types::Type;
+pub use self::values::Value;
 
 pub mod basic_block;
 pub mod builder;
@@ -20,8 +21,6 @@ pub mod module;
 pub mod target;
 pub mod types;
 pub mod values;
-
-pub type LLVMResult<T> = Result<T, LLVMString>;
 
 pub trait GetRef<T> {
     fn get_ref(&self) -> T;
@@ -51,12 +50,6 @@ impl LLVMString {
 }
 impl Display for LLVMString {
     fn fmt(&self, f: &mut Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{:?}", self.as_string())
-    }
-}
-
-impl Debug for LLVMString {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self.as_string())
     }
 }

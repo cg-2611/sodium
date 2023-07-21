@@ -1,7 +1,7 @@
+use crate::source::Range;
+
 pub mod cursor;
 pub mod token_stream;
-
-use crate::source::Range;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenKind {

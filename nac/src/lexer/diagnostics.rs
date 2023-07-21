@@ -1,13 +1,4 @@
-use crate::errors::{Diagnostic, DiagnosticLevel};
-use crate::lexer::Lexer;
-use crate::source::Range;
+use crate::errors::{Diagnostic, ErrorOccurred};
 
-impl<'src> Lexer<'src> {
-    pub fn unrecognised_token_error(&self, c: char, range: Range) -> Diagnostic {
-        Diagnostic::ranged(
-            DiagnosticLevel::Error,
-            format!("unrecognised token '{}'", c),
-            range,
-        )
-    }
-}
+pub type LexerError<'a> = Diagnostic<'a, ErrorOccurred>;
+pub type LexerResult<'a, T> = Result<T, LexerError<'a>>;

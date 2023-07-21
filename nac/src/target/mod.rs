@@ -2,23 +2,23 @@ use llvm_sys::target_machine::LLVMCodeGenOptLevel;
 use llvm_sys::target_machine::LLVMCodeModel;
 use llvm_sys::target_machine::LLVMRelocMode;
 
-use crate::errors::Result;
 use crate::llvm::{Module, Target, TargetMachine, TargetTriple};
 use crate::session::Session;
-use crate::target::diagnostics::{target_machine_error, target_triple_error};
+
+pub use self::diagnostics::{TargetGenError, TargetGenResult};
 
 pub mod diagnostics;
 pub mod link;
 
-pub struct TargetGen<'s, 'ctx> {
-    session: &'s Session,
+pub struct TargetGen<'a, 'ctx> {
+    session: &'a Session,
     module: &'ctx Module<'ctx>,
     target_machine: TargetMachine,
 }
 
-impl<'s, 'ctx> TargetGen<'s, 'ctx> {
-    pub fn new(session: &'s Session, module: &'ctx Module) -> Result<Self> {
-        let target_machine = Self::create_target_machine()?;
+impl<'a, 'ctx> TargetGen<'a, 'ctx> {
+    pub fn new(session: &'a Session, module: &'ctx Module) -> TargetGenResult<'a, Self> {
+        let target_machine = Self::create_target_machine(session)?;
 
         Ok(Self {
             session,
@@ -27,24 +27,22 @@ impl<'s, 'ctx> TargetGen<'s, 'ctx> {
         })
     }
 
-    pub fn compile_module(session: &'s Session, module: &'ctx Module) -> Result<()> {
-        let target_gen = match Self::new(session, module) {
-            Ok(target_gen) => target_gen,
-            Err(diagnostic) => return Err(diagnostic),
-        };
-
-        let result = target_gen.link();
-        if let Some(diagnostic) = result.err() {
-            target_gen.session.report_diagnostic(diagnostic)
-        }
-
-        Ok(())
+    pub fn compile_module(session: &'a Session, module: &'ctx Module) -> TargetGenResult<'a, ()> {
+        let target_gen = Self::new(session, module)?;
+        target_gen.link()
     }
 
-    pub fn create_target_machine() -> Result<TargetMachine> {
+    pub fn create_target_machine(session: &'a Session) -> TargetGenResult<'a, TargetMachine> {
         Target::initialise_all();
         let target_triple = TargetTriple::get_default_triple();
-        let target = Target::from_triple(&target_triple).map_err(target_triple_error)?;
+        let target = Target::from_triple(&target_triple).map_err(|message| {
+            let message = format!(
+                "failed to get target triple for target generation: {}",
+                message
+            );
+
+            session.create_error(message)
+        })?;
 
         let cpu = TargetMachine::get_host_cpu_name();
         let features = TargetMachine::get_host_cpu_features();
@@ -58,7 +56,10 @@ impl<'s, 'ctx> TargetGen<'s, 'ctx> {
                 LLVMRelocMode::LLVMRelocDefault,
                 LLVMCodeModel::LLVMCodeModelDefault,
             )
-            .ok_or(target_machine_error())?;
+            .ok_or_else(|| {
+                session
+                    .create_error("error creating target machine for target generation".to_string())
+            })?;
 
         Ok(target_machine)
     }

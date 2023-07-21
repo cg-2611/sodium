@@ -1,11 +1,10 @@
 use crate::ast::expr::{Block, Expr, ExprKind, Literal, LiteralKind, RetExpr};
 use crate::ast::stmt::Stmt;
-use crate::errors::Result;
-use crate::parser::Parser;
+use crate::parser::{Parser, ParserResult};
 use crate::token::{Keyword, TokenKind};
 
-impl<'s> Parser<'s> {
-    pub fn parse_expr(&mut self) -> Result<Box<Expr>> {
+impl<'a> Parser<'a> {
+    pub fn parse_expr(&mut self) -> ParserResult<'a, Box<Expr>> {
         match self.token.kind {
             TokenKind::LeftBrace => {
                 let block = self.parse_block()?;
@@ -25,11 +24,11 @@ impl<'s> Parser<'s> {
                     integer_literal_range,
                 )))
             }
-            _ => Err(self.error("expected expr", self.token.range)),
+            _ => Err(self.parser_error("expected expr", self.token.range)),
         }
     }
 
-    pub fn parse_block(&mut self) -> Result<Box<Block>> {
+    pub fn parse_block(&mut self) -> ParserResult<'a, Box<Block>> {
         let left_brace = self.expect(TokenKind::LeftBrace)?;
         let mut stmts: Vec<Stmt> = Vec::new();
 
@@ -38,8 +37,9 @@ impl<'s> Parser<'s> {
 
             match stmt {
                 Ok(stmt) => stmts.push(stmt),
-                Err(diagnostic) => {
-                    self.report_diagnostic(diagnostic, Some(Parser::recover_stmt));
+                Err(mut diagnostic) => {
+                    diagnostic.emit();
+                    self.recover_stmt();
                 }
             }
         }
@@ -48,14 +48,14 @@ impl<'s> Parser<'s> {
         Ok(Box::new(Block::new(stmts, left_brace.to(right_brace))))
     }
 
-    pub fn parse_ret_expr(&mut self) -> Result<Box<RetExpr>> {
+    pub fn parse_ret_expr(&mut self) -> ParserResult<'a, Box<RetExpr>> {
         let ret_keyword = self.expect(TokenKind::Keyword(Keyword::Ret))?;
         let expr = self.parse_expr()?;
         let expr_range = expr.range;
         Ok(Box::new(RetExpr::new(expr, ret_keyword.to(expr_range))))
     }
 
-    pub fn parse_integer_literal(&mut self) -> Result<Literal> {
+    pub fn parse_integer_literal(&mut self) -> ParserResult<'a, Literal> {
         if let TokenKind::IntegerLiteral(x) = self.token.kind {
             let integer_literal = Ok(Literal {
                 kind: LiteralKind::Integer(x),
