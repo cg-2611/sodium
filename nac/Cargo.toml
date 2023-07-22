@@ -1,0 +1,8 @@
+[package]
+name = "nac"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+llvm-sys = "160.1.2"
+tempfile = "3.6.0"
