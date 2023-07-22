@@ -8,6 +8,20 @@ mod stmt;
 pub(crate) use macros::*;
 
 // tests source file:
+//      fn name() -> i32 {}
+#[test]
+fn parser_produces_ast_from_valid_source_file() {
+    let src = "fn name() -> i32 {}";
+
+    let session = Session::new();
+    let token_stream = crate::lexer::Lexer::tokenize(&session, src).unwrap();
+    let ast = Parser::parse(&session, token_stream);
+
+    assert!(ast.is_ok());
+    has_errors!(session, 0);
+}
+
+// tests source file:
 //
 #[test]
 fn parser_parses_empty_source_file() {
