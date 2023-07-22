@@ -28,8 +28,13 @@ impl<'a, 'ctx> TargetGen<'a, 'ctx> {
         self.target_gen_error(message)
     }
 
-    pub fn error_invoke_linker(&self, error: std::io::Error) -> TargetGenError<'a> {
+    pub fn error_invoking_linker(&self, error: std::io::Error) -> TargetGenError<'a> {
         let message = format!("failed to invoke linker: {:?}", error);
+        self.target_gen_error(message)
+    }
+
+    pub fn error_linker_exit_failure(&self) -> TargetGenError<'a> {
+        let message = format!("linker failed");
         self.target_gen_error(message)
     }
 }

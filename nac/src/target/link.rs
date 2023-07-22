@@ -54,12 +54,16 @@ impl<'a, 'ctx> TargetGen<'a, 'ctx> {
     }
 
     pub fn link_executable(&self, path: &str) -> TargetGenResult<'a, ()> {
-        Command::new("clang")
+        let linker_status = Command::new("clang")
             .arg(path)
             .arg("-o")
             .arg("./main")
             .status()
-            .map_err(|error| self.error_invoke_linker(error))?;
+            .map_err(|error| self.error_invoking_linker(error))?;
+
+        if !linker_status.success() {
+            return Err(self.error_linker_exit_failure());
+        }
 
         Ok(())
     }

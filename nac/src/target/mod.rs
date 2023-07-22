@@ -7,6 +7,9 @@ use crate::session::Session;
 
 pub use self::diagnostics::{TargetGenError, TargetGenResult};
 
+#[cfg(test)]
+mod tests;
+
 pub mod diagnostics;
 pub mod link;
 
