@@ -145,7 +145,7 @@ fn parser_parses_identifier() {
     let session = Session::new();
     let mut parser = initialise_parser_test!(session, src);
 
-    let ident = parser.parse_identifier().unwrap();
+    let ident = parser.parse_ident().unwrap();
 
     matches_string!(ident.value, "ident");
     has_errors!(session, 0);

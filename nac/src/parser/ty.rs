@@ -9,7 +9,7 @@ impl<'a> Parser<'a> {
     }
 
     pub fn parse_type(&mut self) -> ParserResult<'a, Box<Type>> {
-        let ident = self.parse_identifier()?;
+        let ident = self.parse_ident()?;
         Ok(Box::new(Type::new(ident)))
     }
 }

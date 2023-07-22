@@ -19,7 +19,7 @@ impl<'a> Parser<'a> {
     pub fn parse_fn_decl(&mut self) -> ParserResult<'a, FnDecl> {
         let fn_keyword = self.expect(TokenKind::Keyword(Keyword::Fn))?;
 
-        let ident = self.parse_identifier()?;
+        let ident = self.parse_ident()?;
 
         self.expect(TokenKind::LeftParen)?;
         self.expect(TokenKind::RightParen)?;

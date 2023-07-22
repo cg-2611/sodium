@@ -59,7 +59,7 @@ impl<'a> Parser<'a> {
         Ok(SourceFile::new(decls, start.to(self.token.range)))
     }
 
-    pub fn parse_identifier(&mut self) -> ParserResult<'a, Identifier> {
+    pub fn parse_ident(&mut self) -> ParserResult<'a, Identifier> {
         let ident = self.expect_ident()?;
         self.advance();
 
