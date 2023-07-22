@@ -9,6 +9,9 @@ use crate::session::Session;
 
 pub use self::diagnostics::{CodeGenError, CodeGenResult};
 
+#[cfg(test)]
+mod tests;
+
 pub mod diagnostics;
 
 pub struct CodeGen<'a, 'ctx> {
