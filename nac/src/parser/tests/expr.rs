@@ -3,12 +3,15 @@ use crate::ast::expr::LiteralKind;
 
 macro_rules! parses_and_matches {
     ($src:literal, $parser_fn:ident, $expected:expr) => {
+        let src = $src;
+
         let session = Session::new();
-        let token_stream = Lexer::tokenize(&session, $src).unwrap();
-        let mut parser = Parser::new(&session, token_stream);
+        let mut parser = initialise_parser_test!(session, src);
 
         let result = parser.$parser_fn().unwrap();
+
         assert_eq!(result.kind, $expected);
+        has_errors!(session, 0);
     };
 }
 
@@ -19,11 +22,12 @@ fn parser_identifies_block_expr() {
     let src = "{}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let expr = parser.parse_expr();
-    assert!(expr.is_ok());
+    let expr_result = parser.parse_expr();
+
+    assert!(expr_result.is_ok());
+    has_errors!(session, 0);
 }
 
 // tests expr:
@@ -33,11 +37,12 @@ fn parser_identifies_ret_expr() {
     let src = "ret 2;";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let expr = parser.parse_expr();
-    assert!(expr.is_ok());
+    let expr_result = parser.parse_expr();
+
+    assert!(expr_result.is_ok());
+    has_errors!(session, 0);
 }
 
 // tests expr:
@@ -47,11 +52,12 @@ fn parser_identifies_integer_literal_expr() {
     let src = "2";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let expr = parser.parse_expr();
-    assert!(expr.is_ok());
+    let expr_result = parser.parse_expr();
+
+    assert!(expr_result.is_ok());
+    has_errors!(session, 0);
 }
 
 // tests expr:
@@ -61,11 +67,13 @@ fn parser_identifies_invalid_expr() {
     let src = "fn";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let expr = parser.parse_expr();
-    assert!(expr.is_err());
+    let expr_result = parser.parse_expr();
+
+    assert!(expr_result.is_err());
+    emit_diagnostic!(expr_result);
+    has_errors!(session, 1);
 }
 
 // tests block:
@@ -75,11 +83,12 @@ fn parser_parses_empty_block() {
     let src = "{}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
+
     assert_eq!(block.stmts.len(), 0);
+    has_errors!(session, 0);
 }
 
 // tests block:
@@ -89,11 +98,12 @@ fn parser_parses_block_with_single_stmt() {
     let src = "{ ret 2; }";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
+
     assert_eq!(block.stmts.len(), 1);
+    has_errors!(session, 0);
 }
 
 // tests block:
@@ -109,11 +119,12 @@ fn parser_parses_block_with_multiple_stmts() {
                     }";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
+
     assert_eq!(block.stmts.len(), 2);
+    has_errors!(session, 0);
 }
 
 // tests block:
@@ -127,14 +138,12 @@ fn parser_ignores_invalid_stmt_in_block_and_diagnoses_error() {
                      }";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 1);
     assert_eq!(block.stmts.len(), 0);
+    has_errors!(session, 1);
 }
 
 // tests block:
@@ -150,14 +159,12 @@ fn parser_recovers_after_invalid_statement_in_block() {
                      }";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 1);
     assert_eq!(block.stmts.len(), 1);
+    has_errors!(session, 1);
 }
 
 // tests block:
@@ -175,14 +182,12 @@ fn parser_diagnoses_multiple_invalid_stmts_in_block_after_recovery() {
                      }";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 2);
     assert_eq!(block.stmts.len(), 1);
+    has_errors!(session, 2);
 }
 
 // tests block:
@@ -198,14 +203,12 @@ fn parser_diagnoses_multiple_invalid_stmts_in_block() {
                      }";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let block = parser.parse_block().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 2);
     assert_eq!(block.stmts.len(), 0);
+    has_errors!(session, 2);
 }
 
 // tests ret expr:
@@ -215,11 +218,12 @@ fn parser_parses_ret_expr() {
     let src = "ret 2";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let ret_expr = parser.parse_ret_expr();
-    assert!(ret_expr.is_ok());
+    let ret_expr_result = parser.parse_ret_expr();
+
+    assert!(ret_expr_result.is_ok());
+    has_errors!(session, 0);
 }
 
 // tests ret expr:
@@ -229,11 +233,13 @@ fn parser_identifies_invalid_ret_expr() {
     let src = "ret";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let ret_expr = parser.parse_ret_expr();
-    assert!(ret_expr.is_err());
+    let ret_expr_result = parser.parse_ret_expr();
+
+    assert!(ret_expr_result.is_err());
+    emit_diagnostic!(ret_expr_result);
+    has_errors!(session, 1);
 }
 
 // tests integer literals:
@@ -254,9 +260,11 @@ fn parser_identifies_invalid_integer_literal() {
     let src = "fn";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let integer_literal = parser.parse_integer_literal();
-    assert!(integer_literal.is_err());
+    let integer_literal_result = parser.parse_integer_literal();
+
+    assert!(integer_literal_result.is_err());
+    emit_diagnostic!(integer_literal_result);
+    has_errors!(session, 1);
 }

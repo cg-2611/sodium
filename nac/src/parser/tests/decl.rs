@@ -1,16 +1,5 @@
 use super::*;
 
-macro_rules! identifies_invalid {
-    ($src:literal, $parser_fn:ident) => {
-        let session = Session::new();
-        let token_stream = Lexer::tokenize(&session, $src).unwrap();
-        let mut parser = Parser::new(&session, token_stream);
-
-        let result = parser.$parser_fn();
-        assert!(result.is_err());
-    };
-}
-
 // tests decl:
 //      fn name() -> i32 {}
 #[test]
@@ -18,12 +7,13 @@ fn parser_identifies_fn_decl() {
     let src = "fn name() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let decl = parser.parse_decl().unwrap();
+    let decl_result = parser.parse_decl();
 
-    assert!(decl.is_some());
+    assert!(decl_result.is_ok());
+    assert!(decl_result.unwrap().is_some());
+    has_errors!(session, 0);
 }
 
 // tests decl:
@@ -33,11 +23,13 @@ fn parser_identifies_invalid_decl() {
     let src = "name() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
-    let decl = parser.parse_decl();
-    assert!(decl.is_err());
+    let decl_result = parser.parse_decl();
+
+    assert!(decl_result.is_err());
+    emit_diagnostic!(decl_result);
+    has_errors!(session, 1);
 }
 
 // tests fn decl:
@@ -47,14 +39,14 @@ fn parser_parses_fn_decl() {
     let src = "fn name() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let fn_decl = parser.parse_fn_decl().unwrap();
 
-    assert_eq!(fn_decl.ident.value, String::from("name"));
-    assert_eq!(fn_decl.ret_type.ident.value, String::from("i32"));
+    matches_string!(fn_decl.ident.value, "name");
+    matches_string!(fn_decl.ret_type.ident.value, "i32");
     assert_eq!(fn_decl.body.stmts.len(), 0);
+    has_errors!(session, 0);
 }
 
 // tests fn decls:

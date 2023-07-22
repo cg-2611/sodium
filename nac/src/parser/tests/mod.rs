@@ -1,9 +1,11 @@
 use super::*;
-use crate::lexer::Lexer;
 
 mod decl;
 mod expr;
+mod macros;
 mod stmt;
+
+pub(crate) use macros::*;
 
 // tests source file:
 //
@@ -12,13 +14,12 @@ fn parser_parses_empty_source_file() {
     let src = "";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(!session.has_errors());
     assert_eq!(source_file.decls.len(), 0);
+    has_errors!(session, 0);
 }
 
 // tests source file:
@@ -28,13 +29,12 @@ fn parser_parses_source_file_with_single_decl() {
     let src = "fn name() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(!session.has_errors());
     assert_eq!(source_file.decls.len(), 1);
+    has_errors!(session, 0);
 }
 
 // tests source file:
@@ -46,13 +46,12 @@ fn parser_parses_source_file_with_multiple_decls() {
                     fn name2() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(!session.has_errors());
     assert_eq!(source_file.decls.len(), 2);
+    has_errors!(session, 0);
 }
 
 // tests source file:
@@ -62,14 +61,12 @@ fn parser_ignores_invalid_decl_and_diagnoses_error() {
     let src = "name() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 1);
     assert_eq!(source_file.decls.len(), 0);
+    has_errors!(session, 1);
 }
 
 // tests source file:
@@ -81,14 +78,12 @@ fn parser_recovers_after_invalid_declaration() {
                     fn name2() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 1);
     assert_eq!(source_file.decls.len(), 1);
+    has_errors!(session, 1);
 }
 
 // tests source file:
@@ -102,14 +97,12 @@ fn parser_diagnoses_multiple_invalid_decls_after_recovery() {
                     name3() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 2);
     assert_eq!(source_file.decls.len(), 1);
+    has_errors!(session, 2);
 }
 
 // tests source file:
@@ -121,14 +114,12 @@ fn parser_diagnoses_multiple_invalid_decls() {
                     fn() -> i32 {}";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let source_file = parser.parse_source_file().unwrap();
 
-    assert!(session.has_errors());
-    assert_eq!(session.error_count(), 2);
     assert_eq!(source_file.decls.len(), 0);
+    has_errors!(session, 2);
 }
 
 // tests identifier:
@@ -138,11 +129,12 @@ fn parser_parses_identifier() {
     let src = "ident";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let ident = parser.parse_identifier().unwrap();
-    assert_eq!(ident.value, String::from("ident"));
+
+    matches_string!(ident.value, "ident");
+    has_errors!(session, 0);
 }
 
 // tests type:
@@ -152,9 +144,10 @@ fn parser_parses_type() {
     let src = "i32";
 
     let session = Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
-    let mut parser = Parser::new(&session, token_stream);
+    let mut parser = initialise_parser_test!(session, src);
 
     let ty = parser.parse_type().unwrap();
-    assert_eq!(ty.ident.value, String::from("i32"));
+
+    matches_string!(ty.ident.value, "i32");
+    has_errors!(session, 0);
 }

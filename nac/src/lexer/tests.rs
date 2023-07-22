@@ -23,7 +23,7 @@ macro_rules! diagnoses {
 
         match_expected!(token_stream, $expected);
 
-        assert!(session.has_errors());
+        assert!(session.has_errors().is_err());
         assert_eq!(session.error_count(), $count);
     };
 }
@@ -96,7 +96,8 @@ fn lexer_tokenizes_multiple_tokens() {
     let session = Session::new();
     let token_stream = Lexer::tokenize(&session, src).unwrap();
 
-    assert!(!session.has_errors());
+    assert!(session.has_errors().is_ok());
+    assert_eq!(session.error_count(), 0);
     assert_eq!(token_stream.vec().len(), expected_tokens.len());
 
     match_expected!(token_stream, expected_tokens);
