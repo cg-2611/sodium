@@ -1,0 +1,14 @@
+[package]
+name = "driver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+codegen = { path = "../codegen" }
+errors = { path = "../errors" }
+lexer = { path = "../lexer" }
+llvm = { path = "../llvm" }
+parser = { path = "../parser" }
+session = { path = "../session" }
+source = { path = "../source" }
+target = { path = "../target" }

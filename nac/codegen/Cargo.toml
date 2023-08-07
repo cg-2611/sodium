@@ -1,0 +1,11 @@
+[package]
+name = "codegen"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ast = { path = "../ast" }
+errors = { path = "../errors" }
+llvm = { path = "../llvm" }
+range = { path = "../range" }
+session = { path = "../session" }

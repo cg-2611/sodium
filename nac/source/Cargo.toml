@@ -1,0 +1,11 @@
+[package]
+name = "source"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+errors = { path = "../errors" }
+session = { path = "../session" }
+range = { path = "../range" }
+
+tempfile = "3.6.0"

@@ -1,2 +1,2 @@
 [workspace]
-members = ["nac"]
+members = ["nac/*"]
