@@ -6,10 +6,19 @@ use crate::tests::{
 //      fn name() -> i32 {}
 #[test]
 fn parser_identifies_fn_decl() {
-    let src = "fn name() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let decl_result = parser.parse_decl();
 
@@ -22,10 +31,18 @@ fn parser_identifies_fn_decl() {
 //      name() -> i32 {}
 #[test]
 fn parser_identifies_invalid_decl() {
-    let src = "name() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let decl_result = parser.parse_decl();
 
@@ -38,10 +55,19 @@ fn parser_identifies_invalid_decl() {
 //      fn name() -> i32 {}
 #[test]
 fn parser_parses_fn_decl() {
-    let src = "fn name() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let fn_decl = parser.parse_fn_decl().unwrap();
 
@@ -60,10 +86,67 @@ fn parser_parses_fn_decl() {
 //      fn name() -> i32
 #[test]
 fn parser_identifies_invalid_fn_decls() {
-    identifies_invalid!("name() -> i32 {}", parse_fn_decl);
-    identifies_invalid!("fn () -> i32 {}", parse_fn_decl);
-    identifies_invalid!("fn name -> i32 {}", parse_fn_decl);
-    identifies_invalid!("fn name() i32 {}", parse_fn_decl);
-    identifies_invalid!("fn name() -> {}", parse_fn_decl);
-    identifies_invalid!("fn name() -> i32", parse_fn_decl);
+    let tokens = vec![
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
+    identifies_invalid!(tokens, parse_fn_decl);
+
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
+    identifies_invalid!(tokens, parse_fn_decl);
+
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
+    identifies_invalid!(tokens, parse_fn_decl);
+
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
+    identifies_invalid!(tokens, parse_fn_decl);
+
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
+    identifies_invalid!(tokens, parse_fn_decl);
+
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+    ];
+    identifies_invalid!(tokens, parse_fn_decl);
 }

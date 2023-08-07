@@ -11,10 +11,26 @@ mod stmt;
 //      fn name() -> i32 {}
 #[test]
 fn parser_produces_ast_from_valid_source_file() {
-    let src = "fn name() -> i32 {}";
+    let token_kinds = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
+
+    let mut tokens = Vec::new();
+
+    for kind in token_kinds {
+        tokens.push(token::Token::new(kind, range::Range::dummy()))
+    }
+
+    let token_stream = token::token_stream::TokenStream::from(tokens);
 
     let session = session::Session::new();
-    let token_stream = lexer::Lexer::tokenize(&session, src).unwrap();
     let ast = Parser::parse(&session, token_stream);
 
     assert!(ast.is_ok());
@@ -25,10 +41,10 @@ fn parser_produces_ast_from_valid_source_file() {
 //
 #[test]
 fn parser_parses_empty_source_file() {
-    let src = "";
+    let tokens = vec![];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -40,10 +56,19 @@ fn parser_parses_empty_source_file() {
 //      fn name() -> i32 {}
 #[test]
 fn parser_parses_source_file_with_single_decl() {
-    let src = "fn name() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -56,11 +81,27 @@ fn parser_parses_source_file_with_single_decl() {
 //      fn name2() -> i32 [}
 #[test]
 fn parser_parses_source_file_with_multiple_decls() {
-    let src = "fn name1() -> i32 {}\n\
-                    fn name2() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name1")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name2")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -72,10 +113,18 @@ fn parser_parses_source_file_with_multiple_decls() {
 //      name() -> i32 {}
 #[test]
 fn parser_ignores_invalid_decl_and_diagnoses_error() {
-    let src = "name() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -88,11 +137,26 @@ fn parser_ignores_invalid_decl_and_diagnoses_error() {
 //      fn name2() -> i32 {}
 #[test]
 fn parser_recovers_after_invalid_declaration() {
-    let src = "name1() -> i32 {}\n\
-                    fn name2() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Identifier(String::from("name1")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name2")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -106,12 +170,33 @@ fn parser_recovers_after_invalid_declaration() {
 //      name3() -> i32 {}
 #[test]
 fn parser_diagnoses_multiple_invalid_decls_after_recovery() {
-    let src = "name1() -> i32 {}\n\
-                    fn name2() -> i32 {}\n\
-                    name3() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Identifier(String::from("name1")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Identifier(String::from("name2")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+        token::TokenKind::Identifier(String::from("name3")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -124,11 +209,25 @@ fn parser_diagnoses_multiple_invalid_decls_after_recovery() {
 //      fn() -> i32 {}
 #[test]
 fn parser_diagnoses_multiple_invalid_decls() {
-    let src = "name() -> i32 {}\n\
-                    fn() -> i32 {}";
+    let tokens = vec![
+        token::TokenKind::Identifier(String::from("name")),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::LeftParen,
+        token::TokenKind::RightParen,
+        token::TokenKind::Arrow,
+        token::TokenKind::Identifier(String::from("i32")),
+        token::TokenKind::LeftBrace,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
@@ -140,10 +239,10 @@ fn parser_diagnoses_multiple_invalid_decls() {
 //      ident
 #[test]
 fn parser_parses_identifier() {
-    let src = "ident";
+    let tokens = vec![token::TokenKind::Identifier(String::from("ident"))];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let ident = parser.parse_ident().unwrap();
 
@@ -155,10 +254,10 @@ fn parser_parses_identifier() {
 //      i32
 #[test]
 fn parser_parses_type() {
-    let src = "i32";
+    let tokens = vec![token::TokenKind::Identifier(String::from("i32"))];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let ty = parser.parse_type().unwrap();
 

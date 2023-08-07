@@ -1,11 +1,9 @@
 use crate::tests::{emit_diagnostic, has_errors, initialise_parser_test};
 
 macro_rules! parses_and_matches {
-    ($src:literal, $parser_fn:ident, $expected:expr) => {
-        let src = $src;
-
+    ($tokens:expr, $parser_fn:ident, $expected:expr) => {
         let session = session::Session::new();
-        let mut parser = initialise_parser_test!(session, src);
+        let mut parser = initialise_parser_test!(session, $tokens);
 
         let result = parser.$parser_fn().unwrap();
 
@@ -18,10 +16,10 @@ macro_rules! parses_and_matches {
 //      {}
 #[test]
 fn parser_identifies_block_expr() {
-    let src = "{}";
+    let tokens = vec![token::TokenKind::LeftBrace, token::TokenKind::RightBrace];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let expr_result = parser.parse_expr();
 
@@ -33,10 +31,14 @@ fn parser_identifies_block_expr() {
 //      ret 2;
 #[test]
 fn parser_identifies_ret_expr() {
-    let src = "ret 2;";
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(2),
+        token::TokenKind::Semicolon,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let expr_result = parser.parse_expr();
 
@@ -48,10 +50,10 @@ fn parser_identifies_ret_expr() {
 //      2
 #[test]
 fn parser_identifies_integer_literal_expr() {
-    let src = "2";
+    let tokens = vec![token::TokenKind::IntegerLiteral(2)];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let expr_result = parser.parse_expr();
 
@@ -63,10 +65,10 @@ fn parser_identifies_integer_literal_expr() {
 //      fn
 #[test]
 fn parser_identifies_invalid_expr() {
-    let src = "fn";
+    let tokens = vec![token::TokenKind::Keyword(token::Keyword::Fn)];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let expr_result = parser.parse_expr();
 
@@ -79,10 +81,10 @@ fn parser_identifies_invalid_expr() {
 //      {}
 #[test]
 fn parser_parses_empty_block() {
-    let src = "{}";
+    let tokens = vec![token::TokenKind::LeftBrace, token::TokenKind::RightBrace];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -94,10 +96,16 @@ fn parser_parses_empty_block() {
 //      { ret 2; }
 #[test]
 fn parser_parses_block_with_single_stmt() {
-    let src = "{ ret 2; }";
+    let tokens = vec![
+        token::TokenKind::LeftBrace,
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(2),
+        token::TokenKind::Semicolon,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -112,13 +120,19 @@ fn parser_parses_block_with_single_stmt() {
 //      }
 #[test]
 fn parser_parses_block_with_multiple_stmts() {
-    let src = "{\n\
-                        ret 1;\n\
-                        ret 2;\n\
-                    }";
+    let tokens = vec![
+        token::TokenKind::LeftBrace,
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(1),
+        token::TokenKind::Semicolon,
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(2),
+        token::TokenKind::Semicolon,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -132,12 +146,15 @@ fn parser_parses_block_with_multiple_stmts() {
 //      }
 #[test]
 fn parser_ignores_invalid_stmt_in_block_and_diagnoses_error() {
-    let src = "{\n\
-                        fn;\n\
-                     }";
+    let tokens = vec![
+        token::TokenKind::LeftBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Semicolon,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -152,13 +169,18 @@ fn parser_ignores_invalid_stmt_in_block_and_diagnoses_error() {
 //      }
 #[test]
 fn parser_recovers_after_invalid_statement_in_block() {
-    let src = "{\n\
-                        fn;\n\
-                        ret 2;\n\
-                     }";
+    let tokens = vec![
+        token::TokenKind::LeftBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Semicolon,
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(2),
+        token::TokenKind::Semicolon,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -174,14 +196,20 @@ fn parser_recovers_after_invalid_statement_in_block() {
 //      }
 #[test]
 fn parser_diagnoses_multiple_invalid_stmts_in_block_after_recovery() {
-    let src = "{\n\
-                        fn;\n\
-                        ret 2;\n\
-                        fn;\n\
-                     }";
+    let tokens = vec![
+        token::TokenKind::LeftBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Semicolon,
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(2),
+        token::TokenKind::Semicolon,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Semicolon,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -196,13 +224,17 @@ fn parser_diagnoses_multiple_invalid_stmts_in_block_after_recovery() {
 //      }
 #[test]
 fn parser_diagnoses_multiple_invalid_stmts_in_block() {
-    let src = "{\n\
-                        fn;\n\
-                        fn;\n\
-                     }";
+    let tokens = vec![
+        token::TokenKind::LeftBrace,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Semicolon,
+        token::TokenKind::Keyword(token::Keyword::Fn),
+        token::TokenKind::Semicolon,
+        token::TokenKind::RightBrace,
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let block = parser.parse_block().unwrap();
 
@@ -214,10 +246,13 @@ fn parser_diagnoses_multiple_invalid_stmts_in_block() {
 //      ret 2
 #[test]
 fn parser_parses_ret_expr() {
-    let src = "ret 2";
+    let tokens = vec![
+        token::TokenKind::Keyword(token::Keyword::Ret),
+        token::TokenKind::IntegerLiteral(2),
+    ];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let ret_expr_result = parser.parse_ret_expr();
 
@@ -229,10 +264,10 @@ fn parser_parses_ret_expr() {
 //      ret
 #[test]
 fn parser_identifies_invalid_ret_expr() {
-    let src = "ret";
+    let tokens = vec![token::TokenKind::Keyword(token::Keyword::Ret)];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let ret_expr_result = parser.parse_ret_expr();
 
@@ -247,18 +282,23 @@ fn parser_identifies_invalid_ret_expr() {
 //      65536
 #[test]
 fn parser_parses_integer_literal() {
+    let tokens = vec![token::TokenKind::IntegerLiteral(2)];
     parses_and_matches!(
-        "2",
+        tokens,
         parse_integer_literal,
         ast::expr::LiteralKind::Integer(2)
     );
+
+    let tokens = vec![token::TokenKind::IntegerLiteral(567)];
     parses_and_matches!(
-        "567",
+        tokens,
         parse_integer_literal,
         ast::expr::LiteralKind::Integer(567)
     );
+
+    let tokens = vec![token::TokenKind::IntegerLiteral(65536)];
     parses_and_matches!(
-        "65536",
+        tokens,
         parse_integer_literal,
         ast::expr::LiteralKind::Integer(65536)
     );
@@ -268,10 +308,10 @@ fn parser_parses_integer_literal() {
 //      fn
 #[test]
 fn parser_identifies_invalid_integer_literal() {
-    let src = "fn";
+    let tokens = vec![token::TokenKind::Keyword(token::Keyword::Fn)];
 
     let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, src);
+    let mut parser = initialise_parser_test!(session, tokens);
 
     let integer_literal_result = parser.parse_integer_literal();
 

@@ -1,6 +1,12 @@
 macro_rules! initialise_parser_test {
-    ($session: expr, $src:expr) => {{
-        let token_stream = lexer::Lexer::tokenize(&$session, $src).unwrap();
+    ($session: expr, $token_kinds: expr) => {{
+        let mut tokens = Vec::new();
+
+        for kind in $token_kinds {
+            tokens.push(token::Token::new(kind, range::Range::dummy()))
+        }
+
+        let token_stream = token::token_stream::TokenStream::from(tokens);
         let parser = crate::Parser::new(&$session, token_stream);
 
         parser
@@ -31,11 +37,9 @@ macro_rules! emit_diagnostic {
 }
 
 macro_rules! identifies_invalid {
-    ($src:literal, $parser_fn:ident) => {
-        let src = $src;
-
+    ($tokens:expr, $parser_fn:ident) => {
         let session = session::Session::new();
-        let mut parser = initialise_parser_test!(session, src);
+        let mut parser = initialise_parser_test!(session, $tokens);
 
         let result = parser.$parser_fn();
         assert!(result.is_err());
