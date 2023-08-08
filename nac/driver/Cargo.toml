@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 codegen = { path = "../codegen" }
+context = { path = "../context" }
 errors = { path = "../errors" }
 lexer = { path = "../lexer" }
-llvm = { path = "../llvm" }
 parser = { path = "../parser" }
 session = { path = "../session" }
 source = { path = "../source" }

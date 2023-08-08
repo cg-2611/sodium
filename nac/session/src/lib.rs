@@ -7,21 +7,6 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new() -> Self {
-        Self {
-            diagnostic_handler: Default::default(),
-        }
-    }
-
-    pub fn run_pass<'a, T>(
-        &self,
-        pass: impl FnOnce() -> Result<T, Diagnostic<'a, ErrorOccurred>>,
-    ) -> NACResult<T> {
-        let result = pass().map_err(|mut error| error.emit())?;
-        self.has_errors()?;
-        Ok(result)
-    }
-
     pub fn create_ranged_error(
         &self,
         message: String,

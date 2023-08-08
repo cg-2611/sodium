@@ -6,8 +6,8 @@ use tempfile::{Builder, TempDir};
 
 use crate::{TargetGen, TargetGenResult};
 
-impl<'a, 'ctx> TargetGen<'a, 'ctx> {
-    pub fn link(&self) -> TargetGenResult<'a, ()> {
+impl<'ctx> TargetGen<'ctx> {
+    pub fn link(&self) -> TargetGenResult<'ctx, ()> {
         let tempdir = Builder::new()
             .prefix("nac_")
             .tempdir()
@@ -21,7 +21,7 @@ impl<'a, 'ctx> TargetGen<'a, 'ctx> {
         Ok(())
     }
 
-    fn get_object_file_path(&self, tempdir: &TempDir) -> TargetGenResult<'a, String> {
+    fn get_object_file_path(&self, tempdir: &TempDir) -> TargetGenResult<'ctx, String> {
         let tempdir_path = tempdir
             .path()
             .to_str()
@@ -47,13 +47,13 @@ impl<'a, 'ctx> TargetGen<'a, 'ctx> {
         Ok(path)
     }
 
-    pub fn write_object_file(&self, path: &str) -> TargetGenResult<'a, ()> {
+    pub fn write_object_file(&self, path: &str) -> TargetGenResult<'ctx, ()> {
         self.target_machine
             .write_to_file(self.module, path)
             .map_err(|message| self.target_gen_error(message.as_string()))
     }
 
-    pub fn link_executable(&self, path: &str) -> TargetGenResult<'a, ()> {
+    pub fn link_executable(&self, path: &str) -> TargetGenResult<'ctx, ()> {
         let linker_status = Command::new("clang")
             .arg(path)
             .arg("-o")

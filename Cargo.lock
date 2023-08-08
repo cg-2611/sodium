@@ -50,9 +50,17 @@ name = "codegen"
 version = "0.1.0"
 dependencies = [
  "ast",
+ "context",
  "errors",
  "llvm",
  "range",
+]
+
+[[package]]
+name = "context"
+version = "0.1.0"
+dependencies = [
+ "llvm",
  "session",
 ]
 
@@ -61,9 +69,9 @@ name = "driver"
 version = "0.1.0"
 dependencies = [
  "codegen",
+ "context",
  "errors",
  "lexer",
- "llvm",
  "parser",
  "session",
  "source",
@@ -260,6 +268,7 @@ dependencies = [
 name = "target"
 version = "0.1.0"
 dependencies = [
+ "context",
  "errors",
  "llvm",
  "session",

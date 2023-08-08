@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 ast = { path = "../ast" }
+context = { path = "../context" }
 errors = { path = "../errors" }
 llvm = { path = "../llvm" }
 range = { path = "../range" }
-session = { path = "../session" }
