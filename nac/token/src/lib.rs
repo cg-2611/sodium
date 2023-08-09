@@ -1,5 +1,8 @@
 use range::Range;
 
+pub use self::cursor::Cursor;
+pub use self::token_stream::TokenStream;
+
 pub mod cursor;
 pub mod token_stream;
 

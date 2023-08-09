@@ -2,9 +2,7 @@ use ast::decl::Decl;
 use ast::{Identifier, SourceFile, AST};
 use range::Range;
 use session::Session;
-use token::cursor::Cursor;
-use token::token_stream::TokenStream;
-use token::{Token, TokenKind};
+use token::{Cursor, Token, TokenKind, TokenStream};
 
 pub use self::diagnostics::{ParserError, ParserResult};
 

@@ -1,8 +1,7 @@
 use range::{Location, Range};
 use session::Session;
 use source::Cursor;
-use token::token_stream::TokenStream;
-use token::{Keyword, Token, TokenKind};
+use token::{Keyword, Token, TokenKind, TokenStream};
 
 pub use self::diagnostics::{LexerError, LexerResult};
 
