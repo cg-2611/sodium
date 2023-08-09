@@ -1,5 +1,6 @@
-use crate::decl::Decl;
 use range::Range;
+
+use crate::decl::Decl;
 
 pub mod decl;
 pub mod expr;
