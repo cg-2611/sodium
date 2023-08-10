@@ -1,4 +1,4 @@
-use ast::stmt::{Stmt, StmtKind};
+use ast::{Stmt, StmtKind};
 use token::TokenKind;
 
 use crate::{Parser, ParserResult};

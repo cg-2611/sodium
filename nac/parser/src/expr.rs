@@ -1,5 +1,4 @@
-use ast::expr::{Block, Expr, ExprKind, Literal, LiteralKind, RetExpr};
-use ast::stmt::Stmt;
+use ast::{Block, Expr, ExprKind, Literal, LiteralKind, RetExpr, Stmt};
 use token::{Keyword, TokenKind};
 
 use crate::{Parser, ParserResult};

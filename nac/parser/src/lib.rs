@@ -1,5 +1,4 @@
-use ast::decl::Decl;
-use ast::{Identifier, SourceFile, AST};
+use ast::{Decl, Identifier, SourceFile, AST};
 use range::Range;
 use session::Session;
 use token::{Cursor, Token, TokenKind, TokenStream};
@@ -36,6 +35,7 @@ impl<'a> Parser<'a> {
     pub fn parse(session: &'a Session, token_stream: TokenStream) -> ParserResult<'a, AST> {
         let mut parser = Parser::new(session, token_stream);
         let root = parser.parse_source_file()?;
+
         Ok(AST::new(root))
     }
 

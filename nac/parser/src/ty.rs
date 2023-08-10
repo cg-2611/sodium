@@ -1,4 +1,4 @@
-use ast::ty::Type;
+use ast::Type;
 use token::TokenKind;
 
 use crate::{Parser, ParserResult};

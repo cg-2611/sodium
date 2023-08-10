@@ -1,4 +1,4 @@
-use ast::decl::{Decl, DeclKind, FnDecl};
+use ast::{Decl, DeclKind, FnDecl};
 use token::{Keyword, TokenKind};
 
 use crate::{Parser, ParserResult};

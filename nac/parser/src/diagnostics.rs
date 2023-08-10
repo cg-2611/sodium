@@ -1,5 +1,4 @@
-use ast::expr::Literal;
-use ast::Identifier;
+use ast::{Identifier, Literal};
 use errors::{Diagnostic, ErrorOccurred};
 use range::Range;
 use token::{Keyword, TokenKind};

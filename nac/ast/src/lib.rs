@@ -1,13 +1,15 @@
 use range::Range;
 
-use crate::decl::Decl;
+pub use self::decl::{Decl, DeclKind, FnDecl};
+pub use self::expr::{Block, Expr, ExprKind, Literal, LiteralKind, RetExpr};
+pub use self::stmt::{Stmt, StmtKind};
+pub use self::ty::Type;
 
 pub mod decl;
 pub mod expr;
 pub mod printer;
 pub mod stmt;
 pub mod ty;
-pub mod visitor;
 
 pub struct AST {
     root: SourceFile,
