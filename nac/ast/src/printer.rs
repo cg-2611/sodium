@@ -1,56 +1,12 @@
-use crate::decl::{Decl, DeclKind, FnDecl};
-use crate::expr::{Block, Expr, ExprKind, Literal, LiteralKind, RetExpr};
-use crate::stmt::{Stmt, StmtKind};
-use crate::ty::Type;
-use crate::visitor::MutVisitor;
-use crate::{Identifier, SourceFile, AST};
+use crate::{
+    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Identifier, Literal, LiteralKind, RetExpr,
+    SourceFile, Stmt, StmtKind, Type, AST,
+};
 
 pub struct ASTPrinter {
     out: String,
     indent_size: usize,
     indent: usize,
-}
-
-impl<'ast> MutVisitor<'ast, ()> for ASTPrinter {
-    fn visit_source_file_mut(&mut self, source_file: &'ast SourceFile) {
-        self.walk_source_file(source_file);
-    }
-
-    fn visit_decl_mut(&mut self, decl: &'ast Decl) {
-        self.walk_decl(decl);
-    }
-
-    fn visit_fn_decl_mut(&mut self, fn_decl: &'ast FnDecl) {
-        self.walk_fn_decl(fn_decl);
-    }
-
-    fn visit_ident_mut(&mut self, ident: &'ast Identifier) {
-        self.walk_ident(ident);
-    }
-
-    fn visit_type_mut(&mut self, ty: &'ast Type) {
-        self.walk_type(ty);
-    }
-
-    fn visit_block_mut(&mut self, block: &'ast Block) {
-        self.walk_block(block);
-    }
-
-    fn visit_stmt_mut(&mut self, stmt: &'ast Stmt) {
-        self.walk_stmt(stmt);
-    }
-
-    fn visit_expr_mut(&mut self, expr: &'ast Expr) {
-        self.walk_expr(expr);
-    }
-
-    fn visit_ret_expr_mut(&mut self, ret_expr: &'ast RetExpr) {
-        self.walk_ret_expr(ret_expr);
-    }
-
-    fn visit_literal_mut(&mut self, literal: &'ast Literal) {
-        self.walk_literal(literal);
-    }
 }
 
 impl<'ast> ASTPrinter {
@@ -61,110 +17,110 @@ impl<'ast> ASTPrinter {
             indent: 0,
         };
 
-        ast_printer.visit_source_file_mut(ast.root());
+        ast_printer.print_source_file(ast.root());
         println!("{}", ast_printer.out);
     }
 
-    pub fn walk_source_file(&mut self, source_file: &'ast SourceFile) {
+    pub fn print_source_file(&mut self, source_file: &'ast SourceFile) {
         self.writeln(format!("source file ({}):", source_file.range).as_str());
         self.indent();
 
         for decl in &source_file.decls {
-            self.visit_decl_mut(decl);
+            self.print_decl(decl);
         }
 
         self.dedent();
     }
 
-    pub fn walk_decl(&mut self, decl: &'ast Decl) {
+    pub fn print_decl(&mut self, decl: &'ast Decl) {
         self.write_indentation();
         self.writeln(format!("decl ({}):", decl.range).as_str());
         self.indent();
 
         match &decl.kind {
-            DeclKind::Fn(fn_decl) => self.visit_fn_decl_mut(fn_decl),
+            DeclKind::Fn(fn_decl) => self.print_fn_decl(fn_decl),
         }
 
         self.dedent();
     }
 
-    pub fn walk_fn_decl(&mut self, fn_decl: &'ast FnDecl) {
+    pub fn print_fn_decl(&mut self, fn_decl: &'ast FnDecl) {
         self.write_indentation();
         self.writeln(format!("fn decl ({}):", fn_decl.range).as_str());
 
         self.indent();
 
-        self.visit_ident_mut(&fn_decl.ident);
-        self.visit_type_mut(&fn_decl.ret_type);
-        self.visit_block_mut(&fn_decl.body);
+        self.print_ident(&fn_decl.ident);
+        self.print_type(&fn_decl.ret_type);
+        self.print_block(&fn_decl.body);
 
         self.dedent();
     }
 
-    pub fn walk_ident(&mut self, ident: &'ast Identifier) {
+    pub fn print_ident(&mut self, ident: &'ast Identifier) {
         self.write_indentation();
         self.writeln(format!("ident: {} ({})", ident.value, ident.range).as_str());
     }
 
-    pub fn walk_type(&mut self, ty: &'ast Type) {
+    pub fn print_type(&mut self, ty: &'ast Type) {
         self.write_indentation();
         self.writeln(format!("type ({}):", ty.ident.range).as_str());
         self.indent();
 
-        self.visit_ident_mut(&ty.ident);
+        self.print_ident(&ty.ident);
 
         self.dedent();
     }
 
-    pub fn walk_block(&mut self, block: &'ast Block) {
+    pub fn print_block(&mut self, block: &'ast Block) {
         self.write_indentation();
         self.writeln(format!("block: ({})", block.range).as_str());
         self.indent();
 
         for stmt in &block.stmts {
-            self.visit_stmt_mut(stmt);
+            self.print_stmt(stmt);
         }
 
         self.dedent();
     }
 
-    pub fn walk_stmt(&mut self, stmt: &'ast Stmt) {
+    pub fn print_stmt(&mut self, stmt: &'ast Stmt) {
         self.write_indentation();
         self.writeln(format!("stmt: ({})", stmt.range).as_str());
         self.indent();
 
         match &stmt.kind {
-            StmtKind::ExprStmt(expr) => self.visit_expr_mut(expr),
+            StmtKind::ExprStmt(expr) => self.print_expr(expr),
         }
 
         self.dedent();
     }
 
-    pub fn walk_expr(&mut self, expr: &'ast Expr) {
+    pub fn print_expr(&mut self, expr: &'ast Expr) {
         self.write_indentation();
         self.writeln(format!("expr: ({})", expr.range).as_str());
         self.indent();
 
         match &expr.kind {
-            ExprKind::Block(block) => self.visit_block_mut(block),
-            ExprKind::Literal(literal) => self.visit_literal_mut(literal),
-            ExprKind::Ret(ret_expr) => self.visit_ret_expr_mut(ret_expr),
+            ExprKind::Block(block) => self.print_block(block),
+            ExprKind::Literal(literal) => self.print_literal(literal),
+            ExprKind::Ret(ret_expr) => self.print_ret_expr(ret_expr),
         }
 
         self.dedent();
     }
 
-    pub fn walk_ret_expr(&mut self, ret_expr: &'ast RetExpr) {
+    pub fn print_ret_expr(&mut self, ret_expr: &'ast RetExpr) {
         self.write_indentation();
         self.writeln(format!("ret expr ({}):", ret_expr.range).as_str());
         self.indent();
 
-        self.visit_expr_mut(&ret_expr.expr);
+        self.print_expr(&ret_expr.expr);
 
         self.dedent();
     }
 
-    pub fn walk_literal(&mut self, literal: &'ast Literal) {
+    pub fn print_literal(&mut self, literal: &'ast Literal) {
         self.write_indentation();
         self.writeln(format!("literal ({}):", literal.range).as_str());
         self.indent();
