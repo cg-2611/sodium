@@ -1,8 +1,6 @@
 use range::Range;
 
-use crate::expr::Block;
-use crate::ty::Type;
-use crate::Identifier;
+use crate::{Block, Identifier, Type};
 
 pub enum DeclKind {
     Fn(Box<FnDecl>),

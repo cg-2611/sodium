@@ -1,6 +1,6 @@
 use range::Range;
 
-use crate::expr::Expr;
+use crate::Expr;
 
 pub enum StmtKind {
     ExprStmt(Box<Expr>),

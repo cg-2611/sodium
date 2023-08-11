@@ -1,6 +1,6 @@
 use range::Range;
 
-use crate::stmt::Stmt;
+use crate::Stmt;
 
 pub enum ExprKind {
     Block(Box<Block>),
