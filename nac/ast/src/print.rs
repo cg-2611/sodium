@@ -59,7 +59,7 @@ impl<'ast> ASTPrinter {
 
     pub fn print_ident(&mut self, ident: &'ast Identifier) {
         self.write_indentation();
-        self.writeln(format!("ident: {} ({})", ident.value, ident.range).as_str());
+        self.writeln(format!("ident  ({}): {}", ident.range, ident.value).as_str());
     }
 
     pub fn print_type(&mut self, ty: &'ast Type) {
@@ -74,7 +74,7 @@ impl<'ast> ASTPrinter {
 
     pub fn print_block(&mut self, block: &'ast Block) {
         self.write_indentation();
-        self.writeln(format!("block: ({})", block.range).as_str());
+        self.writeln(format!("block ({}):", block.range).as_str());
         self.indent();
 
         for stmt in &block.stmts {
@@ -86,7 +86,7 @@ impl<'ast> ASTPrinter {
 
     pub fn print_stmt(&mut self, stmt: &'ast Stmt) {
         self.write_indentation();
-        self.writeln(format!("stmt: ({})", stmt.range).as_str());
+        self.writeln(format!("stmt ({}):", stmt.range).as_str());
         self.indent();
 
         match &stmt.kind {
@@ -98,7 +98,7 @@ impl<'ast> ASTPrinter {
 
     pub fn print_expr(&mut self, expr: &'ast Expr) {
         self.write_indentation();
-        self.writeln(format!("expr: ({})", expr.range).as_str());
+        self.writeln(format!("expr ({}):", expr.range).as_str());
         self.indent();
 
         match &expr.kind {

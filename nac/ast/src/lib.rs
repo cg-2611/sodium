@@ -7,7 +7,7 @@ pub use self::ty::Type;
 
 pub mod decl;
 pub mod expr;
-pub mod printer;
+pub mod print;
 pub mod stmt;
 pub mod ty;
 
