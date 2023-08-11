@@ -5,12 +5,17 @@ use range::Range;
 use crate::diagnostic::Diagnostic;
 use crate::{EmissionPending, ErrorOccurred};
 
-#[derive(Default)]
 pub struct DiagnosticHandler {
     inner: RefCell<DiagnosticHandlerInner>,
 }
 
 impl DiagnosticHandler {
+    pub fn new() -> Self {
+        Self {
+            inner: RefCell::new(DiagnosticHandlerInner::new()),
+        }
+    }
+
     pub fn create_ranged_error(
         &self,
         message: String,
@@ -38,12 +43,21 @@ impl DiagnosticHandler {
     }
 }
 
-#[derive(Default)]
+impl Default for DiagnosticHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct DiagnosticHandlerInner {
     error_count: usize,
 }
 
 impl DiagnosticHandlerInner {
+    pub fn new() -> Self {
+        Self { error_count: 0 }
+    }
+
     pub fn error_count(&self) -> usize {
         self.error_count
     }
@@ -60,5 +74,11 @@ impl DiagnosticHandlerInner {
         eprintln!("{}", diagnostic);
 
         ErrorOccurred
+    }
+}
+
+impl Default for DiagnosticHandlerInner {
+    fn default() -> Self {
+        Self::new()
     }
 }

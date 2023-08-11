@@ -7,12 +7,17 @@ use session::Session;
 use source::file::SourceFileReader;
 use target::TargetGen;
 
-#[derive(Default)]
 pub struct Compiler {
     session: Session,
 }
 
 impl Compiler {
+    pub fn new() -> Self {
+        Self {
+            session: Session::new(),
+        }
+    }
+
     pub fn session(&self) -> &Session {
         &self.session
     }
@@ -38,5 +43,11 @@ impl Compiler {
         self.run_pass(|| TargetGen::compile_module(context, &module))?;
 
         Ok(())
+    }
+}
+
+impl Default for Compiler {
+    fn default() -> Self {
+        Self::new()
     }
 }
