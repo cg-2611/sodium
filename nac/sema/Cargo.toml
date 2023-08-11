@@ -1,0 +1,12 @@
+[package]
+name = "sema"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ast = { path = "../ast" }
+context = { path = "../context" }
+errors = { path = "../errors" }
+ir = { path = "../ir" }
+range = { path = "../range" }
+ty = { path = "../ty" }

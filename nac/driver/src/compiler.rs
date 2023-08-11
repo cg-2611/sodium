@@ -3,6 +3,7 @@ use context::CompilerContext;
 use errors::{Diagnostic, ErrorOccurred, NACResult};
 use lexer::Lexer;
 use parser::Parser;
+use sema::Sema;
 use session::Session;
 use source::file::SourceFileReader;
 use target::TargetGen;
@@ -38,6 +39,10 @@ impl Compiler {
 
         let token_stream = self.run_pass(|| Lexer::tokenize(&self.session, src_file.contents()))?;
         let ast = self.run_pass(|| Parser::parse(&self.session, token_stream))?;
+
+        let ir = self.run_pass(|| Sema::lower_ast(context, ast))?;
+
+        self.run_pass(|| Sema::type_check_ir(context, &ir))?;
 
         let module = self.run_pass(|| CodeGen::codegen(context, "module", &ast))?;
         self.run_pass(|| TargetGen::compile_module(context, &module))?;

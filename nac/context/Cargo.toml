@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 llvm = { path = "../llvm" }
 session = { path = "../session" }
+ty = { path = "../ty" }

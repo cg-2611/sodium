@@ -9,6 +9,7 @@ context = { path = "../context" }
 errors = { path = "../errors" }
 lexer = { path = "../lexer" }
 parser = { path = "../parser" }
+sema = { path = "../sema" }
 session = { path = "../session" }
 source = { path = "../source" }
 target = { path = "../target" }

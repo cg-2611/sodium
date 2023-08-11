@@ -62,6 +62,7 @@ version = "0.1.0"
 dependencies = [
  "llvm",
  "session",
+ "ty",
 ]
 
 [[package]]
@@ -73,6 +74,7 @@ dependencies = [
  "errors",
  "lexer",
  "parser",
+ "sema",
  "session",
  "source",
  "target",
@@ -111,6 +113,14 @@ name = "fastrand"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6999dc1837253364c2ebb0704ba97994bd874e8f195d665c50b7548f6ea92764"
+
+[[package]]
+name = "ir"
+version = "0.1.0"
+dependencies = [
+ "range",
+ "ty",
+]
 
 [[package]]
 name = "lazy_static"
@@ -241,6 +251,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "sema"
+version = "0.1.0"
+dependencies = [
+ "ast",
+ "context",
+ "errors",
+ "ir",
+ "range",
+ "ty",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -294,6 +316,10 @@ version = "0.1.0"
 dependencies = [
  "range",
 ]
+
+[[package]]
+name = "ty"
+version = "0.1.0"
 
 [[package]]
 name = "windows-sys"
