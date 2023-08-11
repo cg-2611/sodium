@@ -21,11 +21,18 @@ impl<'ctx> Sema<'ctx> {
         Self { context }
     }
 
+    pub fn semantic_analysis(context: &'ctx CompilerContext, ast: AST) -> SemaResult<'ctx, IR> {
+        let ir = Sema::lower_ast(context, ast)?;
+        let ir = Sema::type_check_ir(context, ir)?;
+
+        Ok(ir)
+    }
+
     pub fn lower_ast(context: &'ctx CompilerContext, ast: AST) -> SemaResult<'ctx, IR> {
         ASTLower::lower(context, &ast)
     }
 
-    pub fn type_check_ir(context: &'ctx CompilerContext, ir: &IR) -> SemaResult<'ctx, ()> {
+    pub fn type_check_ir(context: &'ctx CompilerContext, ir: IR) -> SemaResult<'ctx, IR> {
         TypeChecker::type_check(context, ir)
     }
 }

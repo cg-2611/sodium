@@ -12,9 +12,10 @@ impl<'ctx, 'ir> TypeChecker<'ctx> {
         Self { context }
     }
 
-    pub fn type_check(context: &'ctx CompilerContext, ir: &'ir IR) -> SemaResult<'ctx, ()> {
+    pub fn type_check(context: &'ctx CompilerContext, ir: IR) -> SemaResult<'ctx, IR> {
         let type_checker = TypeChecker::new(context);
-        type_checker.type_check_source_file(ir.source_file())
+        type_checker.type_check_source_file(ir.source_file())?;
+        Ok(ir)
     }
 
     pub fn type_check_source_file(&self, source_file: &'ir SourceFile) -> SemaResult<'ctx, ()> {

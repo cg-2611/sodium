@@ -39,11 +39,8 @@ impl Compiler {
 
         let token_stream = self.run_pass(|| Lexer::tokenize(&self.session, src_file.contents()))?;
         let ast = self.run_pass(|| Parser::parse(&self.session, token_stream))?;
-
-        let ir = self.run_pass(|| Sema::lower_ast(context, ast))?;
-        self.run_pass(|| Sema::type_check_ir(context, &ir))?;
-
-        let module = self.run_pass(|| CodeGen::codegen(context, "module", &ir))?;
+        let ir = self.run_pass(|| Sema::semantic_analysis(context, ast))?;
+        let module = self.run_pass(|| CodeGen::codegen(context, "module", ir))?;
         self.run_pass(|| TargetGen::compile_module(context, &module))?;
 
         Ok(())

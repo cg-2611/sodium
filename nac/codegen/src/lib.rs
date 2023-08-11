@@ -28,7 +28,7 @@ impl<'ctx, 'ir> CodeGen<'ctx> {
     pub fn codegen(
         context: &'ctx CompilerContext,
         module_name: &str,
-        ir: &'ir IR,
+        ir: IR,
     ) -> CodeGenResult<'ctx, Module<'ctx>> {
         let codegen = Self::new(context, module_name);
         codegen.codegen_source_file(ir.source_file())?;
