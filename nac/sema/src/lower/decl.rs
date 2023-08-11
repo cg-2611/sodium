@@ -23,8 +23,6 @@ impl<'ctx, 'ast> ASTLower<'ctx> {
         let ret_type = self.lower_type(&fn_decl.ret_type)?;
         let body = self.lower_block(&fn_decl.body)?;
 
-        let fn_decl_ty = self.context.type_context().fn_ty(ret_type);
-
-        Ok(FnDecl::new(ident, body, fn_decl_ty, fn_decl.range))
+        Ok(FnDecl::new(ident, body, ret_type, fn_decl.range))
     }
 }

@@ -35,7 +35,7 @@ impl<'ctx, 'ir> TypeChecker<'ctx> {
         let fn_ret_type = &fn_decl.ty;
         let fn_body_type = &fn_decl.body.ty;
 
-        if !fn_ret_type.matches(fn_body_type) {
+        if fn_ret_type != fn_body_type {
             let message = format!(
                 "type mismatch: expected type `{}`, found `{}`",
                 fn_ret_type, fn_body_type

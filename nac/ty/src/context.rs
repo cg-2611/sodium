@@ -12,10 +12,6 @@ impl TypeContext {
     pub fn i32(&self) -> Type {
         self.i32.clone()
     }
-
-    pub fn fn_ty(&self, ret_type: Type) -> Type {
-        Type::fn_ty(ret_type)
-    }
 }
 
 impl Default for TypeContext {

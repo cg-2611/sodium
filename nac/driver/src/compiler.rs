@@ -41,10 +41,9 @@ impl Compiler {
         let ast = self.run_pass(|| Parser::parse(&self.session, token_stream))?;
 
         let ir = self.run_pass(|| Sema::lower_ast(context, ast))?;
-
         self.run_pass(|| Sema::type_check_ir(context, &ir))?;
 
-        let module = self.run_pass(|| CodeGen::codegen(context, "module", &ast))?;
+        let module = self.run_pass(|| CodeGen::codegen(context, "module", &ir))?;
         self.run_pass(|| TargetGen::compile_module(context, &module))?;
 
         Ok(())
