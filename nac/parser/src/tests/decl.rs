@@ -17,14 +17,14 @@ fn parser_identifies_fn_decl() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let decl_result = parser.parse_decl();
 
     assert!(decl_result.is_ok());
     assert!(decl_result.unwrap().is_some());
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests decl:
@@ -41,14 +41,14 @@ fn parser_identifies_invalid_decl() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let decl_result = parser.parse_decl();
 
     assert!(decl_result.is_err());
     emit_diagnostic!(decl_result);
-    has_errors!(session, 1);
+    has_errors!(sess, 1);
 }
 
 // tests fn decl:
@@ -66,15 +66,15 @@ fn parser_parses_fn_decl() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let fn_decl = parser.parse_fn_decl().unwrap();
 
     matches_string!(fn_decl.ident.value, "name");
     matches_string!(fn_decl.ret_type.ident.value, "i32");
     assert_eq!(fn_decl.body.stmts.len(), 0);
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests fn decls:

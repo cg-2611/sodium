@@ -33,7 +33,7 @@ const TEST_FILE_CONTENTS: &str = r#"this is a
 
 #[test]
 fn source_file_reader_reads_file() {
-    let session = session::Session::new();
+    let sess = session::Session::new();
     let tempdir = Builder::new()
         .tempdir()
         .expect("failed to create tempdir for temporary test file");
@@ -41,7 +41,7 @@ fn source_file_reader_reads_file() {
     let file_name = "test_file.na";
     let file_path = initialise_test_file!(tempdir, file_name, TEST_FILE_CONTENTS);
 
-    let source_file_result = SourceFileReader::source_file_from_path(&session, file_path.as_str());
+    let source_file_result = SourceFileReader::source_file_from_path(&sess, file_path.as_str());
 
     assert!(source_file_result.is_ok());
 
@@ -50,13 +50,13 @@ fn source_file_reader_reads_file() {
     assert_eq!(source_file.name(), file_name);
     assert_eq!(source_file.contents(), TEST_FILE_CONTENTS);
 
-    assert!(session.has_errors().is_ok());
-    assert_eq!(session.error_count(), 0);
+    assert!(sess.has_errors().is_ok());
+    assert_eq!(sess.error_count(), 0);
 }
 
 #[test]
 fn source_file_reader_rejects_files_with_incorrect_extension() {
-    let session = session::Session::new();
+    let sess = session::Session::new();
     let tempdir = Builder::new()
         .tempdir()
         .expect("failed to create tempdir for temporary test file");
@@ -64,18 +64,18 @@ fn source_file_reader_rejects_files_with_incorrect_extension() {
     let file_name = "test_file.rs";
     let file_path = initialise_test_file!(tempdir, file_name, TEST_FILE_CONTENTS);
 
-    let source_file_result = SourceFileReader::source_file_from_path(&session, file_path.as_str());
+    let source_file_result = SourceFileReader::source_file_from_path(&sess, file_path.as_str());
 
     assert!(source_file_result.is_err());
     emit_diagnostic!(source_file_result);
 
-    assert!(session.has_errors().is_err());
-    assert_eq!(session.error_count(), 1);
+    assert!(sess.has_errors().is_err());
+    assert_eq!(sess.error_count(), 1);
 }
 
 #[test]
 fn source_file_reader_rejects_files_with_missing_extension() {
-    let session = session::Session::new();
+    let sess = session::Session::new();
     let tempdir = Builder::new()
         .tempdir()
         .expect("failed to create tempdir for temporary test file");
@@ -83,29 +83,29 @@ fn source_file_reader_rejects_files_with_missing_extension() {
     let file_name = "test_file";
     let file_path = initialise_test_file!(tempdir, file_name, TEST_FILE_CONTENTS);
 
-    let source_file_result = SourceFileReader::source_file_from_path(&session, file_path.as_str());
+    let source_file_result = SourceFileReader::source_file_from_path(&sess, file_path.as_str());
 
     assert!(source_file_result.is_err());
     emit_diagnostic!(source_file_result);
 
-    assert!(session.has_errors().is_err());
-    assert_eq!(session.error_count(), 1);
+    assert!(sess.has_errors().is_err());
+    assert_eq!(sess.error_count(), 1);
 }
 
 #[test]
 fn source_file_reader_rejects_file_that_does_not_exist() {
-    let session = session::Session::new();
+    let sess = session::Session::new();
     let tempdir = Builder::new()
         .tempdir()
         .expect("failed to create tempdir for temporary test file");
 
     let _ = initialise_test_file!(tempdir, "test_file.na", TEST_FILE_CONTENTS);
 
-    let source_file_result = SourceFileReader::source_file_from_path(&session, "does_not_exist.na");
+    let source_file_result = SourceFileReader::source_file_from_path(&sess, "does_not_exist.na");
 
     assert!(source_file_result.is_err());
     emit_diagnostic!(source_file_result);
 
-    assert!(session.has_errors().is_err());
-    assert_eq!(session.error_count(), 1);
+    assert!(sess.has_errors().is_err());
+    assert_eq!(sess.error_count(), 1);
 }

@@ -30,11 +30,11 @@ fn parser_produces_ast_from_valid_source_file() {
 
     let token_stream = token::token_stream::TokenStream::from(tokens);
 
-    let session = session::Session::new();
-    let ast = Parser::parse(&session, token_stream);
+    let sess = session::Session::new();
+    let ast = Parser::parse(&sess, token_stream);
 
     assert!(ast.is_ok());
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests source file:
@@ -43,13 +43,13 @@ fn parser_produces_ast_from_valid_source_file() {
 fn parser_parses_empty_source_file() {
     let tokens = vec![];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 0);
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests source file:
@@ -67,13 +67,13 @@ fn parser_parses_source_file_with_single_decl() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 1);
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests source file:
@@ -100,13 +100,13 @@ fn parser_parses_source_file_with_multiple_decls() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 2);
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests source file:
@@ -123,13 +123,13 @@ fn parser_ignores_invalid_decl_and_diagnoses_error() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 0);
-    has_errors!(session, 1);
+    has_errors!(sess, 1);
 }
 
 // tests source file:
@@ -155,13 +155,13 @@ fn parser_recovers_after_invalid_declaration() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 1);
-    has_errors!(session, 1);
+    has_errors!(sess, 1);
 }
 
 // tests source file:
@@ -195,13 +195,13 @@ fn parser_diagnoses_multiple_invalid_decls_after_recovery() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 1);
-    has_errors!(session, 2);
+    has_errors!(sess, 2);
 }
 
 // tests source file:
@@ -226,13 +226,13 @@ fn parser_diagnoses_multiple_invalid_decls() {
         token::TokenKind::RightBrace,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let source_file = parser.parse_source_file().unwrap();
 
     assert_eq!(source_file.decls.len(), 0);
-    has_errors!(session, 2);
+    has_errors!(sess, 2);
 }
 
 // tests identifier:
@@ -241,13 +241,13 @@ fn parser_diagnoses_multiple_invalid_decls() {
 fn parser_parses_identifier() {
     let tokens = vec![token::TokenKind::Identifier(String::from("ident"))];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let ident = parser.parse_ident().unwrap();
 
     matches_string!(ident.value, "ident");
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests type:
@@ -256,11 +256,11 @@ fn parser_parses_identifier() {
 fn parser_parses_type() {
     let tokens = vec![token::TokenKind::Identifier(String::from("i32"))];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let ty = parser.parse_type().unwrap();
 
     matches_string!(ty.ident.value, "i32");
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }

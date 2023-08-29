@@ -28,12 +28,12 @@ impl<'cx, 'ir> CodeGen<'cx> {
     }
 
     pub fn codegen(
-        session: &'cx Session,
+        sess: &'cx Session,
         llvm_context: &'cx LLVMContext,
         module_name: &str,
         ir: IR<'_>,
     ) -> CodeGenResult<'cx, LLVMModule<'cx>> {
-        let codegen = Self::new(session, llvm_context, module_name);
+        let codegen = Self::new(sess, llvm_context, module_name);
         codegen.codegen_source_file(ir.source_file())?;
         Ok(codegen.module)
     }

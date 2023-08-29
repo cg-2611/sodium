@@ -4,23 +4,23 @@ use errors::{Diagnostic, ErrorOccurred};
 use session::Session;
 
 pub struct SourceFileReader<'a> {
-    session: &'a Session,
+    sess: &'a Session,
     path: PathBuf,
 }
 
 impl<'a> SourceFileReader<'a> {
-    pub fn new(session: &'a Session, path: &str) -> Self {
+    pub fn new(sess: &'a Session, path: &str) -> Self {
         Self {
-            session,
+            sess,
             path: PathBuf::from(path),
         }
     }
 
     pub fn source_file_from_path(
-        session: &'a Session,
+        sess: &'a Session,
         path: &str,
     ) -> Result<SourceFile, Diagnostic<'a, ErrorOccurred>> {
-        let source_file_reader = SourceFileReader::new(session, path);
+        let source_file_reader = SourceFileReader::new(sess, path);
 
         if let Some(extension) = source_file_reader.path.extension().and_then(|e| e.to_str()) {
             if extension != "na" {
@@ -28,14 +28,14 @@ impl<'a> SourceFileReader<'a> {
                     "invalid path {:?}: file extension must be .na",
                     source_file_reader.path
                 );
-                return Err(session.create_error(message));
+                return Err(sess.create_error(message));
             }
         } else {
             let message = format!(
                 "could not determine extension of path {:?}",
                 source_file_reader.path
             );
-            return Err(session.create_error(message));
+            return Err(sess.create_error(message));
         }
 
         let file_path = Path::new(path);
@@ -46,7 +46,7 @@ impl<'a> SourceFileReader<'a> {
                     "could not determine name of file at path {:?}",
                     source_file_reader.path
                 );
-                return Err(session.create_error(message));
+                return Err(sess.create_error(message));
             }
         };
 
@@ -60,7 +60,7 @@ impl<'a> SourceFileReader<'a> {
             Ok(string) => Ok(string),
             Err(error) => {
                 let message = format!("could not read contents of file {:?}: {}", self.path, error);
-                Err(self.session.create_error(message))
+                Err(self.sess.create_error(message))
             }
         }
     }

@@ -17,7 +17,7 @@ pub struct Lexer<'src> {
 }
 
 impl<'a, 'src> Lexer<'src> {
-    pub fn tokenize(session: &'a Session, src: &'src str) -> LexerResult<'a, TokenStream> {
+    pub fn tokenize(sess: &'a Session, src: &'src str) -> LexerResult<'a, TokenStream> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut lexer = Lexer::new(src);
 
@@ -31,7 +31,7 @@ impl<'a, 'src> Lexer<'src> {
                 }
                 TokenKind::Unknown(c) => {
                     let message = format!("unrecognized token '{}'", c);
-                    session.create_ranged_error(message, token.range).emit();
+                    sess.create_ranged_error(message, token.range).emit();
 
                     tokens.push(token);
                 }

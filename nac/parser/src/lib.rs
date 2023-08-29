@@ -15,15 +15,15 @@ pub mod stmt;
 pub mod ty;
 
 pub struct Parser<'a> {
-    session: &'a Session,
+    sess: &'a Session,
     cursor: Cursor,
     token: Token,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(session: &'a Session, token_stream: TokenStream) -> Self {
+    pub fn new(sess: &'a Session, token_stream: TokenStream) -> Self {
         let mut parser = Self {
-            session,
+            sess,
             cursor: Cursor::new(token_stream),
             token: Token::dummy(),
         };
@@ -32,8 +32,8 @@ impl<'a> Parser<'a> {
         parser
     }
 
-    pub fn parse(session: &'a Session, token_stream: TokenStream) -> ParserResult<'a, AST> {
-        let mut parser = Parser::new(session, token_stream);
+    pub fn parse(sess: &'a Session, token_stream: TokenStream) -> ParserResult<'a, AST> {
+        let mut parser = Parser::new(sess, token_stream);
         let root = parser.parse_source_file()?;
 
         Ok(AST::new(root))

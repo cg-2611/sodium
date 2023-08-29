@@ -10,13 +10,13 @@ fn parser_identifies_expr_stmt() {
         token::TokenKind::Semicolon,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let stmt_result = parser.parse_stmt();
 
     assert!(stmt_result.is_ok());
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests expr stmt:
@@ -29,13 +29,13 @@ fn parser_parses_expr_stmt() {
         token::TokenKind::Semicolon,
     ];
 
-    let session = session::Session::new();
-    let mut parser = initialise_parser_test!(session, tokens);
+    let sess = session::Session::new();
+    let mut parser = initialise_parser_test!(sess, tokens);
 
     let expr_stmt_result = parser.parse_expr_stmt();
 
     assert!(expr_stmt_result.is_ok());
-    has_errors!(session, 0);
+    has_errors!(sess, 0);
 }
 
 // tests expr stmts:

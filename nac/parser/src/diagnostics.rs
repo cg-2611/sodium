@@ -10,8 +10,7 @@ pub type ParserResult<'a, T> = Result<T, ParserError<'a>>;
 
 impl<'a> Parser<'a> {
     pub fn parser_error(&self, message: &str, range: Range) -> ParserError<'a> {
-        self.session
-            .create_ranged_error(String::from(message), range)
+        self.sess.create_ranged_error(String::from(message), range)
     }
 
     pub fn error_expected_token(&self, kind: TokenKind) -> ParserResult<'a, Range> {
@@ -28,7 +27,7 @@ impl<'a> Parser<'a> {
 
     fn error_expected_found(&self, message: &str, range: Range) -> ParserError<'a> {
         let message = format!("{}, found {:?}", message, self.token.kind);
-        self.session.create_ranged_error(message, range)
+        self.sess.create_ranged_error(message, range)
     }
 
     pub fn recover_decl(&mut self) {

@@ -18,13 +18,13 @@ macro_rules! match_expected {
 
 macro_rules! diagnoses {
     ($count:literal, $src:literal, $expected:expr) => {
-        let session = session::Session::new();
-        let token_stream = Lexer::tokenize(&session, $src).unwrap();
+        let sess = session::Session::new();
+        let token_stream = Lexer::tokenize(&sess, $src).unwrap();
 
         match_expected!(token_stream, $expected);
 
-        assert!(session.has_errors().is_err());
-        assert_eq!(session.error_count(), $count);
+        assert!(sess.has_errors().is_err());
+        assert_eq!(sess.error_count(), $count);
     };
 }
 
@@ -105,11 +105,11 @@ fn lexer_tokenizes_multiple_tokens() {
         token::TokenKind::EOF,
     ];
 
-    let session = session::Session::new();
-    let token_stream = Lexer::tokenize(&session, src).unwrap();
+    let sess = session::Session::new();
+    let token_stream = Lexer::tokenize(&sess, src).unwrap();
 
-    assert!(session.has_errors().is_ok());
-    assert_eq!(session.error_count(), 0);
+    assert!(sess.has_errors().is_ok());
+    assert_eq!(sess.error_count(), 0);
     assert_eq!(token_stream.vec().len(), expected_tokens.len());
 
     match_expected!(token_stream, expected_tokens);
