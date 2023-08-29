@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+arena = { path = "../arena" }
 ast = { path = "../ast" }
-context = { path = "../context" }
+data_structures = { path = "../data_structures" }
 errors = { path = "../errors" }
-ir = { path = "../ir" }
+session = { path = "../session" }
 range = { path = "../range" }
-ty = { path = "../ty" }

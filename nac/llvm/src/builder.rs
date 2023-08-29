@@ -1,17 +1,16 @@
-use std::marker::PhantomData;
-
-use crate::{BasicBlock, Context, GetRef, Value};
+use crate::{BasicBlock, GetRef, LLVMContext, Value};
 use llvm_sys::core::{
     LLVMBuildRet, LLVMBuildRetVoid, LLVMDisposeBuilder, LLVMPositionBuilderAtEnd,
 };
 use llvm_sys::prelude::LLVMBuilderRef;
+use std::marker::PhantomData;
 
-pub struct Builder<'ctx> {
+pub struct LLVMBuilder<'cx> {
     builder: LLVMBuilderRef,
-    _marker: PhantomData<&'ctx Context>,
+    _marker: PhantomData<&'cx LLVMContext>,
 }
 
-impl<'ctx> Builder<'ctx> {
+impl<'cx> LLVMBuilder<'cx> {
     pub fn new(builder: LLVMBuilderRef) -> Self {
         Self {
             builder,
@@ -33,13 +32,13 @@ impl<'ctx> Builder<'ctx> {
     }
 }
 
-impl<'ctx> GetRef<LLVMBuilderRef> for Builder<'ctx> {
+impl<'cx> GetRef<LLVMBuilderRef> for LLVMBuilder<'cx> {
     fn get_ref(&self) -> LLVMBuilderRef {
         self.builder
     }
 }
 
-impl<'ctx> Drop for Builder<'ctx> {
+impl<'cx> Drop for LLVMBuilder<'cx> {
     fn drop(&mut self) {
         unsafe { LLVMDisposeBuilder(self.get_ref()) }
     }

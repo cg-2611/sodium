@@ -1,28 +1,24 @@
-use ir::{Decl, DeclKind, FnDecl};
-
+use crate::ir::{Block, Decl, DeclKind, FnDecl};
 use crate::lower::ASTLower;
-use crate::SemaResult;
+use crate::ty::Type;
 
-impl<'ctx, 'ast> ASTLower<'ctx> {
-    pub fn lower_decl(&self, decl: &'ast ast::Decl) -> SemaResult<'ctx, Decl> {
-        match &decl.kind {
-            ast::DeclKind::Fn(ast_fn_decl) => {
-                let fn_decl = self.lower_fn_decl(ast_fn_decl)?;
-                let fn_decl_ty = fn_decl.ty.clone();
-                Ok(Decl::new(
-                    DeclKind::Fn(Box::new(fn_decl)),
-                    fn_decl_ty,
-                    ast_fn_decl.range,
-                ))
-            }
-        }
+impl<'cx, 'ast> ASTLower {
+    pub fn lower_decl(
+        &self,
+        decl: &'ast ast::Decl,
+        kind: DeclKind<'cx>,
+        ty: Type<'cx>,
+    ) -> Decl<'cx> {
+        Decl::new(kind, ty, decl.range)
     }
 
-    pub fn lower_fn_decl(&self, fn_decl: &'ast ast::FnDecl) -> SemaResult<'ctx, FnDecl> {
-        let ident = self.lower_ident(&fn_decl.ident)?;
-        let ret_type = self.lower_type(&fn_decl.ret_type)?;
-        let body = self.lower_block(&fn_decl.body)?;
-
-        Ok(FnDecl::new(ident, body, ret_type, fn_decl.range))
+    pub fn lower_fn_decl(
+        &self,
+        fn_decl: &'ast ast::FnDecl,
+        body: Box<Block<'cx>>,
+        ty: Type<'cx>,
+    ) -> FnDecl<'cx> {
+        let ident = self.lower_ident(&fn_decl.ident);
+        FnDecl::new(ident, body, ty, fn_decl.range)
     }
 }

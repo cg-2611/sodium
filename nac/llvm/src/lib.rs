@@ -5,10 +5,10 @@ use std::fmt::{Display, Formatter};
 use llvm_sys::core::{LLVMCreateMessage, LLVMDisposeMessage};
 
 pub use self::basic_block::BasicBlock;
-pub use self::builder::Builder;
-pub use self::context::Context;
+pub use self::builder::LLVMBuilder;
+pub use self::context::LLVMContext;
 pub use self::diagnostics::LLVMResult;
-pub use self::module::Module;
+pub use self::module::LLVMModule;
 pub use self::target::{Target, TargetMachine, TargetTriple};
 pub use self::types::Type;
 pub use self::values::Value;

@@ -11,7 +11,7 @@ use llvm_sys::target_machine::{
     LLVMGetTargetFromTriple, LLVMTargetMachineEmitToFile, LLVMTargetMachineRef, LLVMTargetRef,
 };
 
-use crate::{GetRef, LLVMResult, LLVMString, Module};
+use crate::{GetRef, LLVMModule, LLVMResult, LLVMString};
 
 pub use llvm_sys::target_machine::LLVMCodeGenOptLevel;
 pub use llvm_sys::target_machine::LLVMCodeModel;
@@ -102,7 +102,7 @@ impl TargetMachine {
         LLVMString::new(features)
     }
 
-    pub fn write_to_file(&self, module: &Module, path: &str) -> LLVMResult<()> {
+    pub fn write_to_file(&self, module: &LLVMModule, path: &str) -> LLVMResult<()> {
         let path = LLVMString::from(path);
         let mut error_string = MaybeUninit::uninit();
 

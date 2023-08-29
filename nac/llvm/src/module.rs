@@ -5,14 +5,14 @@ use llvm_sys::analysis::{LLVMVerifierFailureAction, LLVMVerifyModule};
 use llvm_sys::core::{LLVMAddFunction, LLVMDisposeModule, LLVMDumpModule, LLVMPrintModuleToFile};
 use llvm_sys::prelude::LLVMModuleRef;
 
-use crate::{Context, GetRef, LLVMResult, LLVMString, Type, Value};
+use crate::{GetRef, LLVMContext, LLVMResult, LLVMString, Type, Value};
 
-pub struct Module<'ctx> {
+pub struct LLVMModule<'cx> {
     module: LLVMModuleRef,
-    _marker: PhantomData<&'ctx Context>,
+    _marker: PhantomData<&'cx LLVMContext>,
 }
 
-impl<'ctx> Module<'ctx> {
+impl<'cx> LLVMModule<'cx> {
     pub fn new(module: LLVMModuleRef) -> Self {
         Self {
             module,
@@ -67,13 +67,13 @@ impl<'ctx> Module<'ctx> {
     }
 }
 
-impl<'ctx> GetRef<LLVMModuleRef> for Module<'ctx> {
+impl<'cx> GetRef<LLVMModuleRef> for LLVMModule<'cx> {
     fn get_ref(&self) -> LLVMModuleRef {
         self.module
     }
 }
 
-impl<'ctx> Drop for Module<'ctx> {
+impl<'cx> Drop for LLVMModule<'cx> {
     fn drop(&mut self) {
         unsafe { LLVMDisposeModule(self.get_ref()) }
     }

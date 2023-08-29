@@ -3,13 +3,11 @@ use range::Range;
 
 use crate::CodeGen;
 
-pub type CodeGenError<'ctx> = Diagnostic<'ctx, ErrorOccurred>;
-pub type CodeGenResult<'ctx, T> = Result<T, CodeGenError<'ctx>>;
+pub type CodeGenError<'cx> = Diagnostic<'cx, ErrorOccurred>;
+pub type CodeGenResult<'cx, T> = Result<T, CodeGenError<'cx>>;
 
-impl<'ctx> CodeGen<'ctx> {
-    pub fn codegen_error(&self, message: &str, range: Range) -> CodeGenError<'ctx> {
-        self.context
-            .session()
-            .create_ranged_error(String::from(message), range)
+impl<'cx> CodeGen<'cx> {
+    pub fn codegen_error(&self, message: &str, range: Range) -> CodeGenError<'cx> {
+        self.sess.create_ranged_error(String::from(message), range)
     }
 }

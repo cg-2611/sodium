@@ -9,12 +9,12 @@ pub mod expr;
 pub mod print;
 pub mod stmt;
 
-pub struct IR {
-    source_file: SourceFile,
+pub struct IR<'cx> {
+    source_file: SourceFile<'cx>,
 }
 
-impl IR {
-    pub fn new(source_file: SourceFile) -> Self {
+impl<'cx> IR<'cx> {
+    pub fn new(source_file: SourceFile<'cx>) -> Self {
         Self { source_file }
     }
 
@@ -23,13 +23,13 @@ impl IR {
     }
 }
 
-pub struct SourceFile {
-    pub decls: Vec<Box<Decl>>,
+pub struct SourceFile<'cx> {
+    pub decls: Vec<Box<Decl<'cx>>>,
     pub range: Range,
 }
 
-impl SourceFile {
-    pub fn new(decls: Vec<Box<Decl>>, range: Range) -> Self {
+impl<'cx> SourceFile<'cx> {
+    pub fn new(decls: Vec<Box<Decl<'cx>>>, range: Range) -> Self {
         Self { decls, range }
     }
 }

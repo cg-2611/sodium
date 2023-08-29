@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-context = { path = "../context" }
 errors = { path = "../errors" }
-ir = { path = "../ir" }
 llvm = { path = "../llvm" }
 range = { path = "../range" }
-ty = { path = "../ty" }
+sema = { path = "../sema" }
+session = { path = "../session" }
+

@@ -4,10 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+arena = { path = "../arena" }
 codegen = { path = "../codegen" }
-context = { path = "../context" }
 errors = { path = "../errors" }
 lexer = { path = "../lexer" }
+llvm = { path = "../llvm" }
 parser = { path = "../parser" }
 sema = { path = "../sema" }
 session = { path = "../session" }

@@ -1,4 +1,4 @@
-use crate::{
+use crate::ir::{
     Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Identifier, Literal, LiteralKind, RetExpr,
     SourceFile, Stmt, StmtKind, IR,
 };
@@ -34,7 +34,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_decl(&mut self, decl: &'ir Decl) {
         self.write_indentation();
-        self.writeln(format!("decl <{}> ({}):", decl.ty, decl.range).as_str());
+        self.writeln(format!("decl <{:?}> ({}):", decl.ty, decl.range).as_str());
         self.indent();
 
         match &decl.kind {
@@ -46,7 +46,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_fn_decl(&mut self, fn_decl: &'ir FnDecl) {
         self.write_indentation();
-        self.writeln(format!("fn decl <{}> ({}):", fn_decl.ty, fn_decl.range).as_str());
+        self.writeln(format!("fn decl <{:?}> ({}):", fn_decl.ty, fn_decl.range).as_str());
 
         self.indent();
 
@@ -63,7 +63,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_block(&mut self, block: &'ir Block) {
         self.write_indentation();
-        self.writeln(format!("block <{}> ({}):", block.ty, block.range).as_str());
+        self.writeln(format!("block <{:?}> ({}):", block.ty, block.range).as_str());
         self.indent();
 
         for stmt in &block.stmts {
@@ -75,7 +75,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_stmt(&mut self, stmt: &'ir Stmt) {
         self.write_indentation();
-        self.writeln(format!("stmt <{}> ({}):", stmt.ty, stmt.range).as_str());
+        self.writeln(format!("stmt <{:?}> ({}):", stmt.ty, stmt.range).as_str());
         self.indent();
 
         match &stmt.kind {
@@ -87,7 +87,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_expr(&mut self, expr: &'ir Expr) {
         self.write_indentation();
-        self.writeln(format!("expr <{}> ({}):", expr.ty, expr.range).as_str());
+        self.writeln(format!("expr <{:?}> ({}):", expr.ty, expr.range).as_str());
         self.indent();
 
         match &expr.kind {
@@ -101,7 +101,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_ret_expr(&mut self, ret_expr: &'ir RetExpr) {
         self.write_indentation();
-        self.writeln(format!("ret expr <{}> ({}):", ret_expr.ty, ret_expr.range).as_str());
+        self.writeln(format!("ret expr <{:?}> ({}):", ret_expr.ty, ret_expr.range).as_str());
         self.indent();
 
         self.print_expr(&ret_expr.expr);
@@ -111,7 +111,7 @@ impl<'ir> IRPrinter {
 
     pub fn print_literal(&mut self, literal: &'ir Literal) {
         self.write_indentation();
-        self.writeln(format!("literal <{}> ({}):", literal.ty, literal.range).as_str());
+        self.writeln(format!("literal <{:?}> ({}):", literal.ty, literal.range).as_str());
         self.indent();
 
         match &literal.kind {

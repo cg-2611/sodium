@@ -1,54 +1,45 @@
 use codegen::CodeGen;
-use context::CompilerContext;
 use errors::{Diagnostic, ErrorOccurred, NACResult};
 use lexer::Lexer;
+use llvm::LLVMContext;
 use parser::Parser;
+use sema::ty::context::{TypeArena, TypeContext};
 use sema::Sema;
 use session::Session;
 use source::file::SourceFileReader;
 use target::TargetGen;
 
-pub struct Compiler {
-    session: Session,
+pub fn run_pass<'a, T>(
+    sess: &Session,
+    pass: impl FnOnce() -> Result<T, Diagnostic<'a, ErrorOccurred>>,
+) -> NACResult<T> {
+    let result = pass().map_err(|mut error| error.emit())?;
+    sess.has_errors()?;
+    Ok(result)
 }
 
-impl Compiler {
-    pub fn new() -> Self {
-        Self {
-            session: Session::new(),
-        }
-    }
+pub fn compile_file(path: &str) -> NACResult<()> {
+    let sess = Session::new();
 
-    pub fn session(&self) -> &Session {
-        &self.session
-    }
+    let src_file = run_pass(&sess, || {
+        SourceFileReader::source_file_from_path(&sess, path)
+    })?;
 
-    pub fn run_pass<'a, T>(
-        &self,
-        pass: impl FnOnce() -> Result<T, Diagnostic<'a, ErrorOccurred>>,
-    ) -> NACResult<T> {
-        let result = pass().map_err(|mut error| error.emit())?;
-        self.session.has_errors()?;
+    let token_stream = run_pass(&sess, || Lexer::tokenize(&sess, src_file.contents()))?;
+    let ast = run_pass(&sess, || Parser::parse(&sess, token_stream))?;
 
-        Ok(result)
-    }
+    let type_arena = TypeArena::new();
 
-    pub fn compile_file(&self, context: &CompilerContext, path: &str) -> NACResult<()> {
-        let src_file =
-            self.run_pass(|| SourceFileReader::source_file_from_path(&self.session, path))?;
+    let ir = TypeContext::create_and_enter(&sess, &type_arena, |tcx| {
+        run_pass(&sess, || Sema::analysis(tcx, ast))
+    })?;
 
-        let token_stream = self.run_pass(|| Lexer::tokenize(&self.session, src_file.contents()))?;
-        let ast = self.run_pass(|| Parser::parse(&self.session, token_stream))?;
-        let ir = self.run_pass(|| Sema::semantic_analysis(context, ast))?;
-        let module = self.run_pass(|| CodeGen::codegen(context, "module", ir))?;
-        self.run_pass(|| TargetGen::compile_module(context, &module))?;
+    let llvm_context = LLVMContext::create();
+    let module = run_pass(&sess, || {
+        CodeGen::codegen(&sess, &llvm_context, "module", ir)
+    })?;
 
-        Ok(())
-    }
-}
+    run_pass(&sess, || TargetGen::compile_module(&sess, &module))?;
 
-impl Default for Compiler {
-    fn default() -> Self {
-        Self::new()
-    }
+    Ok(())
 }

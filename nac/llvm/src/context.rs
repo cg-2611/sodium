@@ -4,26 +4,26 @@ use llvm_sys::core::{
 };
 use llvm_sys::prelude::LLVMContextRef;
 
-use crate::{BasicBlock, Builder, GetRef, LLVMString, Module, Type, Value};
+use crate::{BasicBlock, GetRef, LLVMBuilder, LLVMModule, LLVMString, Type, Value};
 
-pub struct Context(LLVMContextRef);
+pub struct LLVMContext(LLVMContextRef);
 
-impl Context {
+impl LLVMContext {
     pub fn new(context: LLVMContextRef) -> Self {
         Self(context)
     }
 
     pub fn create() -> Self {
-        unsafe { Context::new(LLVMContextCreate()) }
+        unsafe { LLVMContext::new(LLVMContextCreate()) }
     }
 
-    pub fn create_module(&self, name: &str) -> Module {
+    pub fn create_module(&self, name: &str) -> LLVMModule {
         let name = LLVMString::from(name);
-        unsafe { Module::new(LLVMModuleCreateWithNameInContext(name.ptr, self.get_ref())) }
+        unsafe { LLVMModule::new(LLVMModuleCreateWithNameInContext(name.ptr, self.get_ref())) }
     }
 
-    pub fn create_builder(&self) -> Builder {
-        unsafe { Builder::new(LLVMCreateBuilderInContext(self.get_ref())) }
+    pub fn create_builder(&self) -> LLVMBuilder {
+        unsafe { LLVMBuilder::new(LLVMCreateBuilderInContext(self.get_ref())) }
     }
 
     pub fn dispose(&self) {
@@ -46,13 +46,13 @@ impl Context {
     }
 }
 
-impl GetRef<LLVMContextRef> for Context {
+impl GetRef<LLVMContextRef> for LLVMContext {
     fn get_ref(&self) -> LLVMContextRef {
         self.0
     }
 }
 
-impl Drop for Context {
+impl Drop for LLVMContext {
     fn drop(&mut self) {
         unsafe { LLVMContextDispose(self.get_ref()) }
     }
