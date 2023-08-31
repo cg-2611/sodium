@@ -18,7 +18,6 @@ impl<'cx, 'ast> ASTLower {
         body: Box<Block<'cx>>,
         ty: Type<'cx>,
     ) -> FnDecl<'cx> {
-        let ident = self.lower_ident(&fn_decl.ident);
-        FnDecl::new(ident, body, ty, fn_decl.range)
+        FnDecl::new(fn_decl.ident, body, ty, fn_decl.range)
     }
 }

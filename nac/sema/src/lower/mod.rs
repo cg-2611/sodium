@@ -1,4 +1,4 @@
-use crate::ir::{Decl, Identifier, SourceFile};
+use crate::ir::{Decl, SourceFile};
 
 pub mod decl;
 pub mod expr;
@@ -18,9 +18,5 @@ impl<'cx, 'ast> ASTLower {
         decls: Vec<Box<Decl<'cx>>>,
     ) -> SourceFile<'cx> {
         SourceFile::new(decls, source_file.range)
-    }
-
-    pub fn lower_ident(&self, ident: &'ast ast::Identifier) -> Identifier {
-        Identifier::new(ident.value.clone(), ident.range)
     }
 }

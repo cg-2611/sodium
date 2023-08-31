@@ -8,4 +8,5 @@ errors = { path = "../errors" }
 range = { path = "../range" }
 session = { path = "../session" }
 source = { path = "../source" }
+symbol = { path = "../symbol" }
 token = { path = "../token" }

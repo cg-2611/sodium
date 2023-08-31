@@ -1,6 +1,7 @@
-use ast::{Identifier, Literal};
+use ast::Literal;
 use errors::{Diagnostic, ErrorOccurred};
 use range::Range;
+use symbol::Ident;
 use token::{Keyword, TokenKind};
 
 use crate::Parser;
@@ -17,7 +18,7 @@ impl<'a> Parser<'a> {
         Err(self.error_expected_found(format!("expected {:?}", kind).as_str(), self.token.range))
     }
 
-    pub fn expected_identifier(&self) -> ParserResult<'a, Identifier> {
+    pub fn expected_identifier(&self) -> ParserResult<'a, Ident> {
         Err(self.error_expected_found("expected identifier", self.token.range))
     }
 

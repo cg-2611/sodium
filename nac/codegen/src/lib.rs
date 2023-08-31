@@ -1,7 +1,9 @@
+use std::ops::Deref;
+
 use llvm::{LLVMBuilder, LLVMContext, LLVMModule, Type, Value};
 use sema::ir::{
-    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Identifier, Literal, LiteralKind, RetExpr,
-    SourceFile, Stmt, StmtKind, IR,
+    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal, LiteralKind, RetExpr, SourceFile, Stmt,
+    StmtKind, IR,
 };
 use sema::ty;
 use session::Session;
@@ -64,9 +66,14 @@ impl<'cx, 'ir> CodeGen<'cx> {
 
     pub fn codegen_fn_decl(&self, fn_decl: &'ir FnDecl<'_>) -> CodeGenResult<'cx, Option<Value>> {
         let fn_type = self.type_to_llvm_type(&fn_decl.ty)?.fn_type();
-        let fn_value = self
-            .module
-            .add_function(fn_decl.ident.value.as_str(), &fn_type);
+        let fn_value = self.module.add_function(
+            fn_decl
+                .ident
+                .symbol
+                .as_str(self.sess.symbol_interner())
+                .deref(),
+            &fn_type,
+        );
 
         let block = self.llvm_context.append_basic_block(&fn_value, "entry");
         self.builder.position_at_end(&block);
@@ -78,11 +85,6 @@ impl<'cx, 'ir> CodeGen<'cx> {
             .map_err(|message| self.codegen_error(&message.as_string(), fn_decl.range))?;
 
         Ok(Some(fn_value))
-    }
-
-    pub fn codegen_ident(&self, ident: &'ir Identifier) -> CodeGenResult<'cx, Option<Value>> {
-        let _ = ident;
-        Ok(None)
     }
 
     pub fn codegen_block(&self, block: &'ir Block<'_>) -> CodeGenResult<'cx, Option<Value>> {

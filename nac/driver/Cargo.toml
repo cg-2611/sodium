@@ -13,4 +13,5 @@ parser = { path = "../parser" }
 sema = { path = "../sema" }
 session = { path = "../session" }
 source = { path = "../source" }
+symbol = { path = "../symbol" }
 target = { path = "../target" }

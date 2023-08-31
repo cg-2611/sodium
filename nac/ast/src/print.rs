@@ -1,18 +1,23 @@
 use crate::{
-    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Identifier, Literal, LiteralKind, RetExpr,
-    SourceFile, Stmt, StmtKind, Type, AST,
+    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal, LiteralKind, RetExpr, SourceFile, Stmt,
+    StmtKind, Type, AST,
 };
+use session::Session;
+use std::ops::Deref;
+use symbol::Ident;
 
-pub struct ASTPrinter {
+pub struct ASTPrinter<'a> {
+    sess: &'a Session,
     out: String,
     indent_size: usize,
     indent: usize,
 }
 
-impl<'ast> ASTPrinter {
-    pub fn print_ast(ast: &'ast AST) {
+impl<'a, 'ast> ASTPrinter<'a> {
+    pub fn print_ast(sess: &'a Session, ast: &'ast AST) {
         let mut ast_printer = Self {
-            out: String::default(),
+            sess,
+            out: String::new(),
             indent_size: 4,
             indent: 0,
         };
@@ -57,9 +62,16 @@ impl<'ast> ASTPrinter {
         self.dedent();
     }
 
-    pub fn print_ident(&mut self, ident: &'ast Identifier) {
+    pub fn print_ident(&mut self, ident: &Ident) {
         self.write_indentation();
-        self.writeln(format!("ident  ({}): {}", ident.range, ident.value).as_str());
+        self.writeln(
+            format!(
+                "ident  ({}): {}",
+                ident.range,
+                ident.symbol.as_str(self.sess.symbol_interner()).deref()
+            )
+            .as_str(),
+        );
     }
 
     pub fn print_type(&mut self, ty: &'ast Type) {

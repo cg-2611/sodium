@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 arena = { path = "../arena" }
 ast = { path = "../ast" }
-data_structures = { path = "../data_structures" }
 errors = { path = "../errors" }
-session = { path = "../session" }
 range = { path = "../range" }
+session = { path = "../session" }
+symbol = { path = "../symbol" }
+

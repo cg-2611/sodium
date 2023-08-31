@@ -1,6 +1,7 @@
 use range::Range;
+use symbol::Ident;
 
-use crate::ir::{Block, Identifier};
+use crate::ir::Block;
 use crate::ty::Type;
 
 pub enum DeclKind<'cx> {
@@ -20,14 +21,14 @@ impl<'cx> Decl<'cx> {
 }
 
 pub struct FnDecl<'cx> {
-    pub ident: Identifier,
+    pub ident: Ident,
     pub body: Box<Block<'cx>>,
     pub ty: Type<'cx>,
     pub range: Range,
 }
 
 impl<'cx> FnDecl<'cx> {
-    pub fn new(ident: Identifier, body: Box<Block<'cx>>, ty: Type<'cx>, range: Range) -> Self {
+    pub fn new(ident: Ident, body: Box<Block<'cx>>, ty: Type<'cx>, range: Range) -> Self {
         Self {
             ident,
             body,

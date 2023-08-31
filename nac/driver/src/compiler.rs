@@ -27,7 +27,7 @@ pub fn compile_file(path: &str) -> NACResult<()> {
 
     let token_stream = run_pass(&sess, || Lexer::tokenize(&sess, src_file.contents()))?;
     let ast = run_pass(&sess, || Parser::parse(&sess, token_stream))?;
-
+    
     let type_arena = TypeArena::new();
 
     let ir = TypeContext::create_and_enter(&sess, &type_arena, |tcx| {

@@ -1,6 +1,7 @@
-use range::{Location, Range};
+use range::Location;
 use session::Session;
 use source::Cursor;
+use symbol::{Ident, Symbol};
 use token::{Keyword, Token, TokenKind, TokenStream};
 
 pub use self::diagnostics::{LexerError, LexerResult};
@@ -10,16 +11,26 @@ mod tests;
 
 pub mod diagnostics;
 
-pub struct Lexer<'src> {
+pub struct Lexer<'a, 'src> {
+    sess: &'a Session,
     cursor: Cursor<'src>,
     line: u32,
     column: u32,
 }
 
-impl<'a, 'src> Lexer<'src> {
+impl<'a, 'src> Lexer<'a, 'src> {
+    pub fn new(sess: &'a Session, src: &'src str) -> Self {
+        Self {
+            sess,
+            cursor: Cursor::new(src),
+            line: 1,
+            column: 1,
+        }
+    }
+
     pub fn tokenize(sess: &'a Session, src: &'src str) -> LexerResult<'a, TokenStream> {
         let mut tokens: Vec<Token> = Vec::new();
-        let mut lexer = Lexer::new(src);
+        let mut lexer = Lexer::new(sess, src);
 
         loop {
             let token = lexer.next_token();
@@ -41,16 +52,6 @@ impl<'a, 'src> Lexer<'src> {
 
         Ok(TokenStream::from(tokens))
     }
-}
-
-impl<'src> Lexer<'src> {
-    pub fn new(src: &'src str) -> Self {
-        Self {
-            cursor: Cursor::new(src),
-            line: 1,
-            column: 1,
-        }
-    }
 
     pub fn next_token(&mut self) -> Token {
         self.skip_whitespace();
@@ -58,7 +59,7 @@ impl<'src> Lexer<'src> {
         let start = Location::new(self.line, self.column);
         let first_char = self.advance();
         let token_kind = match first_char {
-            c if is_identifier_start(c) => self.tokenize_identifier(c),
+            c if is_identifier_start(c) => self.tokenize_identifier(c, start),
             c if is_base_10_digit(c) => self.tokenize_integer_literal(c),
             '-' => match self.advance() {
                 '>' => TokenKind::Arrow,
@@ -77,10 +78,7 @@ impl<'src> Lexer<'src> {
     }
 
     fn make_token(&self, kind: TokenKind, start: Location) -> Token {
-        Token::new(
-            kind,
-            Range::new(start, Location::new(self.line, self.column)),
-        )
+        Token::new(kind, start.to(Location::new(self.line, self.column)))
     }
 
     fn advance(&mut self) -> char {
@@ -105,7 +103,7 @@ impl<'src> Lexer<'src> {
         }
     }
 
-    fn tokenize_identifier(&mut self, c: char) -> TokenKind {
+    fn tokenize_identifier(&mut self, c: char, start: Location) -> TokenKind {
         let mut identifier = c.to_string();
 
         while is_identifier_start(self.peek()) || is_base_10_digit(self.peek()) {
@@ -116,7 +114,10 @@ impl<'src> Lexer<'src> {
         match identifier.as_str() {
             "fn" => TokenKind::Keyword(Keyword::Fn),
             "ret" => TokenKind::Keyword(Keyword::Ret),
-            _ => TokenKind::Identifier(identifier),
+            ident => TokenKind::Identifier(Ident::new(
+                Symbol::intern(ident, self.sess.symbol_interner()),
+                start.to(Location::new(self.line, self.column)),
+            )),
         }
     }
 

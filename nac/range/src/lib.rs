@@ -1,9 +1,15 @@
 use std::fmt::Display;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Location {
     line: u32,
     column: u32,
+}
+
+impl Location {
+    pub fn to(self, end: Location) -> Range {
+        Range::new(self, end)
+    }
 }
 
 impl Location {
@@ -16,7 +22,7 @@ impl Location {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Range {
     start: Location,
     end: Location,

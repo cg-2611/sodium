@@ -1,4 +1,5 @@
 use range::Range;
+use symbol::Ident;
 
 pub use self::cursor::Cursor;
 pub use self::token_stream::TokenStream;
@@ -6,13 +7,13 @@ pub use self::token_stream::TokenStream;
 pub mod cursor;
 pub mod token_stream;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum TokenKind {
     // keywords
     Keyword(Keyword),
 
     // literal tokens
-    Identifier(String),
+    Identifier(Ident),
     IntegerLiteral(i32),
 
     // symbols
@@ -27,13 +28,13 @@ pub enum TokenKind {
     EOF,
     Unknown(char),
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Keyword {
     Fn,
     Ret,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Token {
     pub kind: TokenKind,
     pub range: Range,

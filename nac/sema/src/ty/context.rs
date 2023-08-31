@@ -1,9 +1,9 @@
 use std::ops::Deref;
 
 use arena::TypedArena;
-use data_structures::intern::{InternMap, Interned, Interner};
 use session::Session;
 
+use crate::ty::intern::TypeInterner;
 use crate::ty::{Type, TypeKind};
 
 #[derive(Default)]
@@ -23,24 +23,6 @@ impl<'cx> Deref for TypeArena<'cx> {
     }
 }
 
-pub struct TypeInterner<'cx> {
-    type_arena: &'cx TypeArena<'cx>,
-    map: InternMap<'cx, TypeKind<'cx>>,
-}
-
-impl<'cx> TypeInterner<'cx> {
-    pub fn new(type_arena: &'cx TypeArena<'cx>) -> Self {
-        Self {
-            type_arena,
-            map: InternMap::new(),
-        }
-    }
-
-    pub fn intern_type(&self, kind: TypeKind<'cx>) -> Interned<'cx, TypeKind<'cx>> {
-        self.map.intern(kind, |kind| self.type_arena.alloc(kind))
-    }
-}
-
 pub struct PrimitiveTypes<'cx> {
     pub i32: Type<'cx>,
 }
@@ -48,7 +30,7 @@ pub struct PrimitiveTypes<'cx> {
 impl<'cx> PrimitiveTypes<'cx> {
     pub fn new(interner: &TypeInterner<'cx>) -> Self {
         Self {
-            i32: Type::new(interner.intern_type(TypeKind::I32)),
+            i32: Type::new(interner.intern(TypeKind::I32)),
         }
     }
 }
@@ -120,6 +102,6 @@ impl<'cx> Context<'cx> {
     }
 
     pub fn fn_type(&self, ty: Type<'cx>) -> Type<'cx> {
-        Type::new(self.type_interner.intern_type(TypeKind::Fn(ty)))
+        Type::new(self.type_interner.intern(TypeKind::Fn(ty)))
     }
 }

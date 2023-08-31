@@ -3,17 +3,6 @@
 version = 3
 
 [[package]]
-name = "ahash"
-version = "0.8.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c99f64d1e06488f620f932677e24bc6e2897582980441ae90a671415bd7ec2f"
-dependencies = [
- "cfg-if",
- "once_cell",
- "version_check",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -21,12 +10,6 @@ checksum = "43f6cb1bf222025340178f382c426f13757b2960e89779dfcb319c32542a5a41"
 dependencies = [
  "memchr",
 ]
-
-[[package]]
-name = "allocator-api2"
-version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0942ffc6dcaadf03badf6e6a2d0228460359d5e34b57ccdc720b7382dfbd5ec5"
 
 [[package]]
 name = "arena"
@@ -37,6 +20,8 @@ name = "ast"
 version = "0.1.0"
 dependencies = [
  "range",
+ "session",
+ "symbol",
 ]
 
 [[package]]
@@ -78,13 +63,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "data_structures"
-version = "0.1.0"
-dependencies = [
- "hashbrown",
-]
-
-[[package]]
 name = "driver"
 version = "0.1.0"
 dependencies = [
@@ -97,6 +75,7 @@ dependencies = [
  "sema",
  "session",
  "source",
+ "symbol",
  "target",
 ]
 
@@ -135,16 +114,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6999dc1837253364c2ebb0704ba97994bd874e8f195d665c50b7548f6ea92764"
 
 [[package]]
-name = "hashbrown"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c6201b9ff9fd90a5a3bac2e56a830d0caa509576f0e503818ee82c181b3437a"
-dependencies = [
- "ahash",
- "allocator-api2",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -158,6 +127,7 @@ dependencies = [
  "range",
  "session",
  "source",
+ "symbol",
  "token",
 ]
 
@@ -207,12 +177,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
-name = "once_cell"
-version = "1.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
-
-[[package]]
 name = "parser"
 version = "0.1.0"
 dependencies = [
@@ -220,6 +184,7 @@ dependencies = [
  "errors",
  "range",
  "session",
+ "symbol",
  "token",
 ]
 
@@ -284,10 +249,10 @@ version = "0.1.0"
 dependencies = [
  "arena",
  "ast",
- "data_structures",
  "errors",
  "range",
  "session",
+ "symbol",
 ]
 
 [[package]]
@@ -302,6 +267,7 @@ version = "0.1.0"
 dependencies = [
  "errors",
  "range",
+ "symbol",
 ]
 
 [[package]]
@@ -312,6 +278,13 @@ dependencies = [
  "range",
  "session",
  "tempfile",
+]
+
+[[package]]
+name = "symbol"
+version = "0.1.0"
+dependencies = [
+ "range",
 ]
 
 [[package]]
@@ -342,13 +315,8 @@ name = "token"
 version = "0.1.0"
 dependencies = [
  "range",
+ "symbol",
 ]
-
-[[package]]
-name = "version_check"
-version = "0.9.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
 name = "windows-sys"

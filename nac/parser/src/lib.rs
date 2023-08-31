@@ -1,6 +1,7 @@
-use ast::{Decl, Identifier, SourceFile, AST};
+use ast::{Decl, SourceFile, AST};
 use range::Range;
 use session::Session;
+use symbol::Ident;
 use token::{Cursor, Token, TokenKind, TokenStream};
 
 pub use self::diagnostics::{ParserError, ParserResult};
@@ -57,7 +58,7 @@ impl<'a> Parser<'a> {
         Ok(SourceFile::new(decls, start.to(self.token.range)))
     }
 
-    pub fn parse_ident(&mut self) -> ParserResult<'a, Identifier> {
+    pub fn parse_ident(&mut self) -> ParserResult<'a, Ident> {
         let ident = self.expect_ident()?;
         self.advance();
 
@@ -78,9 +79,9 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn expect_ident(&self) -> ParserResult<'a, Identifier> {
-        if let TokenKind::Identifier(value) = &self.token.kind {
-            Ok(Identifier::new(value.to_string(), self.token.range))
+    fn expect_ident(&self) -> ParserResult<'a, Ident> {
+        if let TokenKind::Identifier(ident) = self.token.kind {
+            Ok(ident)
         } else {
             self.expected_identifier()
         }

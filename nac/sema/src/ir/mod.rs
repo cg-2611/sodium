@@ -33,14 +33,3 @@ impl<'cx> SourceFile<'cx> {
         Self { decls, range }
     }
 }
-
-pub struct Identifier {
-    pub value: String,
-    pub range: Range,
-}
-
-impl Identifier {
-    pub fn new(value: String, range: Range) -> Self {
-        Self { value, range }
-    }
-}
