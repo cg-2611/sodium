@@ -21,7 +21,7 @@ impl InternedString {
 
 impl Borrow<str> for InternedString {
     fn borrow(&self) -> &str {
-        &self.0[..]
+        &self.0
     }
 }
 
@@ -29,7 +29,7 @@ impl Deref for InternedString {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        &self.0[..]
+        &self.0
     }
 }
 
@@ -61,7 +61,11 @@ impl SymbolInterner {
         symbol
     }
 
-    pub fn get(&self, symbol: Symbol) -> InternedString {
+    pub fn get_interned(&self, symbol: &Symbol) -> InternedString {
         (*self.strings.borrow())[symbol.0 as usize].clone()
+    }
+
+    pub fn get_string(&self, symbol: &Symbol) -> String {
+        self.get_interned(symbol).to_string()
     }
 }

@@ -3,7 +3,6 @@ use crate::ir::{
     StmtKind, IR,
 };
 use session::Session;
-use std::ops::Deref;
 use symbol::Ident;
 
 pub struct IRPrinter<'a> {
@@ -63,14 +62,8 @@ impl<'a, 'ir> IRPrinter<'a> {
 
     pub fn print_ident(&mut self, ident: &Ident) {
         self.write_indentation();
-        self.writeln(
-            format!(
-                "ident ({}): {}",
-                ident.range,
-                ident.symbol.as_str(self.sess.symbol_interner()).deref()
-            )
-            .as_str(),
-        );
+        let ident_string = self.sess.symbol_interner().get_string(&ident.symbol);
+        self.writeln(format!("ident ({}): {}", ident.range, ident_string).as_str());
     }
 
     pub fn print_block(&mut self, block: &'ir Block) {

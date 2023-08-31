@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use llvm::{LLVMBuilder, LLVMContext, LLVMModule, Type, Value};
 use sema::ir::{
     Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal, LiteralKind, RetExpr, SourceFile, Stmt,
@@ -67,11 +65,10 @@ impl<'cx, 'ir> CodeGen<'cx> {
     pub fn codegen_fn_decl(&self, fn_decl: &'ir FnDecl<'_>) -> CodeGenResult<'cx, Option<Value>> {
         let fn_type = self.type_to_llvm_type(&fn_decl.ty)?.fn_type();
         let fn_value = self.module.add_function(
-            fn_decl
-                .ident
-                .symbol
-                .as_str(self.sess.symbol_interner())
-                .deref(),
+            self.sess
+                .symbol_interner()
+                .get_string(&fn_decl.ident.symbol)
+                .as_str(),
             &fn_type,
         );
 

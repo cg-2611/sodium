@@ -3,7 +3,6 @@ use crate::{
     StmtKind, Type, AST,
 };
 use session::Session;
-use std::ops::Deref;
 use symbol::Ident;
 
 pub struct ASTPrinter<'a> {
@@ -64,14 +63,8 @@ impl<'a, 'ast> ASTPrinter<'a> {
 
     pub fn print_ident(&mut self, ident: &Ident) {
         self.write_indentation();
-        self.writeln(
-            format!(
-                "ident  ({}): {}",
-                ident.range,
-                ident.symbol.as_str(self.sess.symbol_interner()).deref()
-            )
-            .as_str(),
-        );
+        let ident_string = self.sess.symbol_interner().get_string(&ident.symbol);
+        self.writeln(format!("ident  ({}): {}", ident.range, ident_string).as_str());
     }
 
     pub fn print_type(&mut self, ty: &'ast Type) {

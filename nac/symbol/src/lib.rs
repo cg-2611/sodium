@@ -1,8 +1,6 @@
-use std::fmt::{Debug, Display, Formatter};
+use std::fmt::Debug;
 
 use range::Range;
-
-use crate::intern::InternedString;
 
 pub use self::intern::SymbolInterner;
 
@@ -12,12 +10,6 @@ pub mod intern;
 pub struct Ident {
     pub symbol: Symbol,
     pub range: Range,
-}
-
-impl Display for Ident {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        Debug::fmt(self, f)
-    }
 }
 
 impl Ident {
@@ -38,7 +30,7 @@ impl Symbol {
         interner.intern(string)
     }
 
-    pub fn as_str(self, interner: &SymbolInterner) -> InternedString {
-        interner.get(self)
+    pub fn string(&self, interner: &SymbolInterner) -> String {
+        interner.get_string(self)
     }
 }
