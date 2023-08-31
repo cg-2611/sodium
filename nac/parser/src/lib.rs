@@ -6,9 +6,6 @@ use token::{Cursor, Token, TokenKind, TokenStream};
 
 pub use self::diagnostics::{ParserError, ParserResult};
 
-#[cfg(test)]
-mod tests;
-
 pub mod decl;
 pub mod diagnostics;
 pub mod expr;

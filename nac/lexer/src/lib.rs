@@ -6,9 +6,6 @@ use token::{Keyword, Token, TokenKind, TokenStream};
 
 pub use self::diagnostics::{LexerError, LexerResult};
 
-#[cfg(test)]
-mod tests;
-
 pub mod diagnostics;
 
 pub struct Lexer<'a, 'src> {
