@@ -22,13 +22,13 @@ impl<'cx> Decl<'cx> {
 
 pub struct FnDecl<'cx> {
     pub ident: Ident,
-    pub body: Box<Block<'cx>>,
+    pub body: Block<'cx>,
     pub ty: Type<'cx>,
     pub range: Range,
 }
 
 impl<'cx> FnDecl<'cx> {
-    pub fn new(ident: Ident, body: Box<Block<'cx>>, ty: Type<'cx>, range: Range) -> Self {
+    pub fn new(ident: Ident, body: Block<'cx>, ty: Type<'cx>, range: Range) -> Self {
         Self {
             ident,
             body,

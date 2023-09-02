@@ -3,9 +3,11 @@ use range::Range;
 use crate::Stmt;
 
 pub enum ExprKind {
-    Block(Box<Block>),
-    Ret(Box<RetExpr>),
+    Block(Block),
     Literal(Literal),
+    Binary(BinaryExpr),
+    Unary(UnaryExpr),
+    Ret(RetExpr),
 }
 
 pub struct Expr {
@@ -30,16 +32,6 @@ impl Block {
     }
 }
 
-pub struct RetExpr {
-    pub expr: Box<Expr>,
-    pub range: Range,
-}
-impl RetExpr {
-    pub fn new(expr: Box<Expr>, range: Range) -> Self {
-        Self { expr, range }
-    }
-}
-
 #[derive(Debug, PartialEq)]
 pub enum LiteralKind {
     Integer(i32),
@@ -53,5 +45,60 @@ pub struct Literal {
 impl Literal {
     pub fn new(kind: LiteralKind, range: Range) -> Self {
         Self { kind, range }
+    }
+}
+
+pub enum BinaryOperator {
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+}
+
+pub struct BinaryExpr {
+    pub operator: BinaryOperator,
+    pub lhs: Box<Expr>,
+    pub rhs: Box<Expr>,
+    pub range: Range,
+}
+
+impl BinaryExpr {
+    pub fn new(operator: BinaryOperator, lhs: Box<Expr>, rhs: Box<Expr>, range: Range) -> Self {
+        Self {
+            operator,
+            lhs,
+            rhs,
+            range,
+        }
+    }
+}
+
+pub enum UnaryOperator {
+    Negate,
+}
+
+pub struct UnaryExpr {
+    pub operator: UnaryOperator,
+    pub expr: Box<Expr>,
+    pub range: Range,
+}
+
+impl UnaryExpr {
+    pub fn new(operator: UnaryOperator, expr: Box<Expr>, range: Range) -> Self {
+        Self {
+            operator,
+            expr,
+            range,
+        }
+    }
+}
+
+pub struct RetExpr {
+    pub expr: Box<Expr>,
+    pub range: Range,
+}
+impl RetExpr {
+    pub fn new(expr: Box<Expr>, range: Range) -> Self {
+        Self { expr, range }
     }
 }

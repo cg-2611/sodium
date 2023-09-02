@@ -1,6 +1,6 @@
 use crate::ir::{
-    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal, LiteralKind, RetExpr, SourceFile, Stmt,
-    StmtKind, IR,
+    BinaryExpr, BinaryOperator, Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal,
+    LiteralKind, RetExpr, SourceFile, Stmt, StmtKind, UnaryExpr, UnaryOperator, IR,
 };
 use session::Session;
 use symbol::Ident;
@@ -98,18 +98,10 @@ impl<'a, 'ir> IRPrinter<'a> {
         match &expr.kind {
             ExprKind::Block(block) => self.print_block(block),
             ExprKind::Literal(literal) => self.print_literal(literal),
+            ExprKind::Binary(binary_expr) => self.print_binary_expr(binary_expr),
+            ExprKind::Unary(unary_expr) => self.print_unary_expr(unary_expr),
             ExprKind::Ret(ret_expr) => self.print_ret_expr(ret_expr),
         }
-
-        self.dedent();
-    }
-
-    pub fn print_ret_expr(&mut self, ret_expr: &'ir RetExpr) {
-        self.write_indentation();
-        self.writeln(format!("ret expr <{}> ({}):", ret_expr.ty, ret_expr.range).as_str());
-        self.indent();
-
-        self.print_expr(&ret_expr.expr);
 
         self.dedent();
     }
@@ -125,6 +117,57 @@ impl<'a, 'ir> IRPrinter<'a> {
                 self.writeln(format!("integer literal: {}", x).as_str());
             }
         }
+
+        self.dedent();
+    }
+
+    pub fn print_unary_expr(&mut self, unary_expr: &'ir UnaryExpr) {
+        self.write_indentation();
+        self.writeln(format!("unary expr <{}> ({}):", unary_expr.ty, unary_expr.range).as_str());
+
+        self.indent();
+
+        self.write_indentation();
+
+        // TODO: extract to function
+        match unary_expr.operator {
+            UnaryOperator::Negate => self.writeln("operator: -"),
+        }
+
+        self.print_expr(&unary_expr.expr);
+
+        self.dedent();
+    }
+
+    pub fn print_binary_expr(&mut self, binary_expr: &'ir BinaryExpr) {
+        self.write_indentation();
+        self.writeln(format!("binary expr <{}> ({}):", binary_expr.ty, binary_expr.range).as_str());
+
+        self.indent();
+
+        self.print_expr(&binary_expr.lhs);
+
+        self.write_indentation();
+
+        // TODO: extract to function
+        match binary_expr.operator {
+            BinaryOperator::Add => self.writeln("operator: +"),
+            BinaryOperator::Subtract => self.writeln("operator: -"),
+            BinaryOperator::Multiply => self.writeln("operator: *"),
+            BinaryOperator::Divide => self.writeln("operator: /"),
+        }
+
+        self.print_expr(&binary_expr.rhs);
+
+        self.dedent();
+    }
+
+    pub fn print_ret_expr(&mut self, ret_expr: &'ir RetExpr) {
+        self.write_indentation();
+        self.writeln(format!("ret expr <{}> ({}):", ret_expr.ty, ret_expr.range).as_str());
+        self.indent();
+
+        self.print_expr(&ret_expr.expr);
 
         self.dedent();
     }

@@ -3,7 +3,7 @@ use range::Range;
 use crate::Expr;
 
 pub enum StmtKind {
-    ExprStmt(Box<Expr>),
+    ExprStmt(Expr),
 }
 
 pub struct Stmt {

@@ -4,7 +4,7 @@ use symbol::Ident;
 use crate::{Block, Type};
 
 pub enum DeclKind {
-    Fn(Box<FnDecl>),
+    Fn(FnDecl),
 }
 
 pub struct Decl {
@@ -20,13 +20,13 @@ impl Decl {
 
 pub struct FnDecl {
     pub ident: Ident,
-    pub ret_type: Box<Type>,
-    pub body: Box<Block>,
+    pub ret_type: Type,
+    pub body: Block,
     pub range: Range,
 }
 
 impl FnDecl {
-    pub fn new(ident: Ident, ret_type: Box<Type>, body: Box<Block>, range: Range) -> Self {
+    pub fn new(ident: Ident, ret_type: Type, body: Block, range: Range) -> Self {
         Self {
             ident,
             ret_type,

@@ -42,11 +42,23 @@ FunctionReturnType ::= "->" Type ;
 Type ::= Identifier ;
 ```
 ```
-Expression ::= Block | IntegerLiteralExpression | ReturnExpression ;
+Expression ::= 
+      Block 
+    | LiteralExpression
+    | OperatorExpression
+    | ReturnExpression ;
 
 Block ::= "{" Statement* "}"
 
-IntegerLiteralExpression ::= IntegerLiteral ;
+LiteralExpression ::= IntegerLiteral ;
+
+OperatorExpression ::= BinaryOperatorExpression ;
+BinaryOperatorExpression ::= ArithmeticOperatorExpression ;
+ArithmeticOperatorExpression ::=
+      Expression "+" Expression
+    | Expression "-" Expression
+    | Expression "*" Expression
+    | Expression "/" Expression ;
 
 ReturnExpression ::= "ret" Expression ;
 ```

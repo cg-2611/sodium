@@ -4,7 +4,7 @@ use crate::ir::Expr;
 use crate::ty::Type;
 
 pub enum StmtKind<'cx> {
-    ExprStmt(Box<Expr<'cx>>),
+    ExprStmt(Expr<'cx>),
 }
 
 pub struct Stmt<'cx> {

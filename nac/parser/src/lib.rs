@@ -1,4 +1,4 @@
-use ast::{Decl, SourceFile, AST};
+use ast::{SourceFile, AST};
 use range::Range;
 use session::Session;
 use symbol::Ident;
@@ -39,11 +39,11 @@ impl<'a> Parser<'a> {
 
     pub fn parse_source_file(&mut self) -> ParserResult<'a, SourceFile> {
         let start = self.token.range;
-        let mut decls: Vec<Box<Decl>> = Vec::new();
+        let mut decls = Vec::new();
 
         loop {
             match self.parse_decl() {
-                Ok(Some(decl)) => decls.push(Box::new(decl)),
+                Ok(Some(decl)) => decls.push(decl),
                 Ok(None) => break,
                 Err(mut diagnostic) => {
                     diagnostic.emit();

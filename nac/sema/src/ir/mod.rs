@@ -1,7 +1,10 @@
 use range::Range;
 
 pub use self::decl::{Decl, DeclKind, FnDecl};
-pub use self::expr::{Block, Expr, ExprKind, Literal, LiteralKind, RetExpr};
+pub use self::expr::{
+    BinaryExpr, BinaryOperator, Block, Expr, ExprKind, Literal, LiteralKind, RetExpr, UnaryExpr,
+    UnaryOperator,
+};
 pub use self::stmt::{Stmt, StmtKind};
 
 pub mod decl;
@@ -24,12 +27,12 @@ impl<'cx> IR<'cx> {
 }
 
 pub struct SourceFile<'cx> {
-    pub decls: Vec<Box<Decl<'cx>>>,
+    pub decls: Vec<Decl<'cx>>,
     pub range: Range,
 }
 
 impl<'cx> SourceFile<'cx> {
-    pub fn new(decls: Vec<Box<Decl<'cx>>>, range: Range) -> Self {
+    pub fn new(decls: Vec<Decl<'cx>>, range: Range) -> Self {
         Self { decls, range }
     }
 }

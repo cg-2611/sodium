@@ -15,7 +15,7 @@ impl<'cx, 'ast> ASTLower {
     pub fn lower_fn_decl(
         &self,
         fn_decl: &'ast ast::FnDecl,
-        body: Box<Block<'cx>>,
+        body: Block<'cx>,
         ty: Type<'cx>,
     ) -> FnDecl<'cx> {
         FnDecl::new(fn_decl.ident, body, ty, fn_decl.range)

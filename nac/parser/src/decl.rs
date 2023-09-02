@@ -10,7 +10,7 @@ impl<'a> Parser<'a> {
             TokenKind::Keyword(Keyword::Fn) => {
                 let fn_decl = self.parse_fn_decl()?;
                 let fn_decl_range = fn_decl.range;
-                let decl = Decl::new(DeclKind::Fn(Box::new(fn_decl)), fn_decl_range);
+                let decl = Decl::new(DeclKind::Fn(fn_decl), fn_decl_range);
                 Ok(Some(decl))
             }
             _ => Err(self.parser_error("expected decl", self.token.range)),

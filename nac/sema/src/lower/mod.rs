@@ -15,7 +15,7 @@ impl<'cx, 'ast> ASTLower {
     pub fn lower_source_file(
         &self,
         source_file: &'ast ast::SourceFile,
-        decls: Vec<Box<Decl<'cx>>>,
+        decls: Vec<Decl<'cx>>,
     ) -> SourceFile<'cx> {
         SourceFile::new(decls, source_file.range)
     }

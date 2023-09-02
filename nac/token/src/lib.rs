@@ -17,12 +17,16 @@ pub enum TokenKind {
     IntegerLiteral(i32),
 
     // symbols
-    Arrow,      // "->"
-    LeftBrace,  // "{"
-    RightBrace, // "}"
-    LeftParen,  // "("
-    RightParen, // ")"
-    Semicolon,  // ";"
+    Arrow,      // ->
+    LeftBrace,  // {
+    RightBrace, // }
+    LeftParen,  // (
+    RightParen, // )
+    Semicolon,  // ;
+    Add,        // +
+    Subtract,   // -
+    Multiply,   // *
+    Divide,     // /
 
     // misc
     EOF,

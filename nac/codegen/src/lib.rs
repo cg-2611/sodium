@@ -1,7 +1,7 @@
 use llvm::{LLVMBuilder, LLVMContext, LLVMModule, Type, Value};
 use sema::ir::{
-    Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal, LiteralKind, RetExpr, SourceFile, Stmt,
-    StmtKind, IR,
+    BinaryExpr, BinaryOperator, Block, Decl, DeclKind, Expr, ExprKind, FnDecl, Literal,
+    LiteralKind, RetExpr, SourceFile, Stmt, StmtKind, UnaryExpr, UnaryOperator, IR,
 };
 use sema::ty;
 use session::Session;
@@ -104,16 +104,11 @@ impl<'cx, 'ir> CodeGen<'cx> {
     pub fn codegen_expr(&self, expr: &'ir Expr<'_>) -> CodeGenResult<'cx, Option<Value>> {
         match &expr.kind {
             ExprKind::Block(block) => self.codegen_block(block),
-            ExprKind::Ret(ret_expr) => self.codegen_ret_expr(ret_expr),
             ExprKind::Literal(literal) => self.codegen_literal(literal),
+            ExprKind::Unary(unary_expr) => self.codegen_unary_expr(unary_expr),
+            ExprKind::Binary(binary_expr) => self.codegen_binary_expr(binary_expr),
+            ExprKind::Ret(ret_expr) => self.codegen_ret_expr(ret_expr),
         }
-    }
-
-    pub fn codegen_ret_expr(
-        &self,
-        ret_expr: &'ir RetExpr<'_>,
-    ) -> CodeGenResult<'cx, Option<Value>> {
-        self.codegen_expr(&ret_expr.expr)
     }
 
     pub fn codegen_literal(&self, literal: &'ir Literal<'_>) -> CodeGenResult<'cx, Option<Value>> {
@@ -125,6 +120,47 @@ impl<'cx, 'ir> CodeGen<'cx> {
         };
 
         Ok(literal)
+    }
+
+    pub fn codegen_unary_expr(
+        &self,
+        unary_expr: &'ir UnaryExpr<'_>,
+    ) -> CodeGenResult<'cx, Option<Value>> {
+        let expr_value = self.codegen_expr(&unary_expr.expr)?.unwrap();
+        let unary_expr_value = match unary_expr.operator {
+            UnaryOperator::Negate => self.builder.build_int_negation(expr_value),
+        };
+
+        Ok(Some(unary_expr_value))
+    }
+
+    pub fn codegen_binary_expr(
+        &self,
+        binary_expr: &'ir BinaryExpr<'_>,
+    ) -> CodeGenResult<'cx, Option<Value>> {
+        let lhs = self.codegen_expr(&binary_expr.lhs)?.unwrap();
+        let rhs = self.codegen_expr(&binary_expr.rhs)?.unwrap();
+
+        let binary_expr_value = match binary_expr.operator {
+            BinaryOperator::Add => self.builder.build_int_add(lhs, rhs),
+            BinaryOperator::Subtract => self.builder.build_int_subtract(lhs, rhs),
+            BinaryOperator::Multiply => self.builder.build_int_multiply(lhs, rhs),
+            BinaryOperator::Divide => {
+                return Err(self.codegen_error(
+                    "cannot generate llvm ir for divide operation",
+                    binary_expr.range,
+                ))
+            }
+        };
+
+        Ok(Some(binary_expr_value))
+    }
+
+    pub fn codegen_ret_expr(
+        &self,
+        ret_expr: &'ir RetExpr<'_>,
+    ) -> CodeGenResult<'cx, Option<Value>> {
+        self.codegen_expr(&ret_expr.expr)
     }
 
     pub fn type_to_llvm_type(&self, ty: &ty::Type<'_>) -> CodeGenResult<'cx, Type> {

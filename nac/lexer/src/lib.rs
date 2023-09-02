@@ -40,7 +40,6 @@ impl<'a, 'src> Lexer<'a, 'src> {
                 TokenKind::Unknown(c) => {
                     let message = format!("unrecognized token '{}'", c);
                     sess.create_ranged_error(message, token.range).emit();
-
                     tokens.push(token);
                 }
                 _ => tokens.push(token),
@@ -58,15 +57,21 @@ impl<'a, 'src> Lexer<'a, 'src> {
         let token_kind = match first_char {
             c if is_identifier_start(c) => self.tokenize_identifier(c, start),
             c if is_base_10_digit(c) => self.tokenize_integer_literal(c),
-            '-' => match self.advance() {
-                '>' => TokenKind::Arrow,
-                _ => TokenKind::Unknown(first_char), // temporary until '-' is a valid token_mod
+            '-' => match self.peek() {
+                '>' => {
+                    self.advance();
+                    TokenKind::Arrow
+                }
+                _ => TokenKind::Subtract,
             },
             '{' => TokenKind::LeftBrace,
             '}' => TokenKind::RightBrace,
             '(' => TokenKind::LeftParen,
             ')' => TokenKind::RightParen,
             ';' => TokenKind::Semicolon,
+            '+' => TokenKind::Add,
+            '*' => TokenKind::Multiply,
+            '/' => TokenKind::Divide,
             '\0' => TokenKind::EOF,
             _ => TokenKind::Unknown(first_char),
         };

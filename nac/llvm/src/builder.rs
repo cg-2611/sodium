@@ -1,6 +1,7 @@
-use crate::{BasicBlock, GetRef, LLVMContext, Value};
+use crate::{BasicBlock, GetRef, LLVMContext, LLVMString, Value};
 use llvm_sys::core::{
-    LLVMBuildRet, LLVMBuildRetVoid, LLVMDisposeBuilder, LLVMPositionBuilderAtEnd,
+    LLVMBuildAdd, LLVMBuildMul, LLVMBuildNeg, LLVMBuildRet, LLVMBuildRetVoid, LLVMBuildSub,
+    LLVMDisposeBuilder, LLVMPositionBuilderAtEnd,
 };
 use llvm_sys::prelude::LLVMBuilderRef;
 use std::marker::PhantomData;
@@ -29,6 +30,47 @@ impl<'cx> LLVMBuilder<'cx> {
 
     pub fn position_at_end(&self, block: &BasicBlock) {
         unsafe { LLVMPositionBuilderAtEnd(self.get_ref(), block.get_ref()) }
+    }
+
+    pub fn build_int_add(&self, lhs: Value, rhs: Value) -> Value {
+        let name = LLVMString::from("int_add");
+        unsafe {
+            Value::new(LLVMBuildAdd(
+                self.builder,
+                lhs.get_ref(),
+                rhs.get_ref(),
+                name.ptr,
+            ))
+        }
+    }
+
+    pub fn build_int_subtract(&self, lhs: Value, rhs: Value) -> Value {
+        let name = LLVMString::from("int_subtract");
+        unsafe {
+            Value::new(LLVMBuildSub(
+                self.builder,
+                lhs.get_ref(),
+                rhs.get_ref(),
+                name.ptr,
+            ))
+        }
+    }
+
+    pub fn build_int_multiply(&self, lhs: Value, rhs: Value) -> Value {
+        let name = LLVMString::from("int_multiply");
+        unsafe {
+            Value::new(LLVMBuildMul(
+                self.builder,
+                lhs.get_ref(),
+                rhs.get_ref(),
+                name.ptr,
+            ))
+        }
+    }
+
+    pub fn build_int_negation(&self, value: Value) -> Value {
+        let name = LLVMString::from("int_negation");
+        unsafe { Value::new(LLVMBuildNeg(self.builder, value.get_ref(), name.ptr)) }
     }
 }
 
