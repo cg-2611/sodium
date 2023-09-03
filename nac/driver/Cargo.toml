@@ -1,0 +1,17 @@
+[package]
+name = "driver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+arena = { path = "../arena" }
+codegen = { path = "../codegen" }
+errors = { path = "../errors" }
+lexer = { path = "../lexer" }
+llvm = { path = "../llvm" }
+parser = { path = "../parser" }
+sema = { path = "../sema" }
+session = { path = "../session" }
+source = { path = "../source" }
+symbol = { path = "../symbol" }
+target = { path = "../target" }

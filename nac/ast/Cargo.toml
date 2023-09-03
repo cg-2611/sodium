@@ -1,0 +1,9 @@
+[package]
+name = "ast"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+session = {path = "../session"}
+symbol = { path = "../symbol" }
+range = { path = "../range" }

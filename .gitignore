@@ -1,5 +1,11 @@
 .DS_Store
 
-.cache/
+.idea/
 .vscode/
-build/
+
+/build/
+/target/
+
+/examples/*
+!/examples/*.na
+

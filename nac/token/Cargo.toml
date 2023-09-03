@@ -1,0 +1,8 @@
+[package]
+name = "token"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+range = { path = "../range" }
+symbol = { path = "../symbol" }

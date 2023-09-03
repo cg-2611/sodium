@@ -1,0 +1,3 @@
+[workspace]
+members = ["nac/*"]
+resolver = "2"
