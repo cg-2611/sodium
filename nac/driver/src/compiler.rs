@@ -36,7 +36,7 @@ pub fn compile_file(path: &str) -> NACResult<()> {
 
     let llvm_context = LLVMContext::create();
     let module = run_pass(&sess, || {
-        CodeGen::codegen(&sess, &llvm_context, "module", ir)
+        CodeGen::codegen(&sess, &llvm_context, sess.output().name(), ir)
     })?;
 
     run_pass(&sess, || TargetGen::compile_module(&sess, &module))?;
