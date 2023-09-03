@@ -6,8 +6,8 @@ use tempfile::{Builder, TempDir};
 
 use crate::{TargetGen, TargetGenResult};
 
-impl<'ctx> TargetGen<'ctx> {
-    pub fn link(&self) -> TargetGenResult<'ctx, ()> {
+impl<'a> TargetGen<'a> {
+    pub fn link(&self) -> TargetGenResult<'a, ()> {
         let tempdir = Builder::new()
             .prefix("nac_")
             .tempdir()
@@ -21,7 +21,7 @@ impl<'ctx> TargetGen<'ctx> {
         Ok(())
     }
 
-    fn get_object_file_path(&self, tempdir: &TempDir) -> TargetGenResult<'ctx, String> {
+    fn get_object_file_path(&self, tempdir: &TempDir) -> TargetGenResult<'a, String> {
         let tempdir_path = tempdir
             .path()
             .to_str()
@@ -33,7 +33,12 @@ impl<'ctx> TargetGen<'ctx> {
             .as_nanos();
 
         let process_id = std::process::id();
-        let filename = format!("{}_{}_main.o", process_id, timestamp);
+        let filename = format!(
+            "{}_{}_{}.o",
+            process_id,
+            timestamp,
+            self.sess.output().name()
+        );
 
         std::fs::create_dir_all(tempdir_path)
             .map_err(|error| self.error_create_directories(error))?;
@@ -47,17 +52,17 @@ impl<'ctx> TargetGen<'ctx> {
         Ok(path)
     }
 
-    pub fn write_object_file(&self, path: &str) -> TargetGenResult<'ctx, ()> {
+    pub fn write_object_file(&self, path: &str) -> TargetGenResult<'a, ()> {
         self.target_machine
             .write_to_file(self.module, path)
             .map_err(|message| self.target_gen_error(message.as_string()))
     }
 
-    pub fn link_executable(&self, path: &str) -> TargetGenResult<'ctx, ()> {
+    pub fn link_executable(&self, path: &str) -> TargetGenResult<'a, ()> {
         let linker_status = Command::new("clang")
             .arg(path)
             .arg("-o")
-            .arg("./main")
+            .arg(self.sess.output().path())
             .status()
             .map_err(|error| self.error_invoking_linker(error))?;
 

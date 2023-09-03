@@ -3,10 +3,10 @@ use errors::{Diagnostic, ErrorOccurred, NACResult};
 use lexer::Lexer;
 use llvm::LLVMContext;
 use parser::Parser;
-use sema::ty::context::{TypeArena, TypeContext};
+use sema::ty::{TypeArena, TypeContext};
 use sema::Sema;
 use session::Session;
-use source::file::SourceFileReader;
+use source::SourceFileReader;
 use target::TargetGen;
 
 pub fn run_pass<'a, T>(
@@ -19,15 +19,15 @@ pub fn run_pass<'a, T>(
 }
 
 pub fn compile_file(path: &str) -> NACResult<()> {
-    let sess = Session::new();
+    let sess = Session::new(path)?;
 
     let src_file = run_pass(&sess, || {
-        SourceFileReader::source_file_from_path(&sess, path)
+        SourceFileReader::source_file_from_path(&sess, sess.input().path())
     })?;
 
     let token_stream = run_pass(&sess, || Lexer::tokenize(&sess, src_file.contents()))?;
     let ast = run_pass(&sess, || Parser::parse(&sess, token_stream))?;
-    
+
     let type_arena = TypeArena::new();
 
     let ir = TypeContext::create_and_enter(&sess, &type_arena, |tcx| {
