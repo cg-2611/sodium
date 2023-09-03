@@ -45,16 +45,21 @@ Type ::= Identifier ;
 Expression ::= 
       Block 
     | LiteralExpression
-    | OperatorExpression
+    | Unary Expression
+    | BinaryExpression
     | ReturnExpression ;
 
 Block ::= "{" Statement* "}"
 
 LiteralExpression ::= IntegerLiteral ;
 
-OperatorExpression ::= BinaryOperatorExpression ;
-BinaryOperatorExpression ::= ArithmeticOperatorExpression ;
-ArithmeticOperatorExpression ::=
+UnaryExpression ::= UnaryOperatorExpression ;
+UnaryOperatorExpression ::= UnaryAritmeticOperatorExpression ;
+UnaryAritmeticOperatorExpression:: = "-" Expression ;
+
+BinaryExpression ::= BinaryOperatorExpression ;
+BinaryOperatorExpression ::= BinaryArithmeticOperatorExpression ;
+BinaryArithmeticOperatorExpression ::=
       Expression "+" Expression
     | Expression "-" Expression
     | Expression "*" Expression
