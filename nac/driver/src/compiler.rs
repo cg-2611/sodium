@@ -9,10 +9,10 @@ use session::Session;
 use source::SourceFileReader;
 use target::TargetGen;
 
-pub fn run_pass<'a, T>(
-    sess: &Session,
-    pass: impl FnOnce() -> Result<T, Diagnostic<'a, ErrorOccurred>>,
-) -> NACResult<T> {
+pub fn run_pass<'a, T, P>(sess: &Session, pass: P) -> NACResult<T>
+where
+    P: FnOnce() -> Result<T, Diagnostic<'a, ErrorOccurred>>,
+{
     let result = pass().map_err(|mut error| error.emit())?;
     sess.has_errors()?;
     Ok(result)

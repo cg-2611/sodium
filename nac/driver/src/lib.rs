@@ -5,7 +5,10 @@ pub mod compiler;
 const EXIT_SUCCESS: i32 = 0;
 const EXIT_FAILURE: i32 = 1;
 
-fn catch_unwind_with_exit_code(f: impl FnOnce() -> NACResult<()>) -> i32 {
+fn catch_unwind_with_exit_code<F>(f: F) -> i32
+where
+    F: FnOnce() -> NACResult<()>,
+{
     let result = f();
     match result {
         Ok(_) => EXIT_SUCCESS,
