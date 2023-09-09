@@ -24,8 +24,8 @@ impl<'a> Diagnostic<'a, ErrorOccurred> {
         }
     }
 
-    pub fn set_range(&mut self, range: Range) {
-        self.data.set_range(range);
+    pub fn set_location(&mut self, file: String, range: Range) {
+        self.data.set_location(file, range);
     }
 }
 
@@ -59,36 +59,70 @@ impl<E: EmissionPending> Drop for Diagnostic<'_, E> {
     }
 }
 
+pub struct DiagnosticLocation {
+    file: String,
+    range: Range,
+}
+
+impl DiagnosticLocation {
+    pub fn new(file: String, range: Range) -> Self {
+        Self { file, range }
+    }
+
+    pub fn file(&self) -> &String {
+        &self.file
+    }
+
+    pub fn range(&self) -> &Range {
+        &self.range
+    }
+}
+
 #[derive(Debug)]
 enum DiagnosticLevel {
     Error,
 }
 
+impl DiagnosticLevel {
+    pub fn to_str(&self) -> &str {
+        match self {
+            DiagnosticLevel::Error => "error",
+        }
+    }
+}
+
 struct DiagnosticData {
+    location: Option<DiagnosticLocation>,
     level: DiagnosticLevel,
     message: String,
-    range: Option<Range>,
 }
 
 impl DiagnosticData {
     fn new_error(message: String) -> Self {
         Self {
+            location: None,
             level: DiagnosticLevel::Error,
             message,
-            range: None,
         }
     }
 
-    fn set_range(&mut self, range: Range) {
-        self.range = Some(range);
+    fn set_location(&mut self, file: String, range: Range) {
+        self.location = Some(DiagnosticLocation::new(file, range));
     }
 }
 
 impl Display for DiagnosticData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.range {
-            Some(range) => write!(f, "{:?}: {}: {}", self.level, range, self.message),
-            None => write!(f, "{:?}: {}", self.level, self.message),
+        match &self.location {
+            Some(diagnostic_location) => write!(
+                f,
+                "{}:{}: {}: {}",
+                diagnostic_location.file,
+                diagnostic_location.range.start(),
+                self.level.to_str(),
+                self.message
+            ),
+            None => write!(f, "{}: {}", self.level.to_str(), self.message),
         }
     }
 }

@@ -74,7 +74,7 @@ impl Session {
                     "invalid path {:?}: failed to determine output file name",
                     path
                 );
-                return Err(diagnostic_handler.create_error(message).emit());
+                return Err(diagnostic_handler.create_error( message).emit());
             }
         };
 
@@ -98,11 +98,11 @@ impl Session {
         message: String,
         range: Range,
     ) -> Diagnostic<'_, ErrorOccurred> {
-        self.diagnostic_handler.create_ranged_error(message, range)
+        self.diagnostic_handler.create_ranged_error(message, self.input.name().to_string(), range)
     }
 
     pub fn create_error(&self, message: String) -> Diagnostic<'_, ErrorOccurred> {
-        self.diagnostic_handler.create_error(message)
+        self.diagnostic_handler.create_error( message)
     }
 
     pub fn error_count(&self) -> usize {
