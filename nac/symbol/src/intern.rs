@@ -7,15 +7,15 @@ use std::rc::Rc;
 use crate::Symbol;
 
 #[derive(Clone, Hash, Eq, PartialEq)]
-pub struct InternedString(Rc<String>);
+pub struct InternedString(Rc<str>);
 
 impl InternedString {
     pub fn new(string: &str) -> Self {
-        Self(Rc::new(string.to_string()))
+        Self(Rc::from(string))
     }
 
     pub fn as_str(&self) -> &str {
-        self.0.as_str()
+        self.0.borrow()
     }
 }
 
